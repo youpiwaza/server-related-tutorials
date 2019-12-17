@@ -7,5 +7,6 @@ Flemme de faire les nav links, n'hésitez pas à fouiller dans les dossiers.
 
 ## Notes
 
-- Running on windows 10
-- Commands not lunched from powershell but from Node.js command prompt (i'll probably switch soon x))
+- Je recommande d'installer un plugin de coloration syntaxique pour dockerfile x)
+- Testé via Docker desktop
+- Testé sur WSL (plus tard)
