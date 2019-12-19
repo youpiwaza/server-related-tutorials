@@ -1,8 +1,8 @@
 # Installation
 
-[docker doc ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+Installation sur WLS pour que cela soit plus proche de l'environnement serveur
 
-(installation..)
+[docker doc ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
 ```
 sudo docker run hello-world
@@ -12,4 +12,75 @@ See 'docker run --help'.
 
 *sigh*
 
-[Plus tard..](https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly)
+- [Docker on WLS](https://nickjanetakis.com/blog/setting-up-docker-for-windows-and-wsl-to-work-flawlessly)
+	- [Installation Docker sur ubuntu officiel (maintenu)](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
+	- Installation docker compose ko > [SO / Installation DC](https://stackoverflow.com/a/36689427/12026487)
+
+En gros, on fait tourner Docker desktop qui fait tourner le daemon Docker parfaitement sous windows, et on s'y connecte via WLS
+
+Steps :
+
+- Installations docker & docker compose ok
+- Path ok
+- WSL pour se connecter au docker windows ok
+- Vérifications > KO
+	- Variable d'environnement DOCKER_HOST KO [SO](https://stackoverflow.com/questions/25225206/exporting-docker-host-in-bashrc-produces-a-different-result-to-the-same-command)
+	- Solution > exécuter directement la création de la variable d'environnement :
+		- Note : Cela ne fonctionne que pour l'utilisateur courant...
+	
+```
+// Dans le terminal 
+> export DOCKER_HOST=tcp://localhost:2375 
+> echo "Docker Host is set to ${DOCKER_HOST}" 
+// Vérification 
+> docker info
+```
+
+- Vérification docker-compose > KO
+	- Installation classique plutôt que par pip [SO / Installation DC](https://stackoverflow.com/a/36689427/12026487)
+	- `> docker-compose --version` ok
+
+- Correction volumes
+	- /mnt/c/ > /c/
+	- Non testé
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+//
