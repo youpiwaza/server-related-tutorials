@@ -1,0 +1,4 @@
+FROM nginx:1.17.6-alpine
+COPY static-html-directory /usr/share/nginx/html
+# KO, la syntaxe entre la doc Dockerfile et la doc Docker volume ne correspond a rien
+VOLUME /nginx-vol
