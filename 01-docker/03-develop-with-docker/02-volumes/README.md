@@ -228,6 +228,84 @@ Création d'un nouveau build qui va copier depuis le dossier courant .
 Cay vraiment kewl
 
 
+### Backups & restauration
+
+Création de conteneur et de volumes anonymes à la volée, pour effectuer des actions sur des volumes (pas d'accès direct au volumes sans plugins)
+
+Note : l'argument `--rm` permet de supprimer automatiquement les volumes anonymes à la destruction du conteneur auquel il est attaché.
+
+
+#### Sauvegarde de volumes
+
+Possibilité d'utiliser `--volumes-from` en argument de `docker run` afin de monter un conteneur avec un volume pré-éxistant.
+
+- Possibilité de monter directement un volume (pas besoin qu'il soit rattaché pour sauvegarder)
+
+One liner backup
+
+1. On crée un conteneur qui va
+2. *bind (volume)* > se connecter à un répertoire de l'hôte (via `-v`, dans le répertoire `/backup`)
+3. monter le volume à sauvegarder (à partir du conteneur auquel il est attaché),
+  - Je pense qu'il reste possible de passer par mount..
+4. faire une copie de son contenu,
+5. la zipper,
+6. et la copier à la fois dans le répertoire `/backup`, ainsi que dans le répertoire courant (`$(pwd)`) de l'hôte (grâce au bind)
+7. Puis le conteneur est détruit, vu qu'il ne fait plus rien
+
+```
+// docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+
+// Attention, on passe le conteneur concerné avec --volume-from, et NON le volume, NI le nom du build !
+// En gros le tout dernier paramètre c'est le répertoire (contenu dans le volume) à sauvegarder
+// Le reste ne bouge pas
+> docker run --rm \
+  --volumes-from test-volumes-nginx \
+  -v $(pwd):/backup \
+  alpine:latest \
+  tar cvf /backup/backup.tar /usr/share/nginx/html
+```
+
+---
+
+Essai en montant correctement les volumes (pour *bind* on rajoute `type=bind,`)
+
+```
+> docker run --rm \
+  --mount source=nginx-vol,destination=/home/volumeContent \
+  --mount type=bind,source=$(pwd),target=/backup \
+  alpine:latest \
+  tar cvf /backup/backup2.tar "/home/volumeContent"
+```
+
+OK :D
+
+En gros
+
+1. On monte le *volume* (directement, sans passer par le conteneur) "nginx-vol", dans le dossier "/home/volumeContent" de notre nouveau conteneur
+2. On *bind* le répertoire courant de l'hôte (~dossier courant du terminal, en passant par le cli) au répertoire "/backup" du conteneur
+3. On zip  "/home/volumeContent" dans le fichier "backup2.tar", qui se trouvera dans "/backup"
+4. Cela copie dans le répertoire courant grâce au *bind*.
+
+
+#### Restaurer
+
+One liner
+
+```
+docker run --rm --volumes-from dbstore2 -v $(pwd):/backup ubuntu bash -c "cd /dbdata && tar xvf /backup/backup.tar --strip 1"
+```
+
+1. Nouveau conteneur, monté avec le même volume que le conteneur  dbstore2
+2. *bind* le repertoire courant de l'hôte avec le répertoire "/backup" du nouveau conteneur
+3. On demande au shell d'exécuter
+  1. Go dans "/dbdata" // Le répertoire arbitraire ou sont stockées les données du build, correspond à "/usr/share/nginx/html" dans les exemples précédents
+  2. Y extraire "/backup/backup.tar" (Le fichier est présent dans le novueau conteneur car il est également présent dans le répertoire courant de l'hôte (*bind*))
+
+**non testé, + meilleure écriture (cf. backup)**
+
+
+
+
 
 
 
