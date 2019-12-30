@@ -1,0 +1,3 @@
+FROM nginx:1.17.6-alpine
+# context ./another-static-html-directory
+COPY . /usr/share/nginx/html

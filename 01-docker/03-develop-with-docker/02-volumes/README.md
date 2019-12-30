@@ -304,6 +304,96 @@ docker run --rm --volumes-from dbstore2 -v $(pwd):/backup ubuntu bash -c "cd /db
 **non testé, + meilleure écriture (cf. backup)**
 
 
+## Bind
+
+[bind mounts](https://docs.docker.com/storage/bind-mounts/)
+
+Grosso merdo même comportement que volume, mais le dossier *source* provient du conteneur source.
+
+```
+// Création d'un conteneur nginx alakon, avec le fichier html de base bindé à un fichier local
+> docker run -d \
+  --name=nginxtest \
+  -p 8080:80 \
+  --mount type=bind,source="$(pwd)"/to-bind-html-directory,target=/usr/share/nginx/html \
+  nginx:1.17.6-alpine
+```
+
+1. Go sur le [localhost](http://localhost:8080/) // ok
+2. Modifier le fichier local (hôte) ./to-bind-html-directory/index.html
+3. Besoin de réactualiser afin que le navigateur répercute les changements :)
+
+Note : Possibilité de *bind* un dossier différent des sources, typiquement un dossier /prod
+
+---
+
+Prochaine étape, faire tourner le HMR :
+
+- A priori on peut passer par webpack ou par gulp
+- Le but serait de bind le dossier hôte, et de faire tourner gulp-watch sur le container, sur le dossier bindé..
+- [Vidéo grafikart environnement de dev](https://www.youtube.com/watch?v=F9R1EOaA7EA)
+
+
+**CONFIGURATION VIA BIND !**
+
+[Grafikart env de dev](https://youtu.be/F9R1EOaA7EA?t=1000)
+
+On rajoute des fichiers dans le conteneur (ou on écrase des fichiers) ! On remplace la conf à la volée.
+
+
+### Configuration du bind dans le fichier (docker compose)
+
+- *Fichier docker-compose4.yml*
+- *Dossier /to-bind-html-directory*
+
+Création de l'image nginx de base, avec définition des ports
+
+```
+version: '3.7'
+
+services:
+  test-compose-bind:
+    image: nginx:1.17.6-alpine
+    ports:
+      - '8080:80'
+```
+
+Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
+
+```
+> docker stack deploy -c docker-compose4.yml swarm-compose-bind
+```
+
+Test sur le [localhost](http://localhost:8080/) // ok */!\ Toujours une petite latence au lancement du service !*
+
+Arrêt du service
+
+```
+docker stack rm swarm-compose-bind
+```
+
+Ajout du bind
+
+```
+  test-compose-bind:
+    # [...]
+    volumes:
+      - type: bind
+        source: ./to-bind-html-directory
+        target: /usr/share/nginx/html
+```
+
+(Relancer service & tester (localhost > changer fichier > actualiser > okay))
+
+
+
+
+
+
+
+
+
+
 
 
 

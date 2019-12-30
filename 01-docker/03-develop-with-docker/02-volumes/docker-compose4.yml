@@ -1,0 +1,11 @@
+version: '3.7'
+
+services:
+  test-compose-bind:
+    image: nginx:1.17.6-alpine
+    ports:
+      - '8080:80'
+    volumes:
+      - type: bind
+        source: ./to-bind-html-directory
+        target: /usr/share/nginx/html
