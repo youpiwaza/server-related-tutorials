@@ -1,0 +1,36 @@
+version: '3'
+services:
+  nginx:
+    build:
+        context: ./containers/nginx
+    container_name: nginx
+    restart: unless-stopped
+    volumes:
+        - ./:/var/www
+        - ./containers/logs/nginx/:/var/log/nginx
+    tty: true
+    ports:
+      - "80:80"
+      - "443:443"
+    depends_on:
+      - php-fpm
+    links:
+      - php-fpm
+    networks:
+      - app-network
+  php-fpm:
+    build:
+        context: ./containers/php-fpm
+    container_name: php-fpm
+    restart: unless-stopped
+    volumes:
+      - ./:/var/www
+    ports:
+      - "9000"
+    networks:
+      - app-network
+
+#Docker Networks
+networks:
+  app-network:
+    driver: bridge
