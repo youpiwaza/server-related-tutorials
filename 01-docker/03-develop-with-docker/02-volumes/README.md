@@ -369,7 +369,7 @@ Test sur le [localhost](http://localhost:8080/) // ok */!\ Toujours une petite l
 Arrêt du service
 
 ```
-docker stack rm swarm-compose-bind
+> docker stack rm swarm-compose-bind
 ```
 
 Ajout du bind
