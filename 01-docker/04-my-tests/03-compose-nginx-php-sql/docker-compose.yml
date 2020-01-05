@@ -25,6 +25,7 @@ services:
       - type: bind
         source: ./config/nginx1.17.6-alpine/etc/nginx/conf.d/site.conf
         target: /etc/nginx/conf.d/site.conf
+  
   phpfpm:
     # latest when writing
     image: 'php:7.4.1-fpm'
@@ -36,6 +37,32 @@ services:
       - type: bind
         source: ./src
         target: /home/www
-
+  
+  db:
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_ROOT_PASSWORD: pizza
+    # latest when writing
+    image: 'mysql:8.0.18'
+    restart: always
+    #secrets:
+    #- MYSQL_ROOT_PASSWORD
+    volumes:
+      # Autommatically loaded thanks to default my.cnf > '!includedir /etc/mysql/conf.d/'
+      - type: bind
+        source: ./config/mysql8.0.18/_defaults/etc/mysql/conf.d/my-conf.cnf
+        target: /etc/mysql/conf.d/my-conf.cnf
+  
+  adminer:
+    # latest when writing
+    image: 'adminer:4.7.5'
+    ports:
+      # Running on port 8081 as 8080 is already used by web
+      - 8081:8080
+      
 networks:
   network-php:
+
+#secrets:
+#  MYSQL_ROOT_PASSWORD:
+#    file: ./secrets/mysql/MYSQL_ROOT_PASSWORD.txt
