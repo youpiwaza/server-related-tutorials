@@ -54,6 +54,9 @@ services:
     secrets:
     - MYSQL_ROOT_PASSWORD
     volumes:
+      - type: bind
+        source: ./config/mysql8.0.18/etc/mysql/my.cnf
+        target: /etc/mysql/my.cnf
       # Automatically loaded thanks to default my.cnf > '!includedir /etc/mysql/conf.d/'
       - type: bind
         source: ./config/mysql8.0.18/etc/mysql/conf.d/my-conf.cnf

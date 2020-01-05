@@ -240,7 +240,7 @@ volumes:
 
 
 
-## Sécurité / Docker secrets
+## Sécurité / Docker secrets / KO AVEC PLUGIN DE MERDE mysql connect
 
 Bonnes pratiques + s'entrainer un peu, un [exemple](https://github.com/docker-library/mysql/issues/414).
 
@@ -294,11 +294,27 @@ EDIT : essai avec swarm (`docker stack...`) ok une fois, mais en fait non, ça p
 // TODO #cancer
 
 
+### Essai résolutions warnings
+
+#### Warning symbolic links
+
+[github issue](https://github.com/docker-library/mysql/issues/591) > reco changement conf de base
+
+Surcharge de `my.cnf` via bind > commenter le bousin.
 
 
+#### Warning CA certificate ca.pem is self signed
+
+https://i-mscp.net/thread/16232-ca-certificate-ca-pem-is-self-signed-reported-by-mysql/
+
+Osef
 
 
+#### Insecure configuration for --pid-file
 
+`Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.`
+
+Rien sur le net, pas le courage
 
 
 
