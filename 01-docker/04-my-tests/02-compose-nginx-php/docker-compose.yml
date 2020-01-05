@@ -25,6 +25,7 @@ services:
       - type: bind
         source: ./config/nginx1.17.6-alpine/etc/nginx/conf.d/site.conf
         target: /etc/nginx/conf.d/site.conf
+  
   phpfpm:
     # latest when writing
     image: 'php:7.4.1-fpm'

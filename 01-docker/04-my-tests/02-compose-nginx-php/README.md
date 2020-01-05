@@ -28,13 +28,13 @@ Solution : écraser ce fichier par un fichier vide, puis ajouter notre confiurat
 Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
 
 ```
-> docker stack deploy -c docker-compose.yml swarm-php-sql
+> docker stack deploy -c docker-compose.yml swarm-php
 ```
 
 Arrêt du service
 
 ```
-> docker stack rm swarm-php-sql
+> docker stack rm swarm-php
 ```
 
 **Notes**
