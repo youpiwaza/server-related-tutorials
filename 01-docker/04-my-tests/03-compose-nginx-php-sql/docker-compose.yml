@@ -6,7 +6,7 @@ services:
     # latest when writing
     image: nginx:1.17.6-alpine
     networks:
-      - network-php
+      - network-php-sql
     ports:
       - '8080:80'
     volumes:
@@ -28,9 +28,15 @@ services:
   
   phpfpm:
     # latest when writing
-    image: 'php:7.4.1-fpm'
+    #image: 'php:7.4.1-fpm'
+    
+    # Custom image to install php PDO extensions
+    build:
+      context: ./
+      dockerfile: DockerfilePhpWithPdo
+    
     networks:
-      - network-php
+      - network-php-sql
     volumes:
       # Project files, bind mount for dev
       # Php-fpm needs access to sources files to, else he can't access them due to containerisation
@@ -50,6 +56,9 @@ services:
     
     # latest when writing
     image: 'mysql:8.0.18'
+    networks:
+      - network-php-sql
+      - network-sql-adminer
     restart: always
     secrets:
     - MYSQL_ROOT_PASSWORD
@@ -74,12 +83,15 @@ services:
       ADMINER_DESIGN: 'pappu687'
     # latest when writing
     image: 'adminer:4.7.5'
+    networks:
+      - network-sql-adminer
     ports:
       # Running on port 8081 as 8080 is already used by web
       - 8081:8080
       
 networks:
-  network-php:
+  network-php-sql:
+  network-sql-adminer:
 
 secrets:
   MYSQL_ROOT_PASSWORD:

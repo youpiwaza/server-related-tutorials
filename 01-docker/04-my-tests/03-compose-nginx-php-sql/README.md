@@ -318,9 +318,25 @@ Rien sur le net, pas le courage
 
 
 
+## Requête PHP alaakon
 
+Réutilisation d'un vieux script PDO > could not find driver.
 
+Besoin d'installer PDO > [github issue](https://github.com/docker-library/docs/issues/723#issuecomment-405196521) & [Another one](https://github.com/docker-library/php/issues/62)
 
+Création d'une image dédiée `DockerfilePhpWithPdo`, remplacement dans docker-compose.
+
+Attention ! Lors de la connexion à la bdd via PHP
+
+- Bien spécifier l'hôte de la connexion PDO comme docker : `$host = "db_tartopaum";`
+  - (Pas oublier login/pass.. Et adapter nom bdd, table, champ)
+- PHP et SQL doivent faire partie du même network
+  - **Un network est créé par défaut entre MySQL & adminer, et ce dernier se fait oblitérer si définition d'un réseau explicite pour mysql**
+    - Solutions :
+      - ~~Mettre tlm sur le même réseau~~ // sécu
+      - Créer un réseau explicite dédié entre sql & adminer
+
+Yay, tout good
 
 
 

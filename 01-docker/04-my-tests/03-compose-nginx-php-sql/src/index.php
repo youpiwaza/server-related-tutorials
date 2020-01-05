@@ -8,7 +8,12 @@
 </head>
 <body>
 	<h1>Test PHP & MySQL</h1>
-	<p>Test de récupération SQL via PHP : <?php echo 'Fuck yeah'; ?></p>
-	<p><a href="todo.php">Administration SQL</a></p>
+
+	<?php 
+		require_once('_debug.php');
+		require_once('_connexion.php');
+		require_once('requete-alakon.php');
+	?>
+	<p><a href="http://localhost:8081/?server=db_tartopaum&username=bob" target="_blank">Administration SQL</a> / Login <code>bob</code> & pass <code>bobspw</code></p>
 </body>
 </html>
