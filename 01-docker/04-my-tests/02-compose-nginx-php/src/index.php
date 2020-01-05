@@ -10,9 +10,7 @@
 	<h1>Une page PHP classique</h1>
 	<ul>
 		<li><a href="test-php.php">Test PHP</a></li>
-		<li><a href="test-sql.php">Test SQL</a></li>
 	</ul>
 	<p>Test php sur l'index : <?php echo 'Fuck yeah'; ?></p>
-	<?= phpinfo(); ?>
 </body>
 </html>
