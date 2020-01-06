@@ -5,8 +5,7 @@ Pour tester : `docker-compose up`
 Sources :
 
 - *Fichier docker-compose.yml*
-- *Dossier configs /config*
-  - Contient également les configurations par défaut
+- *Fichier docker-compose-whoami.yml*
 
 
 
@@ -31,15 +30,11 @@ Arrêt du service
 **docker-compose CLI avancé**
 
 ```bash
-# Lancer en arrière plan, uniquement le service whoami
+# Lancer en arrière plan, uniquement le service whoami # KO ça lance tout
 > docker-compose up -d whoami
 
 # (compose scale service) # ! KO scale tout
 > docker-compose up -d --scale whoami=2
-
-# swarm scale service
-# > docker service scale SERVICE_NAME=2
-> docker service scale swarm-traefik_whoami=2
 ```
 
 ---
@@ -153,12 +148,9 @@ CONTAINER ID        IMAGE                          COMMAND                  CREA
 1702b37b7c98        containous/whoami              "/whoami"                25 seconds ago      Up 24 seconds       80/tcp                04-traefik_whoami_1
 ```
 
+Mise en place de traefik + swarm dans le test suivant
 
-### Tests via swarm
-
-
-
-
+Note : Je ne suis pas rentré dans la config (statique) de traefik ; je vais voir si il y en a besoin dans l'implémentation avec swarm
 
 
 
