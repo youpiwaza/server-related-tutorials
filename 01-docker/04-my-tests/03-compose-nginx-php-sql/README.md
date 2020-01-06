@@ -355,8 +355,8 @@ Solution : build l'image de PHP avec PDO, la [push sur docker hub](https://hub.d
 # Build
 # /!\ Ne pas oublier le dernier '.' pour le contexte
 > docker build \
--f DockerfilePhpWithPdo \
--t youpiwaza/php-with-pdo:1.0.0 \
+  -f DockerfilePhpWithPdo \
+  -t youpiwaza/php-with-pdo:1.0.0 \
 .
 
 # Push
