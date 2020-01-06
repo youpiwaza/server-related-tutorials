@@ -31,9 +31,12 @@ services:
     #image: 'php:7.4.1-fpm'
     
     # Custom image to install php PDO extensions
-    build:
-      context: ./
-      dockerfile: DockerfilePhpWithPdo
+    # Doesn't work with docker stack (swarm) > build > tag > push
+    #build:
+    #  context: ./
+    #  dockerfile: DockerfilePhpWithPdo
+
+    image: 'youpiwaza/php-with-pdo:1.0.0'
     
     networks:
       - network-php-sql

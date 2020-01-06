@@ -340,6 +340,63 @@ Yay, tout good
 
 
 
+## docker stack deploy Fix
+
+docker-compose.yml > build est KO avec docker stack (swarm) qui n'accepte que les images.
+
+Solution : build l'image de PHP avec PDO, la [push sur docker hub](https://hub.docker.com/repository/docker/youpiwaza/php-with-pdo) & la réutiliser.
+
+1. [Dockerhub](https://docs.docker.com/docker-hub/repos/) > Log in > Création d'un repo
+2. `docker build -t <hub-user>/<repo-name>[:<tag>]`
+3. [CLI login](https://docs.docker.com/engine/reference/commandline/login/) / `docker login login -u=<hub-user>`
+4. `docker push <hub-user>/<repo-name>[:<tag>]`
+
+```bash
+# Build
+# /!\ Ne pas oublier le dernier '.' pour le contexte
+> docker build \
+-f DockerfilePhpWithPdo \
+-t youpiwaza/php-with-pdo:1.0.0 \
+.
+
+# Push
+> ~~docker push youpiwaza/php-with-pdo:1.0.0~~
+# denied: requested access to the resource is denied
+
+# Login
+> docker login -u=youpiwaza
+# Password ? > yay
+
+# Push
+> docker push youpiwaza/php-with-pdo:1.0.0
+
+```
+
+Maj du docker-compose.yml
+
+```yaml
+  phpfpm:
+    image: 'youpiwaza/php-with-pdo:1.0.0'
+```
+
+Test > *Purrrfect*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
