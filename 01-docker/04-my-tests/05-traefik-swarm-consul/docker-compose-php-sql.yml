@@ -1,0 +1,120 @@
+version: '3.7'
+
+# http://geekyplatypus.com/dockerise-your-php-application-with-nginx-and-php7-fpm/
+services:
+  web:
+
+    # https://docs.traefik.io/providers/docker/
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.web.rule=Host(`web.docker.localhost`)"
+        #- traefik.http.services.web-service.loadbalancer.server.port=8080
+
+    # latest when writing
+    image: nginx:1.17.6-alpine
+    networks:
+      - network-php-sql
+    ports:
+      - '8080:80'
+    volumes:
+      # Project files, bind mount for dev (allow files updates on refresh)
+      - type: bind
+        source: ./php-sql-src
+        # Custom src path in container
+        # Nginx custom conf in HOST/config/nginx1.17.6-alpine/sites-enabled/site.conf
+        target: /home/www
+      # Replace nginx default conf with blank file to prevent localhost:80 conflict
+      - type: bind
+        source: ./php-sql-config/nginx1.17.6-alpine/etc/nginx/conf.d/default.conf
+        target: /etc/nginx/conf.d/default.conf
+      # Config override
+      # Automatically loaded thanks to default nginx.conf > 'include /etc/nginx/conf.d/*.conf;'
+      - type: bind
+        source: ./php-sql-config/nginx1.17.6-alpine/etc/nginx/conf.d/site.conf
+        target: /etc/nginx/conf.d/site.conf
+  
+  phpfpm:
+    # latest when writing
+    #image: 'php:7.4.1-fpm'
+    
+    # Custom image to install php PDO extensions
+    # Doesn't work with docker stack (swarm) > build > tag > push
+    #build:
+    #  context: ./
+    #  dockerfile: DockerfilePhpWithPdo
+
+    image: 'youpiwaza/php-with-pdo:1.0.0'
+    
+    networks:
+      - network-php-sql
+    volumes:
+      # Project files, bind mount for dev
+      # Php-fpm needs access to sources files to, else he can't access them due to containerisation
+      - type: bind
+        source: ./php-sql-src
+        target: /home/www
+  
+  db_tartopaum:
+    # Sert à faire le lien avec adminer sans network
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      MYSQL_DATABASE: my_awesome_db
+      MYSQL_ROOT_PASSWORD: pizza
+      #MYSQL_ROOT_PASSWORD: /run/secrets/MYSQL_ROOT_PASSWORD.txt
+      MYSQL_USER: bob
+      MYSQL_PASSWORD: bobspw
+    
+    # latest when writing
+    image: 'mysql:8.0.18'
+    networks:
+      - network-php-sql
+      - network-sql-adminer
+    restart: always
+    #secrets:
+    #- MYSQL_ROOT_PASSWORD
+    volumes:
+      - type: bind
+        source: ./php-sql-config/mysql8.0.18/etc/mysql/my.cnf
+        target: /etc/mysql/my.cnf
+      # Automatically loaded thanks to default my.cnf > '!includedir /etc/mysql/conf.d/'
+      - type: bind
+        source: ./php-sql-config/mysql8.0.18/etc/mysql/conf.d/my-conf.cnf
+        target: /etc/mysql/conf.d/my-conf.cnf
+      # Init script
+      - type: bind
+        source: ./php-sql-init/mysql/docker-entrypoint-initdb.d/my_awesome_table.sql
+        target: /docker-entrypoint-initdb.d/my_awesome_table.sql
+      - type: volume
+        source: nginx-php-sql_dbdata
+        target: /var/lib/mysql
+  
+  adminer:
+
+    # https://docs.traefik.io/providers/docker/
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.adminer.rule=Host(`adminer.docker.localhost`)"
+        #- traefik.http.services.adminer-service.loadbalancer.server.port=8081
+    
+    environment:
+      ADMINER_DESIGN: 'pappu687'
+    # latest when writing
+    image: 'adminer:4.7.5'
+    networks:
+      - network-sql-adminer
+    ports:
+      # Running on port 8081 as 8080 is already used by web
+      - 8081:8080
+      
+networks:
+  network-php-sql:
+  network-sql-adminer:
+
+#secrets:
+#  MYSQL_ROOT_PASSWORD:
+#    file: ./secrets/mysql/MYSQL_ROOT_PASSWORD.txt
+
+volumes:
+  nginx-php-sql_dbdata:

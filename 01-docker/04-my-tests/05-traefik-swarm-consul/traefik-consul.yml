@@ -1,0 +1,128 @@
+# https://dockerswarm.rocks/traefik/
+version: '3.7'
+
+services:
+  consul-leader:
+    env_file:
+      - ./config/traefik-consul.env
+    image: consul
+    command: agent -server -client=0.0.0.0 -bootstrap -ui
+    volumes:
+      - consul-data-leader:/consul/data
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+      - 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}'
+    networks:
+      - default
+      - traefik-public
+    deploy:
+      labels:
+        - traefik.frontend.rule=Host:consul.localhost
+        - traefik.enable=true
+        - traefik.port=8500
+        - traefik.tags=${TRAEFIK_PUBLIC_TAG:-traefik-public}
+        - traefik.docker.network=traefik-public
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
+        #- traefik.frontend.auth.basic.users=${USERNAME}:${HASHED_PASSWORD}
+        #- traefik.frontend.auth.basic.users=admin:$apr1$cjCw8yx4$k5c8VGxK1EpI3rG3xZ6t20
+        
+        # https://docs.traefik.io/middlewares/basicauth/
+        # Declaring the user list
+        #
+        # Note: all dollar signs in the hash need to be doubled for escaping.
+        # To create user:password pair, it's possible to use this command:
+        # echo $(htpasswd -nb user password) | sed -e s/\\$/\\$\\$/g
+        # - "traefik.http.middlewares.test-auth.basicauth.users=test:$$apr1$$H6uskkkW$$IgXLP6ewTrSuBkTrqE8wj/,test2:$$apr1$$d9hr9HBB$$4HxwgUir3HP4EsggP/QNo0"
+        
+        # Test en doublant les $ uniquement // ok
+        - traefik.frontend.auth.basic.users=admin:$$apr1$$cjCw8yx4$$k5c8VGxK1EpI3rG3xZ6t20
+  
+  consul-replica:
+    env_file:
+      - ./config/traefik-consul.env
+    image: consul
+    command: agent -server -client=0.0.0.0 -retry-join="consul-leader"
+    volumes:
+      - consul-data-replica:/consul/data
+    environment:
+      - CONSUL_BIND_INTERFACE=eth0
+      - 'CONSUL_LOCAL_CONFIG={"leave_on_terminate": true}'
+    networks:
+      - default
+      - traefik-public
+    deploy:
+      replicas: ${CONSUL_REPLICAS:-3}
+      placement:
+        preferences:
+          - spread: node.id
+  
+  traefik:
+    env_file:
+      - ./config/traefik-consul.env
+    image: traefik:v1.7
+    ports:
+      - 80:80
+      - 443:443
+    deploy:
+      replicas: ${TRAEFIK_REPLICAS:-3}
+      placement:
+        constraints:
+          - node.role == manager
+        preferences:
+          - spread: node.id
+      labels:
+        - traefik.frontend.rule=Host:traefik.localhost
+        - traefik.enable=true
+        - traefik.port=8080
+        - traefik.tags=traefik-public
+        - traefik.docker.network=traefik-public
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
+        #- traefik.frontend.auth.basic.users=${USERNAME}:${HASHED_PASSWORD}
+        - traefik.frontend.auth.basic.users=admin:$$apr1$$cjCw8yx4$$k5c8VGxK1EpI3rG3xZ6t20
+
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    
+    # exposedByDefault / If set to false, containers that don't have a traefik.enable=true label will be ignored from the resulting routing configuration.
+    #--logLevel=INFO
+    command: >
+      --docker
+      --docker.swarmmode
+      --docker.watch
+      --docker.exposedbydefault=false
+      --constraints=tag==traefik-public
+      --entrypoints='Name:http Address::80'
+      --entrypoints='Name:https Address::443 TLS'
+      --consul
+      --consul.endpoint="consul-leader:8500"
+      --acme
+      --acme.email=${EMAIL}
+      --acme.storage="traefik/acme/account"
+      --acme.entryPoint=https
+      --acme.httpChallenge.entryPoint=http
+      --acme.onhostrule=true
+      --acme.acmelogging=true
+      --logLevel=DEBUG
+      --accessLog
+      --api
+    networks:
+      - default
+      - traefik-public
+    depends_on:
+      - consul-leader
+
+volumes:
+  consul-data-leader:
+  consul-data-replica:
+
+networks:
+  traefik-public:
+    external: true

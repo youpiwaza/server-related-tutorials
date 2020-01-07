@@ -1,0 +1,43 @@
+# https://docs.traefik.io/getting-started/quick-start/
+version: '3.7'
+
+services:  
+  whoami:
+
+    deploy:
+      labels:
+        - traefik.enable=true
+        - traefik.frontend.rule=Host:whoami.localhost
+        # whoami default port is 80 : https://github.com/containous/whoami#flags
+        #- traefik.port=80 # Conflict w. traefik ?
+        - traefik.port=8069
+        - traefik.tags=traefik-public
+        - traefik.docker.network=traefik-public
+        
+        #- traefik.redirectorservice.frontend.entryPoints=http
+        #- traefik.redirectorservice.frontend.redirect.entryPoint=https
+        #- traefik.webservice.frontend.entryPoints=https
+
+        # Default entrypoint to http ko
+        #- traefik.webservice.frontend.entryPoints=http
+
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        - traefik.webservice.frontend.entryPoints=https
+
+    # A container that exposes an API to show its IP address
+    image: containous/whoami
+    # Traefik default conf w. labels
+    #labels:
+      #- "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+      #- traefik.frontend.rule=Host:whoami.localhost
+    
+    #networks:
+    #  - traefik-public
+      
+    ports:
+      - 8069:80
+
+#networks:
+#  traefik-public:
+#    external: true
