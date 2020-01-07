@@ -1,0 +1,44 @@
+version: "3.3"
+
+services:
+
+  traefik:
+    image: "traefik:v2.0.0-rc3"
+    command:
+      #- "--log.level=DEBUG"
+      # UI accessible mais non populée
+      - "--api.insecure=true"
+      #- "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      #- "--providers.docker.network=traefik-public"
+    ports:
+      - "80:80"
+      # UI
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - traefik
+      #- traefik-public
+
+  whoami:
+    image: "containous/whoami"
+    deploy:
+      labels:
+        # Si on désactive l'un de ceux la > 404
+        - "traefik.enable=true"
+        - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
+        - "traefik.http.services.whoami.loadbalancer.server.port=80"
+
+        #- "traefik.http.routers.whoami.entrypoints=web"
+    networks:
+      - traefik
+      # Comme je le pensais, pas besoin d'être sur le réseau ouvert
+      #- traefik-public
+
+networks:
+  traefik:
+  #traefik-public:
+  #  external: true

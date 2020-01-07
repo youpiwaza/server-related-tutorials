@@ -161,7 +161,7 @@ Mise en place de traefik + swarm dans le test suivant
 
 Note : Je ne suis pas rentré dans la config (statique) de traefik ; je vais voir si il y en a besoin dans l'implémentation avec swarm
 
-
+Edit : il existe un [exemple](https://docs.traefik.io/user-guides/docker-compose/basic-example/) dans la doc officielle sur lequel je ne suis pas passé..
 
 
 

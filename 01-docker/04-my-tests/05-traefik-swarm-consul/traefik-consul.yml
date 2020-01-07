@@ -93,7 +93,7 @@ services:
     
     # exposedByDefault / If set to false, containers that don't have a traefik.enable=true label will be ignored from the resulting routing configuration.
     #--logLevel=INFO
-    command: >
+    command:
       --docker
       --docker.swarmmode
       --docker.watch
