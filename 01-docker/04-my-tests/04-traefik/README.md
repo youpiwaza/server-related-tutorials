@@ -23,19 +23,20 @@ Arrêt du service
 > docker stack rm swarm-traefik
 ```
 
+```bash
+# Attention, -f est avant up, le reste après --"
+> docker-compose \
+  -f docker-compose-whoami.yml \
+  up \
+  -d \
+  --scale whoami=3
+```
+
+Puis test sur le [localhost r proxy](http://whoami.docker.localhost/)
+
 **Notes**
 
 - Possibilité de lancer via `docker-compose up` pour avoir de meilleurs logs des différents containers.
-
-**docker-compose CLI avancé**
-
-```bash
-# Lancer en arrière plan, uniquement le service whoami # KO ça lance tout
-> docker-compose up -d whoami
-
-# (compose scale service) # ! KO scale tout
-> docker-compose up -d --scale whoami=2
-```
 
 ---
 
@@ -83,6 +84,14 @@ Séparation du docker-compose whoami pour des raisons de convénience
     # Traefik default conf w. labels
     labels:
       - "traefik.http.routers.whoami.rule=Host(`whoami.docker.localhost`)"
+```
+
+```bash
+# Attention, -f est avant up, le reste après --"
+> docker-compose \
+  -f docker-compose-whoami.yml \
+  up \
+  -d \
 ```
 
 [Test reverse proxy](http://whoami.docker.localhost/) // yay
