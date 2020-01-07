@@ -17,14 +17,26 @@ Le but est de monter traefik en tant que service, puis de monter d'autres servic
 Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
 
 ```bash
+# Créer le réseau externe à traefik (lien avec les autres services)
+> docker network create --driver=overlay traefik-public
+
 # déploiement de traefik & whoami
 > docker stack deploy -c traefik.yml traefik
 
 # Déploiement d'un hello world
 > docker stack deploy -c hello.yml hello
+
+# Test avec scale
+#> docker service scale SERVICE=REPLICAS
+> docker service scale traefik_whoami=3
+
+# Supprimer le réseau
+> docker network prune
 ```
 
 Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http://hello.localhost/](http://hello.localhost/).
+
+- Possibilité de vérifier les réplicas via whoami (changement d'ip lors du rechargement de la page)
 
 Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels` > `- "traefik.http.routers.LE_SERVICE.rule=Host(URL_DU_SERVICE)"`
 
@@ -150,3 +162,11 @@ Création d'un nouveau (hello).yml afin de lancer un service indépendant et tes
 
 >> Trop rien de différent, hormis la création du réseau public (swarm préfixe)
 
+
+
+
+
+TODO :
+- ✓ Vérifier bon fonctionnement avec répliques
+- Vérifier les conflits de ports, par exemple si je lance un deuxième service hello
+- Url par défaut + env surcharge
