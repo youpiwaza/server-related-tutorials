@@ -4,15 +4,15 @@ services:
     image: tutum/hello-world:latest
     networks:
       - traefik-public
+      # Créé en tant que "hello_traefik" par swarm
+      #- traefik
     deploy:
       labels:
-        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
+        # Si on désactive l'un de ceux la > 404
         - "traefik.enable=true"
-        
-
-        # Pas vu
+        # http://hello.localhost/
         - "traefik.http.routers.helloworld.rule=Host(`hello.localhost`)"
-        - "traefik.http.routers.helloworld.entrypoints=web"
+        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
 
 networks:
   traefik-public:

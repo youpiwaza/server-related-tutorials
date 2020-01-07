@@ -10,6 +10,33 @@ Enfin, on suit la [doc](https://docs.traefik.io/providers/docker/)
 
 
 
+## Principales commandes
+
+Le but est de monter traefik en tant que service, puis de monter d'autres services et vérifier leur disponibilités sur localhost.
+
+Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
+
+```bash
+# déploiement de traefik & whoami
+> docker stack deploy -c traefik.yml traefik
+
+# Déploiement d'un hello world
+> docker stack deploy -c hello.yml hello
+```
+
+Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http://hello.localhost/](http://hello.localhost/).
+
+Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels` > `- "traefik.http.routers.LE_SERVICE.rule=Host(URL_DU_SERVICE)"`
+
+*Arrêt du service*
+
+```bash
+> docker stack rm traefik
+> docker stack rm hello
+```
+
+
+
 ## Configuration Dicovery
 
 Doc imbitable, avec l'ensemble écrit pour un fichier de configuration externe, alors que la doc elle même ne le recommande pas (mais plutôt la conf dynamique).
@@ -116,3 +143,10 @@ Edit : L'envoie de vivre m'a quittée
 ---
 
 Essai : repartir de [l'exemple de base docker-compose](https://docs.traefik.io/user-guides/docker-compose/basic-example/) et le migrer vers docker swarm en suivant les recos
+
+// WORKS, cf. traefik.yml
+
+Création d'un nouveau (hello).yml afin de lancer un service indépendant et tester la conf.
+
+>> Trop rien de différent, hormis la création du réseau public (swarm préfixe)
+

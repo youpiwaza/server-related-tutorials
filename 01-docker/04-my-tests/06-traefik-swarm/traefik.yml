@@ -1,9 +1,10 @@
-version: "3.3"
+version: "3.7"
 
 services:
 
   traefik:
-    image: "traefik:v2.0.0-rc3"
+    #image: "traefik:v2.0.0-rc3"
+    image: "traefik:v2.1.1"
     command:
       #- "--log.level=DEBUG"
       # UI accessible mais non populée
@@ -21,7 +22,7 @@ services:
       - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - traefik
-      #- traefik-public
+      - traefik-public
 
   whoami:
     image: "containous/whoami"
@@ -29,6 +30,7 @@ services:
       labels:
         # Si on désactive l'un de ceux la > 404
         - "traefik.enable=true"
+        # http://whoami.localhost/
         - "traefik.http.routers.whoami.rule=Host(`whoami.localhost`)"
         - "traefik.http.services.whoami.loadbalancer.server.port=80"
 
@@ -40,5 +42,11 @@ services:
 
 networks:
   traefik:
-  #traefik-public:
-  #  external: true
+
+  # Needs v before
+  # > docker network create --driver=overlay traefik-public
+
+  # Nécéssaire si lancement du service depuis un autre fichier .yml (swarm préfixe le nom du réseau)
+  # Exemple avec hello.yml
+  traefik-public:
+    external: true
