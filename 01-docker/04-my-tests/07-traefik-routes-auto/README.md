@@ -211,7 +211,7 @@ Host(`iamfoo`)
 
 Ca roule bieng
 
-![Démo routes auto](/docs/images/200108-traefik-routes-auto.jpg)
+![Démo routes auto](/01-docker/04-my-tests/07-traefik-routes-auto/docs/images/200108-traefik-routes-auto.jpg)
 
 Mais pour **run & swarm toujours bad gateway**, et un peu flemme :}
 
