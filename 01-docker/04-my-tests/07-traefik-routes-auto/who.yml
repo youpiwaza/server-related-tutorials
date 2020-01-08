@@ -1,0 +1,5 @@
+version: '3.7'
+services:
+  who:
+    container_name: who
+    image: containous/whoami:latest

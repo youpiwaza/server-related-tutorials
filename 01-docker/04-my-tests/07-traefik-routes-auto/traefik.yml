@@ -1,0 +1,48 @@
+# Exemple https://hub.docker.com/_/traefik
+version: '3.7'
+
+services:
+  traefik:
+    image: traefik:v2.0
+    command:
+      --api.insecure=true
+      --providers.docker
+      --providers.docker.defaultRule="Host(`{{
+        empty ( index .Labels \"com.docker.swarm.service.name\" ) | ternary
+          ( empty ( index .Labels \"com.docker.compose.service\" ) | ternary
+            .Name 
+            (index .Labels \"com.docker.compose.service\")
+          )
+          (index .Labels \"com.docker.swarm.service.name\")
+      }}.localhost`)"
+
+      #--providers.docker.defaultRule="Host(`{{ empty .Labels | ternary .Name ( index .Labels \"com.docker.compose.service\" ) }}.localhost`)" # ok AF :D
+      #--providers.docker.defaultRule="Host(`{{ true | ternary \"foo\" \"bar\" }}.localhost`)" # ok > foo
+      #--providers.docker.defaultRule="Host(`{{ empty .Labels }}.localhost`)" # ok > true/false
+      #--providers.docker.defaultRule="Host(`{{ true }}.localhost`)" # ok mais tout true.localhost
+      #--providers.docker.defaultRule="Host(`{{ index .Labels \"com.docker.compose.service\"}}{{ index .Labels \"com.docker.swarm.service.name\"}}.localhost`)"
+      #--providers.docker.defaultRule="Host(`{{ index .Labels \"com.docker.compose.service\"}}.localhost`)"
+      #--providers.docker.defaultRule="Host(`{{ .Name }}.{{ index .Labels \"com.docker.compose.service\"}}`)" # ok / who-07-traefik-routes-auto.who
+      #--providers.docker.defaultRule="Host(`{{ slice .Labels 0 5 }}`)" # koaf # tf is this language ?
+      #--providers.docker.defaultRule="Host(`{{ .Labels[5] }}`)" # ko
+      #--providers.docker.defaultRule="Host(`{{ .Labels ["com.docker.compose.service"] }}`)" # KO
+      #--providers.docker.defaultRule="Host(`{{ .Labels }}`)"
+      #--providers.docker.defaultRule="Host(`{{ len .Labels }}`)"
+      #--providers.docker.defaultRule="Host(`{{ .Name }}.{{ index .Labels }}`)"
+      #--providers.docker.defaultRule="Host(`{{ index .Name "-" }}.localhost`)" # ko
+      #--providers.docker.defaultRule="Host(`{{ trunc 5 .Name }}.localhost`)"
+      #--providers.docker.defaultRule="Host(`{{ substr 0 5 .Name }}.docker.localhost`)"
+      #--providers.docker.defaultRule="Host(`{{ .Name[:len(.Name)-1] }}.docker.localhost`)" # ko
+      #--providers.docker.defaultRule="Host(`{{ slice .Name 0 5 }}.docker.localhost`)" # ko
+      #--providers.docker.defaultRule="Host(`{{ normalize .Name }}.docker.localhost`)"
+      # Default
+      # --providers.docker.defaultRule="Host(`{{ trimPrefix `/` .Name }}.docker.localhost`)"
+
+    ports:
+      - "80:80"
+      - "8080:8080"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+
+      
