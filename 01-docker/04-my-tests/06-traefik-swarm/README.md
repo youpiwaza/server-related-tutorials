@@ -162,11 +162,7 @@ Création d'un nouveau (hello).yml afin de lancer un service indépendant et tes
 
 >> Trop rien de différent, hormis la création du réseau public (swarm préfixe)
 
-
-
-
-
-TODO :
 - ✓ Vérifier bon fonctionnement avec répliques
-- Vérifier les conflits de ports, par exemple si je lance un deuxième service hello
-- Url par défaut + env surcharge
+- ✓ Vérifier les conflits de ports, par exemple si je lance un deuxième service hello
+
+`docker stack deploy -c hello2.yml hello2` // Même chose avec [http://hello2.localhost/](http://hello2.localhost/), aucun souci :D

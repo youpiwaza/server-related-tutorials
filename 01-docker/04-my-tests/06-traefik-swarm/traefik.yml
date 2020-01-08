@@ -35,6 +35,10 @@ services:
         - "traefik.http.services.whoami.loadbalancer.server.port=80"
 
         #- "traefik.http.routers.whoami.entrypoints=web"
+      
+      # Possibilité de vérifier le load balancer : l'ip change
+      replicas: 3
+
     networks:
       - traefik
       # Comme je le pensais, pas besoin d'être sur le réseau ouvert

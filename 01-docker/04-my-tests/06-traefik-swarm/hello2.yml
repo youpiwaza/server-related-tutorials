@@ -1,6 +1,6 @@
 version: '3.7'
 services:
-  helloworld:
+  helloworld2:
     image: tutum/hello-world:latest
     networks:
       - traefik-public
@@ -11,9 +11,8 @@ services:
         # Si on désactive l'un de ceux la > 404
         - "traefik.enable=true"
         # http://hello.localhost/
-        - "traefik.http.routers.helloworld.rule=Host(`hello.localhost`)"
-        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
-      replicas: 3
+        - "traefik.http.routers.helloworld2.rule=Host(`hello2.localhost`)"
+        - "traefik.http.services.helloworld2.loadbalancer.server.port=80"
 
 networks:
   traefik-public:
