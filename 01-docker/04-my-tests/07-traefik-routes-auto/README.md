@@ -216,7 +216,13 @@ Ca roule bieng
 Mais pour **run & swarm toujours bad gateway**, et un peu flemme :}
 
 
+## Note concernant consul
 
+Je vois vraiment pas l'intérêt :3
+
+Okay c'est dynamique avec clés/valeurs may je préfère définir l'url dans le projet direct..
+
+Mise de côté pour le moment.
 
 
 
