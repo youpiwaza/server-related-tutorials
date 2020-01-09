@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  hello:
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
