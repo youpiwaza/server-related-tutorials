@@ -7,23 +7,28 @@
 
 Le but est de monter traefik en tant que service, puis de monter d'autres services et vérifier leur disponibilités sur localhost **mais sans avoir définit leurs routes via les labels**.
 
-Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
+Lancement en tant que conteneur via docker-compose.
 
 ```bash
-# TODO
+# Lancement sans swarm en arrière plan
+> docker-compose -f traefik.yml up -d
+
+# Création de containers alakon
+> docker-compose -f who.yml up -d
+> docker-compose -f hello.yml up -d
 ```
 
-Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http://hello.localhost/](http://hello.localhost/).
+Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http://helloworld3.localhost/](http://helloworld3.localhost/).
 
 - Possibilité de vérifier les réplicas via whoami (changement d'ip lors du rechargement de la page)
 
-Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels` > `- "traefik.http.routers.LE_SERVICE.rule=Host(URL_DU_SERVICE)"`
+Les adresses sont fixées dans les .yml dans `--providers.docker.defaultRule` et des shenanigans, à partir des noms de services fixés dans les .yml des services respectifs.
 
-*Arrêt du service*
+*Arrêt des containers*
 
 ```bash
-> docker stack rm traefik
-> docker stack rm hello
+> docker-compose -f who.yml down
+> docker-compose -f hello.yml down
 ```
 
 
@@ -32,11 +37,13 @@ Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels`
 
 En l'état ça ne marche pas (mode swarm ?). Histoire de ne pas écrire pour ne rien dire, le résumé : En passant par docker-compose (**pour les deux**) ça tourne :
 
+Edit : utiliser ```--providers.docker.defaultRule="Host(`{{ normalize .Name }}.docker.localhost`)"``` dans traefik.yml pour vérifier cet exemple.
+
 ```bash
 # Lancement sans swarm en arrière plan
 > docker-compose -f traefik.yml up -d
 
-# Création d'un service alakon
+# Création de containers alakon
 > docker-compose -f who.yml up -d
 ```
 
@@ -64,7 +71,7 @@ Testé avec ouverture des ports et ajout au réseau traefik > KO
 > docker container ls # names ok
 ```
 
-Accès via nom ko, UI traefik :
+Accès via nom KO, UI traefik :
 
 RULE
 Host(`who-07-traefik-routes-auto.docker.localhost`) // OK
