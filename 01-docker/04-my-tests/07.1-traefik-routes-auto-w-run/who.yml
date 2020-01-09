@@ -1,0 +1,10 @@
+version: '3.7'
+services:
+  who:
+    image: containous/whoami:latest
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
