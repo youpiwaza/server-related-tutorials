@@ -73,7 +73,7 @@ Récupération du projet
 > git clone https://github.com/stefanprodan/swarmprom.git
 ```
 
-Modification de `/conf/prometheus.yml`.
+Modification de `prometheus/conf/prometheus.yml`.
 
 ```yml
 scrape_configs:
@@ -208,14 +208,14 @@ Pas de maj sur le pack depuis 1 ou 2 ans (selon les versions), vérification dan
     - Pas de test, deja KO
   - prometheus:v2.5.0               > https://hub.docker.com/r/prom/prometheus/tags
     - v2.15.2
-    - Test OK /o/
+    - Test KO sans conf
   - caddy 0.10.10                   > https://hub.docker.com/r/abiosoft/caddy/tags
     - Le webserveur pour les 4 UI (~=nginx), l'image contient la conf
     - abiosoft/caddy:1.0.3
     - Test KO
 
 
-
+Pas trop toucher sinon perte de conf... Faire des images pour ça cay pas cool, surtout qu'il monte des volumes exprès a chaque fois, je comprend pas le bail.
 
 
 
