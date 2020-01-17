@@ -1,0 +1,59 @@
+---
+- name: Test installation du serveur web
+  hosts: likorne
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+    - name: Only run "update_cache=yes" if the last one is more than 3600 seconds ago
+      apt:
+        update_cache: yes
+        cache_valid_time: 3600
+    
+    - name: Upgrade installed packages
+      apt:
+        upgrade: dist
+
+    - name: Ensure update-manager-core is installed.
+      apt:
+        name: update-manager-core
+        state: present
+
+    # https://coderwall.com/p/0nckqg/ansible-reboot-ubuntu-if-needed, cf. comments
+    - name: Reboot system if required
+      command: shutdown -r now 'Rebooting to complete system upgrade'
+        removes=/var/run/reboot-required
+    
+    # https://www.linuxnix.com/ubuntu-linuxhow-to-do-unattended-os-release-upgrade/
+    - name: Run do-release-upgrade non-interactively.
+      command: do-release-upgrade -f DistUpgradeViewNonInteractive
+      register: result
+      failed_when: '"No new release found" not in result.stdout'
+    
+    - name: Remove useless packages from the cache
+      apt:
+        autoclean: yes
+    
+    - name: Remove dependencies that are no longer required
+      apt:
+        autoremove: yes
+        
+    - name: Reboot system if required
+      command: shutdown -r now 'Rebooting to complete system upgrade'
+        removes=/var/run/reboot-required
+
+    # https://docs.ansible.com/ansible/latest/reference_appendices/test_strategies.html
+    - name: Get release information
+      command: lsb_release -a
+      register: result
+
+    # - name: Check result
+    #   debug:
+    #     var: result
+      
+    - name: Confirmation
+      assert:
+        that: '"No LSB modules are available" in result.stderr'
+        fail_msg: "There's still updates to be made ?\n{{ result.stderr }}\n{{ result.stdout }}"
+        success_msg: "Release & packages upgraded if needed.\nActual release :\n{{ result.stdout }}"
+...
