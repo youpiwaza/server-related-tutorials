@@ -1,0 +1,10 @@
+---
+- name: Test installation du serveur web
+  hosts: likorne
+  remote_user: ubuntu
+  become: yes
+
+  tasks:
+    - name: Installation de git
+      apt: name=git update_cache=yes
+...
