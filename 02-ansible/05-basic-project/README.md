@@ -149,6 +149,13 @@ Et il y a donc également besoin du fichier de template concerné
 
 ## Variables
 
+[Ansible > User guide > Working w playbooks > Variables](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html)
+
+Règles :
+
+- Underscore uniquement, pas de tirets, de points ni d'espaces
+- Pas de chiffres uniquement (ou commence par chiffre ?)
+
 Définition en début de fichier :
 
 ```yaml
@@ -167,6 +174,40 @@ Puis utilisation via la syntaxe `{{ wtv }}`.
     name: "{{ wtv }}"
 ```
 
+### Possibilité de syntaxe objet
+
+Définition :
+
+```yaml
+foo:
+  field1: one
+  field2: two
+```
+
+Utilisation :
+
+```yaml
+foo['field1']
+# ou alors
+foo.field1
+```
+
+### Defining variables in files
+
+[Ansible doc](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-in-files)
+
+
+
+
+
+TODO
+
+
+
+
+
+
+
 ### Utilisation du conditionnel
 
 Possibilité d'effectuer une tâche uniquement lorsqu'une variable est définie, via `when`
@@ -178,3 +219,8 @@ Possibilité d'effectuer une tâche uniquement lorsqu'une variable est définie,
 
 **Attention**, pas d'accolades !
 
+---
+
+```yaml
+
+```
