@@ -1,5 +1,5 @@
 ---
-- name: Test installation du serveur web
+- name: Update system and dependancies
   hosts: likorne
   remote_user: ubuntu
   become: yes
@@ -47,13 +47,9 @@
       command: lsb_release -a
       register: result
 
-    # - name: Check result
-    #   debug:
-    #     var: result
-      
     - name: Confirmation
       assert:
         that: '"No LSB modules are available" in result.stderr'
-        fail_msg: "There's still updates to be made ?\n{{ result.stderr }}\n{{ result.stdout }}"
-        success_msg: "Release & packages upgraded if needed.\nActual release :\n{{ result.stdout }}"
+        fail_msg: "KO / There's still updates to be made ?\n{{ result.stderr }}\n{{ result.stdout }}"
+        success_msg: "OK / Release & packages upgraded if needed.\nActual release :\n{{ result.stdout }}"
 ...
