@@ -4,12 +4,16 @@ Ansible ne tourne pas sans le SSH.
 
 ## Test de connexion par défaut (hébergeur)
 
-Vérification de la connexion SSH en direct, via les instructions de l'hébergeur
+Vérification de la connexion SSH en direct, via les identifiants fournis par l'hébergeur
 
 ```bash
 > ssh MON_USER@169.169.169.169
 # Donner le password
 # Ok
+
+# Note : si port déjà changé, utiliser
+> ssh MON_USER@169.169.169.169 -p 6969
+# .. avec le port correspondant
 
 # Garder cette connexion ouverte le temps de faire des tests !
 ```
@@ -62,6 +66,7 @@ Ajout de notre clé à l'agent SSH
 
 # Ajouter la clé à l'agent
 > ssh-add ~/.ssh/id-ssh-key-ed25519
+# Pass phrase
 
 # Vérification de l'ajout local
 > ssh-add -l
@@ -172,6 +177,7 @@ Erreur `Bad owner or permissions on /root/.ssh/config`.
 Ce fichier doit avoir des permissions spécifiques (600) sinon [cela merdouille](https://serverfault.com/a/253314)
 
 ```bash
+# Local WSL
 > chmod 600 ~/.ssh/config
 > chown $USER ~/.ssh/config
 ```
@@ -179,6 +185,7 @@ Ce fichier doit avoir des permissions spécifiques (600) sinon [cela merdouille]
 ### Serveur / Problème sudo
 
 ```bash
+# Online
 > sudo service ssh restart
 # sudo: unable to resolve host MON_USER: Name or service not known
 ```
