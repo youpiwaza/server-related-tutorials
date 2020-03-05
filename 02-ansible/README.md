@@ -21,3 +21,7 @@ Note : Il faut parfois lancer la connexion SSH une fois avant, avec la pass phra
 > cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/02-basic-ansible-example/ansible
 > ansible-playbook -i hosts playbook.yml | sed 's/\\n/\n/g'
 ```
+
+## Readaction
+
+Use `ansible-lint` to prevent errors & warnings.
