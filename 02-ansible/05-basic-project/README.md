@@ -1,4 +1,4 @@
-# Ansible project : arborescence & modules usages
+# Ansible project : modules usages
 
 All modules & docs : [Ansible module index](https://docs.ansible.com/ansible/latest/modules/modules_by_category.html)
 
@@ -51,7 +51,7 @@ Exemple installation de plusieurs packages
 
 [Ansible System modules > user](https://docs.ansible.com/ansible/latest/modules/user_module.html#user-module)
 
-Possibilités de 
+Possibilités de
 
 - rajouter, modifier, supprimer un utilisateur.
 - gérer son/ses groupes/s (ajout/append)
@@ -105,7 +105,7 @@ Test de connexion
 
 #### Create a SSH key on the fly
 
-But how to retreive it automatically ?
+Bien générée en ligne (privée et publique), mais comment la récupérer et l'installer en local automatiquement ?
 
 ```yaml
 - name: Create a 2048-bit SSH key for user volibear in ~volibear/.ssh/id_rsa
@@ -116,4 +116,65 @@ But how to retreive it automatically ?
     ssh_key_file: .ssh/id_rsa
 ```
 
-Still work, both keys generated online..
+### Add sudo rights
+
+Besoin d'un transfert de fichier [Ansible Files modules > template](https://docs.ansible.com/ansible/latest/modules/template_module.html#template-module)
+
+Ajout de l'extension recommandée : Better Jinja, pour la syntaxe.
+
+Il y a possibilité :
+
+- d'utiliser les variables dans les templates
+- de spécifier un dossier de destination
+- de gérer l'utilisateur et les groupes du fichier
+- de gérer les droits du fichiers
+- de valider et annuler (`validate & backups`), ex : mise en place de clé SSH
+- de spécifier le caractère de fin de ligne
+
+```yaml
+- name: "{{ user }} devient sudoer"
+  template:
+    dest: etc/sudoers.d/{{ user }}-sudoer
+    src: templates/sudoers.j2
+    # Utilisation d'une commande dédiée (visudo) qui permet de vérifier l'intégrité de ce genre de fichiers
+    validate: "visudo -cf %s"
+  when: user is defined
+```
+
+Et il y a donc également besoin du fichier de template concerné
+
+```j2
+{{ user }} ALL=(ALL:ALL) NOPASSWD: ALL
+```
+
+## Variables
+
+Définition en début de fichier :
+
+```yaml
+- name: Basic tasks
+  vars:
+    wtv: lavaleur
+```
+
+Puis utilisation via la syntaxe `{{ wtv }}`.
+
+**Attention**, les variables doivent toujours être utilisées dans des chaînes de caractères
+
+```yaml
+- name: Create a new user
+  user:
+    name: "{{ wtv }}"
+```
+
+### Utilisation du conditionnel
+
+Possibilité d'effectuer une tâche uniquement lorsqu'une variable est définie, via `when`
+
+```yaml
+- name: Create a new user
+  when: wtv is defined
+```
+
+**Attention**, pas d'accolades !
+
