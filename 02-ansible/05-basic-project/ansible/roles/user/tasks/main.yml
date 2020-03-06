@@ -1,27 +1,27 @@
 ---
 ### Users ###
 # https://docs.ansible.com/ansible/latest/modules/user_module.html#user-module
-- name: "Create a new user {{ user }}"
+- name: 'Create a new user {{ user }}'
   user:
     comment: Grafikart tutorial
-    name: "{{ user }}"
+    name: '{{ user }}'
     shell: /usr/bin/zsh
   when: user is defined
 
 # https://docs.ansible.com/ansible/latest/modules/authorized_key_module.html
-- name: "Set SSH key taken from file, for {{ user }}"
+- name: 'Set SSH key taken from file, for {{ user }}'
   authorized_key:
     # Need to be generated before, and added to local SSH agent
     key: "{{ lookup('file', '~/.ssh/{{ user }}-ssh-key-ed25519.pub') }}"
     state: present
-    user: "{{ user }}"
+    user: '{{ user }}'
   when: user is defined
 
-- name: "{{ user }} become sudoer"
+- name: '{{ user }} become sudoer'
   template:
-    dest: "/etc/sudoers.d/{{ user }}-sudoer"
+    dest: '/etc/sudoers.d/{{ user }}-sudoer'
     src: templates/sudoers.j2
-    validate: "visudo -cf %s"
+    validate: 'visudo -cf %s'
   when: user is defined
 
 # - name: Create a 2048-bit SSH key for user volibear in ~volibear/.ssh/id_rsa
