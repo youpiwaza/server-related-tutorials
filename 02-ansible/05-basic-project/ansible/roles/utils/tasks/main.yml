@@ -1,0 +1,33 @@
+---
+### Packages ###
+- name: Ubuntu 1 package installation
+  apt: 
+    name: git
+    update_cache: yes
+
+# DEPRECATED
+#- name: Ubuntu multiple package installations
+#  apt: name={{ item }} update_cache=yes
+#  with_items:
+#  - git
+#  - vim
+#  - htop
+#  - zsh
+
+# https://docs.ansible.com/ansible/latest/modules/apt_module.html#apt-module
+- name: Ubuntu multiple package installations
+  apt:
+    cache_valid_time: '3600'
+    force_apt_get: yes
+    name: '{{ packagesToInstall }}'
+    update_cache: yes
+    state: latest
+
+- name: Remove useless packages from the cache
+  apt:
+    autoclean: yes
+
+- name: Remove dependencies that are no longer required
+  apt:
+    autoremove: yes
+...
