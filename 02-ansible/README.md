@@ -31,3 +31,20 @@ Note : Il faut parfois lancer la connexion SSH une fois avant, avec la pass phra
 ## Readaction
 
 Use `ansible-lint` to prevent errors & warnings.
+
+## Configuration
+
+[Ansible doc](https://docs.ansible.com/ansible/latest/reference_appendices/config.html)
+
+Recommandé : Modifier `/etc/ansible/ansible.cfg`
+
+Utiliser les valeurs *Ini key*
+
+Valeurs booléennes : 0 ou 1
+
+Mes modifications :
+
+```ini
+# Forcer l'affichage des couleurs dans le terminal
+force_color=1
+```
