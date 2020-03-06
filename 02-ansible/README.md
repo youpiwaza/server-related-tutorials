@@ -18,7 +18,13 @@ Note : Il faut parfois lancer la connexion SSH une fois avant, avec la pass phra
 > ssh awesome
 # Pass phrase
 
+# Acceder au projet
 > cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/02-basic-ansible-example/ansible
+# Configurer l'agent SSH en local
+> eval `ssh-agent`
+> ssh-add ~/.ssh/masamune-ssh-key-ed25519-yay
+
+# Lancer le playbook
 > ansible-playbook -i hosts playbook.yml | sed 's/\\n/\n/g'
 ```
 

@@ -4,6 +4,24 @@ All modules & docs : [Ansible module index](https://docs.ansible.com/ansible/lat
 
 Straight extracted from [grafikart ansible tutorial](https://www.grafikart.fr/tutoriels/ansible-753) and updated/tested following the documentation
 
+## Usage
+
+```bash
+# WSL
+# Reco SSH, si ssh configuré correctement
+> ssh awesome
+# Pass phrase
+
+# Acceder au projet
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/05-basic-project/ansible
+# Configurer l'agent SSH en local
+> eval `ssh-agent`
+> ssh-add ~/.ssh/masamune-ssh-key-ed25519-yay
+
+# Lancer le playbook
+> ansible-playbook -i hosts playbook.yml | sed 's/\\n/\n/g'
+```
+
 ## Package installation
 
 [Ansible Packaging modules > apt](https://docs.ansible.com/ansible/latest/modules/apt_module.html#apt-module)
