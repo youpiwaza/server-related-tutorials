@@ -244,6 +244,36 @@ Possibilité d'effectuer une tâche uniquement lorsqu'une variable est définie,
 
 **Attention**, pas d'accolades !
 
+## Roles / Refacto
+
+[Ansible doc > User guide > Working w playbooks > Creating réusable playbooks > roles](https://docs.ansible.com/ansible/latest/user_guide/playbooks_reuse_roles.html)
+
+Création d'une arborescence dédiée par rôle, ce qui équivaut à un type de tâche (par exemple un rôle qui regroupe tout ce qui concerne la création d'un utilisateur)
+
+Exemple d'arborescence **obligatoire** :
+
+```md
+roles/
+  common/
+    tasks/
+    handlers/
+    files/
+    templates/
+    vars/
+    defaults/
+    meta/
+```
+
+Utilisation :
+
+```yaml
+# Au même niveau que tasks
+roles:
+  - user
+```
+
+**Attention !**, même s'il sont définis après des tâches dans playbook.yml,les rôles seront **éxécutés avant** !
+
 ---
 
 ```yaml
