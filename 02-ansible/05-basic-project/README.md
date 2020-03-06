@@ -214,17 +214,24 @@ foo.field1
 
 [Ansible doc](https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-in-files)
 
+Définition dans un fichier dédié (format .yml), recommandation arbo : dans /vars :
 
+```yaml
+---
+user2: shaco
+user3: amumu
+user4: hecarim
+...
+```
 
+Utilisation :
 
+**Attention**, pas de premier / devant le chemin
 
-TODO
-
-
-
-
-
-
+```yaml
+vars_files:
+  - vars/main.yml
+```
 
 ### Utilisation du conditionnel
 

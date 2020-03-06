@@ -5,6 +5,8 @@
   become: yes
   vars:
     user: volibear
+  vars_files:
+  - vars/main.yml
 
   tasks:
     ### Packages ###
@@ -43,32 +45,32 @@
 
     ### Users ###
     # https://docs.ansible.com/ansible/latest/modules/user_module.html#user-module
-    - name: "Create a new user {{ user }}"
+    - name: "Create a new user {{ user2 }}"
       user:
         comment: Grafikart tutorial
-        name: "{{ user }}"
+        name: "{{ user2 }}"
         shell: /usr/bin/zsh
       when: user is defined
 
     # https://docs.ansible.com/ansible/latest/modules/authorized_key_module.html
-    - name: "Set SSH key taken from file, for {{ user }}"
+    - name: "Set SSH key taken from file, for {{ user2 }}"
       authorized_key:
         # Need to be generated before, and added to local SSH agent
-        key: "{{ lookup('file', '~/.ssh/{{ user }}-ssh-key-ed25519.pub') }}"
+        key: "{{ lookup('file', '~/.ssh/{{ user2 }}-ssh-key-ed25519.pub') }}"
         state: present
-        user: "{{ user }}"
+        user: "{{ user2 }}"
       when: user is defined
 
-    - name: "{{ user }} become sudoer"
+    - name: "{{ user2 }} become sudoer"
       template:
-        dest: "/etc/sudoers.d/{{ user }}-sudoer"
+        dest: "/etc/sudoers.d/{{ user2 }}-sudoer"
         src: templates/sudoers.j2
         validate: "visudo -cf %s"
       when: user is defined
 
     # - name: Create a 2048-bit SSH key for user volibear in ~volibear/.ssh/id_rsa
     #   user:
-    #     name: {{ user }}
+    #     name: {{ user2 }}
     #     generate_ssh_key: yes
     #     ssh_key_bits: 2048
     #     ssh_key_file: .ssh/id_rsa
