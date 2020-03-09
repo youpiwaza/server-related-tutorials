@@ -3,4 +3,7 @@
 publicRepo: 
   name: sample-text-file
   uri: https://github.com/youpiwaza/sample-text-file.git
+privateRepo: 
+  name: private-sample-text-file
+  uri: https://github.com/youpiwaza/private-sample-text-file.git
 ...

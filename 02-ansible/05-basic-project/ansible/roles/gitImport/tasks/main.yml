@@ -15,10 +15,21 @@
 
 # Clone public repo
 #   https://docs.ansible.com/ansible/latest/modules/git_module.html
-- name: 'Clonage du repo {{ publicRepo.name }} depuis {{ publicRepo.uri }}'
-  become: yes
-  git:
-    clone: yes
-    dest: '/home/{{ user }}/tests/publicRepo/'
-    repo: '{{ publicRepo.uri }}'
+# - name: 'Clonage du repo {{ publicRepo.name }} depuis {{ publicRepo.uri }}'
+#   become: yes
+#   git:
+#     clone: yes
+#     dest: '/home/{{ user }}/tests/repo/publicRepo/'
+#     repo: '{{ publicRepo.uri }}'
+
+# # Clone private repo
+# # Besoin de gérer les clés SSH
+# # Peut être plus tard..
+# - name: 'Clonage du repo {{ privateRepo.name }} depuis {{ privateRepo.uri }}'
+#   become: yes
+#   git:
+#     # accept_hostkey: yes
+#     clone: yes
+#     dest: '/home/{{ user }}/tests/repo/privateRepo/'
+#     repo: '{{ privateRepo.uri }}'
 ...

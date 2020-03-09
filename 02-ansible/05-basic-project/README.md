@@ -305,3 +305,9 @@ The conditionnal is used in the templating file.
 Created a [sample repository](https://github.com/youpiwaza/sample-text-file.git) containing a single txt file.
 
 Then cloning it following the [Ansible documentation](https://docs.ansible.com/ansible/latest/modules/git_module.html).
+
+Repo privé : besoin de gérer les clés SSH : Installer une clé sur le serveur et lui dire de l'utiliser pour le repo, cf. [cet article](https://www.jeffgeerling.com/blog/2018/cloning-private-github-repositories-ansible-on-remote-server-through-ssh).
+
+Note : Ne pas oublier de **retirer la clé après** pour des raisons de sécurité.
+
+A voir plus tard..
