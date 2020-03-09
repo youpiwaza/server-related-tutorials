@@ -1,0 +1,24 @@
+---
+### Create a folder and populate it a github repo content ###
+    
+# Re-create folder
+- name: Remove directory test directory
+  file:
+    path: '/home/{{ user }}/tests/repo/'
+    state: absent
+
+- name: Create a directory if it does not exist
+  file:
+    path: '/home/{{ user }}/tests/repo/'
+    state: directory
+    mode: '0755'
+
+# Clone public repo
+#   https://docs.ansible.com/ansible/latest/modules/git_module.html
+- name: 'Clonage du repo {{ publicRepo.name }} depuis {{ publicRepo.uri }}'
+  become: yes
+  git:
+    clone: yes
+    dest: '/home/{{ user }}/tests/publicRepo/'
+    repo: '{{ publicRepo.uri }}'
+...

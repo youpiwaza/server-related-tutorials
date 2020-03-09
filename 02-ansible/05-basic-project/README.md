@@ -299,3 +299,9 @@ cf. roles/conditionnalTemplating
 Prefer the [use of loops](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html) instead od with_SMTHG, even if it won't be deprecated
 
 The conditionnal is used in the templating file.
+
+## Git manipulations
+
+Created a [sample repository](https://github.com/youpiwaza/sample-text-file.git) containing a single txt file.
+
+Then cloning it following the [Ansible documentation](https://docs.ansible.com/ansible/latest/modules/git_module.html).

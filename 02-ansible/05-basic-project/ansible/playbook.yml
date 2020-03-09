@@ -18,6 +18,7 @@
     # Edit line in file
     # - editLineInFile
     # Create different files from a single template, & loop for multiples items
-    - conditionnalTemplating
-    
+    # - conditionnalTemplating
+    # Clone a repo
+  - gitImport
 ...

@@ -1,0 +1,6 @@
+---
+# https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-in-files
+publicRepo: 
+  name: sample-text-file
+  uri: https://github.com/youpiwaza/sample-text-file.git
+...
