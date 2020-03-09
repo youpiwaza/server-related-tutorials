@@ -20,6 +20,8 @@
 - name: '{{ user }} become sudoer'
   template:
     dest: '/etc/sudoers.d/{{ user }}-sudoer'
+    # Possibilité de forcer la création même si le fichier existe déjà
+    # force: yes
     src: templates/sudoers.j2
     validate: 'visudo -cf %s'
   when: user is defined
