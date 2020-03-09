@@ -1,0 +1,20 @@
+---
+### Service ###
+# Install & lunch nginx
+# https://docs.ansible.com/ansible/latest/modules/service_module.html
+- name: Install nginx
+  apt:
+    name: nginx
+    state: latest
+  become: yes
+
+# Vérification : curl ou accès via navigateur sur l'IP du serveur > OK
+- name: Start nginx
+  become: yes
+  service:
+    name: nginx
+    # Lancement au démarrage du sytème
+    enabled: true
+    # Lancement lors de l'execution de ce cookbook
+    state: started
+...

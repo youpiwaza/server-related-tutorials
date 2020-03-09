@@ -8,7 +8,9 @@
 
   roles:
     # Install desired packages
-    - utils
+    # - utils
     # Create a new user
-    - user
+    # - user
+    # Install & lunch a service (ex: nginx)
+    - service
 ...
