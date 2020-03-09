@@ -1,0 +1,49 @@
+---
+### Folders and files management ###
+# Needs nginx installed, cf. /roles/service/
+# https://docs.ansible.com/ansible/latest/modules/file_module.html
+# Create a file, with permissions and stuff
+- name: Touch a file, using symbolic modes to set the permissions (equivalent to 0644)
+  file:
+    group: volibear
+    mode: '0644'
+    owner: volibear
+    path: /etc/nginx/sites-enabled/test-file.txt
+    state: touch
+
+# Create folder
+- name: Create a directory if it does not exist
+  file:
+    path: /etc/nginx/sites-enabled/test-directory
+    state: directory
+    mode: '0755'
+
+# Create link
+- name: Create a symbolic link
+  file:
+    dest: /etc/nginx/sites-enabled/link-to-test-directory
+    group: volibear
+    owner: volibear
+    src: /etc/nginx/sites-enabled/test-directory
+    state: link
+
+# - name: Supprimer le fichier de test
+#   become: yes
+#   file:
+#     path: /etc/nginx/sites-enabled/test-file.txt
+#     # Supprimer un fichier
+#     state: absent
+
+# # Delete folder
+# - name: Recursively remove directory
+#   file:
+#     path: /etc/nginx/sites-enabled/test-directory
+#     state: absent
+
+# # Delete link
+# - name: Remove link
+#   file:
+#     path: /etc/nginx/sites-enabled/link-to-test-directory
+#     state: absent
+
+...
