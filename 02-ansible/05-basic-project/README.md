@@ -233,6 +233,8 @@ vars_files:
   - vars/main.yml
 ```
 
+**Note**: If /vars/main.yml is defined in a specific role folder, it will be loaded automaticcally (seems to, cf. /roles/conditionnalTemplating/)
+
 ### Utilisation du conditionnel
 
 Possibilité d'effectuer une tâche uniquement lorsqu'une variable est définie, via `when`
@@ -287,3 +289,13 @@ Useful to tweak configuration files.
 See /roles/editLineInFile
 
 Alternative: Remove file, and use a j2 template.
+
+## Make a task reusable
+
+Create a specific .yml file in roles/theTask/ folder, and call it with `include` and ~~`with_items`~~.
+
+cf. roles/conditionnalTemplating
+
+Prefer the [use of loops](https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html) instead od with_SMTHG, even if it won't be deprecated
+
+The conditionnal is used in the templating file.

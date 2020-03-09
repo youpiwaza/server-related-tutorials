@@ -1,0 +1,7 @@
+---
+# Create file
+- name: 'Create a file for {{ item.name }}, with pref : do you ? {{ item.doYou }}'
+  template:
+    dest: '/home/{{ user }}/tests/conditionnal/{{ item.name }}.txt'
+    src: templates/yesOrNo.j2
+...

@@ -16,6 +16,8 @@
     # Manage folders and files
     # - foldersAndFiles
     # Edit line in file
-    - editLineInFile
+    # - editLineInFile
+    # Create different files from a single template, & loop for multiples items
+    - conditionnalTemplating
     
 ...

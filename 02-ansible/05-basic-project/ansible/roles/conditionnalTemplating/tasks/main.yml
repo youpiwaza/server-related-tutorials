@@ -1,0 +1,27 @@
+---
+### Create files from an item list, with different contents ###
+# Load vars / It's automatic
+# - name: Load users var
+#   vars_files:
+#     - vars/main.yml
+    
+# Re-create folder
+- name: Remove directory test directory
+  file:
+    path: /home/{{ user }}/tests/conditionnal/
+    state: absent
+
+- name: Create a directory if it does not exist
+  file:
+    path: /home/{{ user }}/tests/conditionnal/
+    state: directory
+    mode: '0755'
+
+# Create file
+- name: Create a file from a template, adaptive to user preferences
+  include: createUserFile.yml
+  # with_items: myUsers
+  # Prefer loop over with_items
+  #   https://docs.ansible.com/ansible/latest/user_guide/playbooks_loops.html
+  loop: '{{ myUsers }}'
+...
