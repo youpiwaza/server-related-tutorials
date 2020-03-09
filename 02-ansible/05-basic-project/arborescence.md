@@ -1,12 +1,19 @@
 # Ansible project : arborescence
 
-- /roles
+- /defaults         // ?
+- /handlers         // Event driven recipies, called with notify
+- /roles            // Tasks refacto, same arbo
   - /wtv
+    - /defaults
+    - /handlers
     - /tasks
       - main.yml
-- /templates
+      - wtv.yml
+    - /templates
+    - /vars
+- /templates        // File templating, can use vars & conditionnal
   - wtv.j2
-- /vars
+- /vars             // Object-like data storage
   - wtv.yml
-- hosts
-- playbook.yml
+- hosts             // What IP to apply cookbooks to
+- playbook.yml      // Main recipy, call roles
