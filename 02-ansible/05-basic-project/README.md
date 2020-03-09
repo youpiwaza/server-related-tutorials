@@ -274,8 +274,16 @@ roles:
 
 **Attention !**, même s'il sont définis après des tâches dans playbook.yml,les rôles seront **éxécutés avant** !
 
----
+## Manage folders and files
 
-```yaml
+See /roles/foldersAndFiles
 
-```
+Note: Prefer templates/wtv.j2 instead of touch stuff.
+
+## Edit a specific line in an existing file
+
+Useful to tweak configuration files.
+
+See /roles/editLineInFile
+
+Alternative: Remove file, and use a j2 template.

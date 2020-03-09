@@ -12,7 +12,10 @@
     # Create a new user
     # - user
     # Install & lunch a service (ex: nginx)
-    - service
+    # - service
     # Manage folders and files
-    - foldersAndFiles
+    # - foldersAndFiles
+    # Edit line in file
+    - editLineInFile
+    
 ...

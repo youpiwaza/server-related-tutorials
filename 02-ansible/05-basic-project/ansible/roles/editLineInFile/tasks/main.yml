@@ -1,0 +1,45 @@
+---
+### Edit a line in a (conf) file ###
+## Create an example file, with permissions and stuff
+# Create folder
+- name: Create a directory if it does not exist
+  file:
+    path: /home/{{ user }}/tests/
+    state: directory
+    mode: '0755'
+
+# Create file
+- name: Touch a file, using symbolic modes to set the permissions (equivalent to 0644)
+  template:
+    dest: '/home/{{ user }}/tests/example-config-file.ini'
+    src: templates/example-config-file.j2
+
+# Remove previous test file
+- name: Remove previous test file
+  file:
+    path: '/home/{{ user }}/tests/example-config-file2.ini'
+    # Supprimer un fichier
+    state: absent
+
+## File edition
+# https://docs.ansible.com/ansible/latest/modules/lineinfile_module.html
+- name: Edit a line a specific file
+  lineinfile:
+    # Replace line with
+    line: 'php_flag[display_errors] = on'
+    # File to modify
+    path: '/home/{{ user }}/tests/example-config-file.ini'
+    # Attention à l'échappement
+    # regexp: '^127\.0\.0\.1'
+    # regexp: '^php_flag'
+    regexp: '^php_flag\[display_errors\] ='
+
+- name: Edit a line a specific file, enven if file doesn't exist (without regexp)
+  lineinfile:
+    # Replace line with
+    line: 'php_flag[display_errors] = on'
+    # File to modify
+    path: '/home/{{ user }}/tests/example-config-file2.ini'
+    # It's also possible to create a file and add a line if it didn't exist before
+    create: yes
+...
