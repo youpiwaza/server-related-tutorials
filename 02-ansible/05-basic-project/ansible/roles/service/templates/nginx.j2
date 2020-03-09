@@ -1,0 +1,11 @@
+server{
+    server_name www.{{ domain }};
+    return 301 $scheme://{{ domain }}$request_uri;
+}
+
+server{
+    server_name {{ domain }};
+    root /var/www/{{ domain }};
+
+    index index.html;
+}

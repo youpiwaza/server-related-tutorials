@@ -13,4 +13,6 @@
     # - user
     # Install & lunch a service (ex: nginx)
     - service
+    # Manage folders and files
+    - foldersAndFiles
 ...

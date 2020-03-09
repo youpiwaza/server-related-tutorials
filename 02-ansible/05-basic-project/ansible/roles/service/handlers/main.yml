@@ -1,0 +1,11 @@
+---
+### Event based tasks ###
+# Restart nginx, will be called in tasks/main.yml, thanks to notify:
+- name: nginx reload
+  # become: yes
+  # Note: action ne sers à rien ? + nouvelle syntaxe qui ne passe pas
+  action: service name=nginx state=reloaded
+  # service:
+  #   name: nginx
+  #   state: reloaded
+...

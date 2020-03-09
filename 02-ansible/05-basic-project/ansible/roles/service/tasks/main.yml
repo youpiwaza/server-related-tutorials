@@ -17,4 +17,41 @@
     enabled: true
     # Lancement lors de l'execution de ce cookbook
     state: started
+
+### KO, sites-enabled/local.dev is a directory > nginx crashes & can't restart unitl removed
+# - name: Supprimer nginx default.conf
+#   become: yes
+#   file:
+#     path: /etc/nginx/sites-enabled/default
+#     # Supprimer un fichier
+#     state: absent
+#   # cf. ./handlers/main.yml
+#   notify: nginx reload
+
+# ### Création d'un site par défaut pour l'utilisateur
+# - name: Création du dossier
+#   become: yes
+#   file:
+#     path: '/home/{{ user }}/{{ domain }}'
+#     state: directory
+#     owner: '{{ user }}'
+
+# - name: Lien vers www
+#   become: yes
+#   file:
+#     dest: '/var/www/{{ domain }}'
+#     src: '/home/{{ user }}/{{ domain }}'
+#     state: link
+
+# - name: Création de la configuration nginx
+#   template:
+#     dest: '/etc/nginx/sites-available/{{ domain }}'
+#     src: templates/nginx.j2
+
+# - name: 'Activation du domaine {{ domain }}'
+#   file:
+#     dest: '/etc/nginx/sites-enabled/{{ domain }}'
+#     src: '/etc/nginx/sites-available/{{ domain }}'
+#     state: link
+#   notify: nginx reload
 ...

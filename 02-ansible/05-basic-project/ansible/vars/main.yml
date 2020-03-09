@@ -1,5 +1,6 @@
 ---
 # https://docs.ansible.com/ansible/latest/user_guide/playbooks_variables.html#defining-variables-in-files
+domain: local.dev
 packagesToInstall: ['git', 'vim', 'htop', 'zsh']
 user: volibear
 ...
