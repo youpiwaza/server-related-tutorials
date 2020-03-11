@@ -1,9 +1,9 @@
 ---
 - name: Test actions locales
   hosts: likorne
-  # Alternative
-  # - hosts: 127.0.0.1
-  #   connection: local
+  # Playbook complet en local, alternative à delegate_to & local_action
+  # hosts: 127.0.0.1
+  # connection: local
   remote_user: '{{ my_remote_user }}'
   become: yes
   vars_files:
