@@ -1,5 +1,5 @@
 my_remote_host: 169.169.169.169
 my_remote_user: YOUR_REMOTE_USER
-my_mail:        YOUR_EMAIL
+my_mail: YOUR_EMAIL
 # https://passwordsgenerator.net/ / lower and UPPERCASE, numbers and special chars
-my_passphrase:  whatever
+my_passphrase: whatever
