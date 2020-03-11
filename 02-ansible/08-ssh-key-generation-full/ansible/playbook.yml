@@ -1,0 +1,62 @@
+---
+# First playbook : Localhost only
+
+- name: Ajout d'une clé SSH
+  hosts: 127.0.0.1
+  connection: local
+  vars_files:
+  - vars/main.yml
+
+  tasks:
+    # Remove eventual previous local keys
+    - name: Remove eventual previous local keys
+      local_action: 'command ssh-keygen -f "/root/.ssh/known_hosts" -R "{{ my_remote_host }}"'
+
+    # Generate SSH keys locally
+    #   https://www.ssh.com/ssh/keygen
+    #   http://man.openbsd.org/cgi-bin/man.cgi/OpenBSD-current/man1/ssh-keygen.1?query=ssh-keygen%26sec=1
+    # -a          / Number of derivation (more = secure++)
+    # -c          / Comment
+    # -f          / Filename
+    # -N          / Passphrase
+    # -t ed25519  / Algorithm type / ed25519 - this is a new algorithm added in OpenSSH
+    - name: "Generate SSH keys locally ONLY IF they don't exist yet"
+      local_action: 'command ssh-keygen -f ~/.ssh/{{ my_remote_user }}-ssh-key-ed25519 -a 100 -t ed25519 -N "{{ my_passphrase }}" -C "{{ my_mail }}"'
+      # Only create files if they don't exist
+      args:
+        creates: ~/.ssh/{{ my_remote_user }}-ssh-key-ed25519
+    
+    ### Pretty funky as it is
+    
+    # # Prevent asking passphrase during ssh-add (use ENV)
+    # #   https://www.ssh.com/ssh/add
+    # #   https://help.ubuntu.com/community/EnvironmentVariables
+    # - name: Setting variables for SSH_ASKPASS
+    #   shell: "echo $SSH_ASKPASS"
+    #   environment:
+    #     SSH_ASKPASS: git stuff
+
+    # Execute both in the same command else it doesn't work
+    #   https://stackoverflow.com/a/51495643/12026487
+    # Must re-enter passphrase
+    # - name: Start the local ssh-agent in the background and add private key to local ssh-agent
+    #   shell: |
+    #     eval `ssh-agent`
+    #     ssh-add ~/.ssh/{{ my_remote_user }}-ssh-key-ed25519
+    #   delegate_to: 127.0.0.1
+
+    # - name: Verify key has been added to local ssh agent
+    #   local_action: 'command ssh-add -l'
+    
+    # - name: Add key to server
+    #   local_action: 'command ssh-copy-id -i ~/.ssh/{{ my_remote_user }}-ssh-key-ed25519 {{ my_remote_user }}@{{ my_remote_host }}'
+    
+    # - debug:
+    #     msg: 'Try connecting with > ssh {{ my_remote_user }}@{{ my_remote_host }}'
+
+    ### Better generate a file with manual commands to execute afterward..
+    - name: Generate a file with manual commands to execute afterward..
+      template:
+        dest: manual-commands.md
+        src: templates/manual-commands.j2
+...

@@ -1,0 +1,19 @@
+# Manual commands to execute in order to complete SSH connexion
+
+```bash
+# Start the local ssh-agent
+> eval `ssh-agent`
+
+# Add private key to local ssh-agent
+> ssh-add ~/.ssh/{{ my_remote_user }}-ssh-key-ed25519
+> (pass phrase)
+
+# (Optionnal) Verify key has been added to local ssh agent
+> ssh-add -l
+
+> ssh-copy-id -i ~/.ssh/{{ my_remote_user }}-ssh-key-ed25519 {{ my_remote_user }}@{{ my_remote_host }}
+> (remote_user_password)
+
+# Try connecting with
+> ssh {{ my_remote_user }}@{{ my_remote_host }}
+```
