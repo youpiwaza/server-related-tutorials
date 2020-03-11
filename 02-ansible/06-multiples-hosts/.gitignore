@@ -1,0 +1,8 @@
+# Real hosts file
+hosts
+
+# Real variables file
+**/vars/main.yml
+
+# Secret README files
+**/*_secret*

@@ -1,0 +1,23 @@
+---
+- name: Test first host
+  hosts: likorne
+  remote_user: '{{ my_remote_user }}'
+  become: yes
+  vars_files:
+  - vars/main.yml
+
+  tasks:
+    - name: Installation de git
+      apt: name=git update_cache=yes
+
+- name: Test second host
+  hosts: likorne2
+  remote_user: '{{ my_remote_user }}'
+  become: yes
+  vars_files:
+  - vars/main.yml
+
+  tasks:
+    - name: Installation de curl
+      apt: name=curl update_cache=yes
+...
