@@ -53,7 +53,13 @@ Créez et stockez une [pass phrase](https://www.ssh.com/iam/password/generator) 
 
 # Vérifier l'ajout de la clé (par défaut dans le dossier de l'utilisateur courant)
 > nano ~/.ssh/authorized_keys
+# En tant que root
+> sudo nano home/THE_USER/.ssh/authorized_keys
 # OK
+
+# Debug avancé : vérifier les logs de connexion si toujours ko
+# En tant que root
+> sudo nano /var/log/auth.log
 ```
 
 ### WSL / Connexion en une ligne
