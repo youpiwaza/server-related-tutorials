@@ -1,53 +1,46 @@
 # Swarmprom monitoring
 
-Test de la suite de [dockerswarm rocks](https://dockerswarm.rocks/swarmprom/)
+Test de la suite de [dockerswarm rocks](https://dockerswarm.rocks/swarmprom/).
 
+Test du bundle via [l'installation classique](https://github.com/stefanprodan/swarmprom).
 
+## Mise en place
+
+Activation des [metrics & experimental](https://docs.docker.com/config/thirdparty/prometheus/).
 
 ## Principales commandes
 
 ```bash
-> git clone https://github.com/stefanprodan/swarmprom.git
-> cd swarmprom
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/08-swarmprom-monitoring/swarmpromWSomeEdits
+
+# > git clone https://github.com/stefanprodan/swarmprom.git
+# > cd swarmprom
+
 > ADMIN_USER=admin \
-ADMIN_PASSWORD=admin \
-SLACK_URL=https://hooks.slack.com/services/TOKEN \
-SLACK_CHANNEL=devops-alerts \
-SLACK_USER=alertmanager \
+  ADMIN_PASSWORD=admin \
+  SLACK_URL=https://hooks.slack.com/services/TOKEN \
+  SLACK_CHANNEL=devops-alerts \
+  SLACK_USER=alertmanager \
 docker stack deploy -c docker-compose.yml monit
 
 # RM
 > docker stack rm monit
 ```
 
+Liste de liens, compte/pass : admin/admin
 
-
-## Mise en place
-
-Activation des [metrics & experimental](https://docs.docker.com/config/thirdparty/prometheus/).
-
-Test du bundle via [l'installation classique](https://github.com/stefanprodan/swarmprom).
-
-Liste de liens : 
-
-- [prometheus (metrics database)](http://localhost:9090/)
 - [grafana (visualize metrics)](http://localhost:3000/)
+- [prometheus (metrics database)](http://localhost:9090/)
 - [alertmanager (alerts dispatcher)](http://localhost:9093/)
 - [unsee (alert manager dashboard)](http://localhost:9094/)
 
-oké
+## Prise en main
 
-
-
-# Prise en main
-
-## Prometheus
-
+### Prometheus
 
 Trop rien dedans de base, [tuto docker](https://docs.docker.com/config/thirdparty/prometheus/)
 
-
-### Configuration
+#### Configuration
 
 Besoin d'une [conf spécifique pour Windows (docker desktop)](https://docs.docker.com/config/thirdparty/prometheus/#configure-and-run-prometheus) // Onglet docker desktop
 
@@ -61,7 +54,6 @@ Docker desktop > Settings > Daemon > Advanced > Ajouter..
   "experimental" : true
 }
 ```
-
 
 Vérification de la conf `docker exec -it CONT_NAME /bin/ash` > `cat /etc/prometheus/prometheus.yml` > Configuré pour linux.
 
@@ -99,8 +91,7 @@ docker stack deploy -c docker-compose.yml monit
 
 Vérifier que tout est bon sur [http://localhost:9090/targets](http://localhost:9090/targets)
 
-
-#### Fix dockerd-exporter
+##### Fix dockerd-exporter
 
 dockerd-exporter > DOWN > Bad gateway
 
@@ -125,8 +116,7 @@ Grafana > Dashboards :
 - Docker swarm services / OK
 - Docker swarm nodes / KO
 
-
-#### Fix node-exporter / Nope
+##### Fix node-exporter / Nope
 
 ```bash
 > docker service ls
@@ -136,21 +126,17 @@ Grafana > Dashboards :
 
 Le service est créé mais ne démarre pas
 
-Reco pour windows > https://github.com/martinlindhe/wmi_exporter
+[Reco pour windows](https://github.com/martinlindhe/wmi_exporter)
 
 Flemme + peu d'interêt en local (1 seul node manager & worker)
 
-
-
-### Use Prometheus
+#### Use Prometheus
 
 [UI](http://localhost:9090/graph) et [Doc](https://docs.docker.com/config/thirdparty/prometheus/#use-prometheus)
 
 Joli graph mais pas plus avancé. En fait prometheus collecte, et grafana affiche.
 
-
-
-## Grafana
+### Grafana
 
 Le truc en démo sur dockerswarm rocks.
 
@@ -182,63 +168,34 @@ Bon ça merdouille pas mal (tests KO > Pas de datas) et pas possible de sauvegar
 
 Note, des [alertes de base](https://github.com/stefanprodan/swarmprom#configure-alerting) sont configurées ave le pakcage /o/
 
-
-
-# Vérifications versions
+## Vérifications versions
 
 Pas de maj sur le pack depuis 1 ou 2 ans (selon les versions), vérification dans le docker-compose.
 
 - volumes à revoir
 - images
   - stefanprodan/dockerd-exporter   > 1 an sans maj, je ne sais pas quelle image de prom est la base
-  - google/cadvisor                 > DEPRECATED: New images will NOT be pushed. Please use gcr.io/google-containers/cadvisor instead. 
+  - google/cadvisor                 > DEPRECATED: New images will NOT be pushed. Please use gcr.io/google-containers/cadvisor instead.
     - Déplacé sur google hub ou chp, payant/relou
     - L'image sur le projet est la dernière actualisée
-  - grafana 5.3.4                   > https://hub.docker.com/r/grafana/grafana , dernière release 1 mois, dernière maj 32mn lol.
+  - [grafana 5.3.4](https://hub.docker.com/r/grafana/grafana), dernière release 1 mois, dernière maj 32mn lol.
     - 5.3.4 est la dernière version stable, le reste est en beta (6.5.0-beta1)
     - Test avec la version 6.5.0 > KO Bad gateway, il doit manquer de la conf
-  - alertmanager:v0.14.0            > https://hub.docker.com/r/prom/alertmanager/tags , dernière release 1 mois
+  - [alertmanager:v0.14.0](https://hub.docker.com/r/prom/alertmanager/tags), dernière release 1 mois
     - v0.20.0 actuellement
     - Test avec la 0.20 // Ok a première vue..
-  - unsee v0.8.0                    > https://hub.docker.com/r/cloudflare/unsee/tags
+  - [unsee v0.8.0](https://hub.docker.com/r/cloudflare/unsee/tags)
     - v0.9.2
     - Test > Config error
-  - node-exporter v0.16.0           > https://hub.docker.com/r/prom/node-exporter/tags
+  - [node-exporter v0.16.0](https://hub.docker.com/r/prom/node-exporter/tags)
     - v0.18.1
     - Pas de test, deja KO
-  - prometheus:v2.5.0               > https://hub.docker.com/r/prom/prometheus/tags
+  - [prometheus:v2.5.0](https://hub.docker.com/r/prom/prometheus/tags)
     - v2.15.2
     - Test KO sans conf
-  - caddy 0.10.10                   > https://hub.docker.com/r/abiosoft/caddy/tags
+  - [caddy 0.10.10](https://hub.docker.com/r/abiosoft/caddy/tags)
     - Le webserveur pour les 4 UI (~=nginx), l'image contient la conf
     - abiosoft/caddy:1.0.3
     - Test KO
 
-
 Pas trop toucher sinon perte de conf... Faire des images pour ça cay pas cool, surtout qu'il monte des volumes exprès a chaque fois, je comprend pas le bail.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

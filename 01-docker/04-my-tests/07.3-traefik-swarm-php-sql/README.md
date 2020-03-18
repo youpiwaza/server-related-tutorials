@@ -2,15 +2,15 @@
 
 Sans routes auto, utilisation des labels, à partir de l'exemple 06-... qui fonctionne.
 
-
-
 ## Principales commandes
 
 ```bash
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/07.3-traefik-swarm-php-sql
+
 # Créer le réseau externe à traefik (lien avec les autres services)
 > docker network create --driver=overlay traefik-public
 
-# déploiement de traefik & whoami
+# Déploiement de traefik
 > docker stack deploy -c traefik.yml traefik
 
 # Déploiement d'un hello world
@@ -20,13 +20,18 @@ Sans routes auto, utilisation des labels, à partir de l'exemple 06-... qui fonc
 > docker stack deploy -c php-sql.yml php-sql
 ```
 
-Vérifications sur [http://hello.localhost/](http://hello.localhost/) et **TODO**
+Vérifications sur:
+
+- [Traefik web UI](http://localhost:8080/)
+- [Service hello](http://hello.localhost/)
+- [Service projet / Site](http://lesite.localhost)
+- [Service projet / Admin SQL](http://ladmin.localhost/)
 
 - Possibilité de vérifier les réplicas via whoami (changement d'ip lors du rechargement de la page)
 
 Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels` > `- "traefik.http.routers.LE_SERVICE.rule=Host(URL_DU_SERVICE)"`
 
-*Arrêt du service*
+Arrêt du service
 
 ```bash
 > docker stack rm traefik
@@ -36,8 +41,6 @@ Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels`
 # Supprimer le réseau
 > docker network prune
 ```
-
-
 
 ## Adaptation du projet
 
@@ -72,5 +75,15 @@ Remise du réseau public, retrait des autres réseaux...
 - Ok via compose
 - Down via swarm
 
-
 Juste marre.. Surtout les résultats aléatoires
+
+Edit quelques mois plus tard: **trucs chelous avec les ports**:
+
+- Service web :
+  - Labels (traefik)  : `traefik.http.services.web.loadbalancer.server.port=8069`
+  - Ports (dcoker)    : `8069:80`
+- Service adminer :
+  - Labels (traefik)  : `traefik.http.services.adminer.loadbalancer.server.port=8080`
+  - Ports (dcoker)    : `8081:8080`
+
+On dirait que c'est inversé ?

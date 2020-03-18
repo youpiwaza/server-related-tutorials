@@ -201,10 +201,10 @@ Création d'un nouveau build qui va copier depuis le dossier courant .
 ```bash
 # Le contexte est définit sur le repo, branche master, dossier "site" (d'où la copie du dossier courant)
 # KO, plus d'accès au contexte local, donc plus accès au Dockerfile4
->  docker build \
-  -f Dockerfile4 \
-  -t some-repo-content-nginx \
-  https://github.com/youpiwaza/test-min-static-site#master:site
+# >  docker build \
+#   -f Dockerfile4 \
+#   -t some-repo-content-nginx \
+#   https://github.com/youpiwaza/test-min-static-site#master:site
 
 # NE PAS OUBLIER LE .git, on ne passe pas l'url du repo, mais l'url à cloner
 >  docker build \

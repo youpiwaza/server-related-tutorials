@@ -1,4 +1,5 @@
 version: '3.7'
 services:
+  # Url tirée du nom de service, ici 'hellowolrd3'
   helloworld3:
     image: tutum/hello-world:latest

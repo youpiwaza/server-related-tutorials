@@ -1,5 +1,7 @@
 version: '3.7'
 services:
+  # Url tirée du nom de service, ici 'who'
   who:
+    # container_name fonctionne avec compose, mais pas avec swarm
     container_name: who
     image: containous/whoami:latest

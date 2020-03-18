@@ -2,7 +2,6 @@
 
 .. A partir de l'[exemple dockerhub](https://hub.docker.com/_/traefik)
 
-
 ## Principales commandes
 
 Le but est de monter traefik en tant que service, puis de monter d'autres services et vérifier leur disponibilités sur localhost **mais sans avoir définit leurs routes via les labels**.
@@ -24,14 +23,12 @@ Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http
 
 Les adresses sont fixées dans les .yml dans `--providers.docker.defaultRule` et des shenanigans, à partir des noms de services fixés dans les .yml des services respectifs.
 
-*Arrêt des containers*
+Arrêt des containers
 
 ```bash
 > docker-compose -f who.yml down
 > docker-compose -f hello.yml down
 ```
-
-
 
 ## Mise en place de l'exemple ~~en mode no brain~~
 
@@ -49,7 +46,6 @@ Edit : utiliser ```--providers.docker.defaultRule="Host(`{{ normalize .Name }}.d
 
 [http://who-07-traefik-routes-auto.docker.localhost/](http://who-07-traefik-routes-auto.docker.localhost/) // ok !
 
-
 ### Note
 
 Traefik via compose & whoami via docker run :
@@ -58,11 +54,9 @@ Le service apparait bien dans traefik **ET sa route est correctement configurée
 
 Testé avec ouverture des ports et ajout au réseau traefik > KO
 
-
-
 ## Test avec un nom personnalisé
 
-**Attention, container_name ne fonctionne pas si déploiement via swarm**
+Attention, container_name ne fonctionne pas si déploiement via swarm
 
 [container_name: my-web-container](https://docs.docker.com/compose/compose-file/#container_name)
 
@@ -132,8 +126,6 @@ Bon ça chie sur le nom du container, mais c'est ptet pas plus mal
 - Plus besoin de nommer les containers
 - Adresse locale en fonction du nom du service
 
-
-
 ## Test avec swarm
 
 Peu d'intérêt vu qu'en théorie on a aucune raison de faire tourner swarm en local pour développer. Mais test quand même #curieux
@@ -168,9 +160,7 @@ Host(`
 # Test sur localhost > Bad Gateway
 ```
 
-**Note : Attention com.docker. compose/swarm**
-
-
+Note : **Attention com.docker. compose/swarm**
 
 ## Conteneur indépendant, round 2
 
@@ -207,7 +197,7 @@ Host(`iamfoo`)
         # Si compose n'est pas défini
         ( empty ( index .Labels \"com.docker.compose.service\" ) | ternary
             # (run) On utilise le nom
-            .Name 
+            .Name
             # Sinon (compose) On utilise le service
             (index .Labels \"com.docker.compose.service\")
         )
@@ -222,7 +212,6 @@ Ca roule bieng
 
 Mais pour **run & swarm toujours bad gateway**, et un peu flemme :}
 
-
 ## Note concernant consul
 
 Je vois vraiment pas l'intérêt :3
@@ -230,25 +219,3 @@ Je vois vraiment pas l'intérêt :3
 Okay c'est dynamique avec clés/valeurs may je préfère définir l'url dans le projet direct..
 
 Mise de côté pour le moment.
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//

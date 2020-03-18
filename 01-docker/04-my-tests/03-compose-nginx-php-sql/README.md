@@ -1,6 +1,11 @@
 # Monter un compose Nginx, PHP, SQL & Admin
 
-Pour tester : `docker-compose up`
+```bash
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/03-compose-nginx-php-sql
+> docker-compose up
+```
+
+Liens: [Front sur 8080](http://localhost:8080/), [Adminer sur 8081](http://localhost:8081/) avec Serveur: *db_tartopaum*, Utilisateur: *bob*, Pass: *bobspw*
 
 Sources :
 
@@ -11,23 +16,21 @@ Sources :
 
 On repart du compose nginx + php :)
 
-
-
 ## Principales commandes
 
 Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
 
-```
+```bash
 > docker stack deploy -c docker-compose.yml swarm-php-sql
 ```
 
 Arrêt du service
 
-```
+```bash
 > docker stack rm swarm-php-sql
 ```
 
-**Notes**
+Notes
 
 - Possibilité de lancer via `docker-compose up` pour avoir de meilleurs logs des différents containers.
 
@@ -35,18 +38,16 @@ Arrêt du service
 
 Rentrer dans un container monté pour vérifier contenu ou conf :
 
+```bash
+# Récupérer le nom du container (Selec + clic droit (copier), puis clic droit (coller))
+> docker container ls
+
+# php-fpm
+> docker exec -it NOM_CONTAINER bash
+
+# **alpine ne possède pas bash (nginx)**
+> docker exec -it NOM_CONTAINER /bin/ash
 ```
-// Récupérer le nom du container (Selec + clic droit (copier), puis clic droit (coller)) 
-> docker container ls 
-
-// php-fpm 
-> docker exec -it NOM_CONTAINER bash 
-
-// **alpine ne possède pas bash (nginx)**
-> docker exec -it NOM_CONTAINER /bin/ash 
-```
-
-
 
 ## Choix de la DB et de l'admin
 
@@ -58,21 +59,18 @@ Je vais partir sur MySQL parce que cela semble légèrement plus performant, que
 
 Concernant le choix de l'admin, les deux recommandent [adminer](https://hub.docker.com/_/adminer) (ex: phpmyadmin), je vais partir la dessus pour mes tests.
 
-
-
 ## Mise en place de MySQL
 
 Lecture de la doc et récupération des bonnes pratiques :
 
 1. Analyse de la configuration de l'image
 2. Initialisation / Récupération de la base de données
-  - Variables d'environnements + volumes
+   - Variables d'environnements + volumes
 3. Sécurité : Utilisation de [docker secrets](https://docs.docker.com/compose/compose-file/#secrets)
-
 
 ### Ajout de MySQL au docker-compose
 
-```
+```yaml
   db_tartopaum:
     # Sert à faire le lien avec adminer sans network
     command: --default-authentication-plugin=mysql_native_password
@@ -85,13 +83,11 @@ Lecture de la doc et récupération des bonnes pratiques :
 
 Ok, mais quelques warnings de configuration à régler
 
-
-
 ## Ajout de adminer
 
 ... pour pouvoir mettre les mains dedans.
 
-```
+```yaml
 adminer:
     # latest when writing
     image: 'adminer:4.7.5'
@@ -107,7 +103,7 @@ Ok, test sur [http://localhost:8081/](http://localhost:8081/), on peut se connec
 
 ---
 
-*Essai adminer via fast-cgi > echec*
+Essai adminer via fast-cgi > echec
 
 Mais tourne sur son propre serveur. La doc recommande de le passer sur le php fast-cgi.
 
@@ -121,28 +117,26 @@ Bref, on avance..
 
 ---
 
-
 ### Changement du thème
 
 Ajout de variable d'environnement pour choisir parmis la [liste des thèmes](https://github.com/vrana/adminer/tree/master/designs)
 
-```
+```yaml
   adminer:
     environment:
       ADMINER_DESIGN: 'pappu687'
 ```
 
-Liste des thèmes bieng : 
+Liste des thèmes bieng :
 
 - Clairs : esterka, lucas-sandery, mvt, nette, ng9, pappu687, pepa-linha
 - Sombres : galkaev, mancave
-
 
 ## Configuration MySQL
 
 On rentre dans le conteneur mysql et on suit la doc
 
-```
+```bash
 > docker exec -it NOM_CONTAINER_MYSQL bash
 ```
 
@@ -150,8 +144,7 @@ Copie des 3 fichiers présents dans `HOST/config/mysql8.0.18/_defaults/etc/mysql
 
 Possibilité de rajouter/surcharger dans `/etc/mysql/conf.d/wtv.cnf`.
 
-
-### Ajout de l'encodage par défaut :
+### Ajout de l'encodage par défaut
 
 Utilisation de [l'encodage recommandé](https://dev.mysql.com/doc/refman/5.5/en/charset-unicode-utf8mb4.html) en suivant les recos [SO](https://stackoverflow.com/a/3513812/12026487).
 
@@ -159,15 +152,13 @@ Création d'un fichier de conf personnalisé `my-conf.cnf` et surcharge de la co
 
 Test > Ok :)
 
-
-
 ## Base de données
 
 ### Initialisation
 
 Utilisation des variables d'environnement dans le docker-compose, ajout de la bdd
 
-```
+```yaml
   db_tartopaum:
     environment:
       MYSQL_DATABASE: my_awesome_db
@@ -177,21 +168,20 @@ Ok, la DB est créée par défaut lors de la première connexion.
 
 Ajout d'un utilisateur
 
-```
+```yaml
   db_tartopaum:
     environment:
       MYSQL_USER: bob
       MYSQL_PASSWORD: bobspw
 ```
 
-Accès ok, privilèges uniquement pour la db créé à la volée. 
-
+Accès ok, privilèges uniquement pour la db créé à la volée.
 
 ### Pré-remplissage de la base
 
 Possibilité de fournir du sql éxécuté automatiquement depuis `/docker-entrypoint-initdb.d` (cf. doc) : création d'un script `HOST/init/mysql/docker-entrypoint-initdb.d/my_awesome_table.sql`
 
-```
+```sql
 /* Create table with 2 fields */
 CREATE TABLE `my_awesome_table` (
   `id_my_awesome_table` int(10) unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
@@ -209,12 +199,11 @@ VALUES ('hey je viens de la bdd');
 - Test ajout nouvel élément en bdd, démontage et remontage (voir si pas d'erreur de persistance..)
   - Persistance, mais d'après la doc, MySQL se crée automatiquement un volume docker.
 
-
 ### Persistance des données (volume)
 
 Création d'un volume **nommé**, c'est plus propre
 
-```
+```yaml
   db_tartopaum:
     # [...]
     volumes:
@@ -238,8 +227,6 @@ volumes:
 - Bien attendre que le docker-compose soit stoppé/kill (gracefull), et a priori plus de problèmes
   - Ou utiliser plutôt `docker container prune` qui ne touche pas aux volumes
 
-
-
 ## Sécurité / Docker secrets / KO AVEC PLUGIN DE MERDE mysql connect
 
 Bonnes pratiques + s'entrainer un peu, un [exemple](https://github.com/docker-library/mysql/issues/414).
@@ -251,7 +238,7 @@ Problèmes de cache bizarres via [docker-compose & les variables d'environnement
 Maj docker-compose
 
 - Verif version `pip show docker-compose` // 1.25.0
-- Ne veut pas s'update, mais genre pas du tout `pip install --user docker-compose` / `pip install --upgrade etc.` / 
+- Ne veut pas s'update, mais genre pas du tout `pip install --user docker-compose` / `pip install --upgrade etc.` /
 - Essai sans cache PM
 - Maj package manager : `pip install -U pip`
   - KO > [wtv](https://github.com/pypa/pip/issues/5221#issuecomment-382069604)
@@ -263,10 +250,10 @@ Maj docker-compose
 - Désinstaller puis reinstaller
   - `pip uninstall docker-compose`
 
-```
-  Successfully uninstalled docker-compose-1.25.0
+```bash
+# Successfully uninstalled docker-compose-1.25.0
 ❯ docker-compose version
-docker-compose version 1.22.0, build f46880fe
+# docker-compose version 1.22.0, build f46880fe
 ```
 
 wat
@@ -275,10 +262,10 @@ Récupération de la [méthode d'installation](https://stackoverflow.com/questio
 
 [Dernière version à date](https://github.com/docker/compose/releases)
 
-```
-sudo curl -L "https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-$(uname -s)-$(uname -m)"  -o /usr/local/bin/docker-compose
-sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
-sudo chmod +x /usr/bin/docker-compose
+```bash
+> sudo curl -L "https://github.com/docker/compose/releases/download/1.25.1-rc1/docker-compose-$(uname -s)-$(uname -m)"  -o /usr/local/bin/docker-compose
+> sudo mv /usr/local/bin/docker-compose /usr/bin/docker-compose
+> sudo chmod +x /usr/bin/docker-compose
 ```
 
 OK
@@ -293,7 +280,6 @@ EDIT : essai avec swarm (`docker stack...`) ok une fois, mais en fait non, ça p
 
 // TODO #cancer
 
-
 ### Essai résolutions warnings
 
 #### Warning symbolic links
@@ -302,21 +288,17 @@ EDIT : essai avec swarm (`docker stack...`) ok une fois, mais en fait non, ça p
 
 Surcharge de `my.cnf` via bind > commenter le bousin.
 
-
 #### Warning CA certificate ca.pem is self signed
 
-https://i-mscp.net/thread/16232-ca-certificate-ca-pem-is-self-signed-reported-by-mysql/
+[wtv](https://i-mscp.net/thread/16232-ca-certificate-ca-pem-is-self-signed-reported-by-mysql/)
 
 Osef
-
 
 #### Insecure configuration for --pid-file
 
 `Insecure configuration for --pid-file: Location '/var/run/mysqld' in the path is accessible to all OS users. Consider choosing a different directory.`
 
 Rien sur le net, pas le courage
-
-
 
 ## Requête PHP alaakon
 
@@ -337,8 +319,6 @@ Attention ! Lors de la connexion à la bdd via PHP
       - Créer un réseau explicite dédié entre sql & adminer
 
 Yay, tout good
-
-
 
 ## docker stack deploy Fix
 
@@ -380,30 +360,3 @@ Maj du docker-compose.yml
 ```
 
 Test > *Purrrfect*
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-

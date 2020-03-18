@@ -1,13 +1,37 @@
 # Traefik / Reverse proxy & UI
 
-Pour tester : `docker-compose up`
+Lancement d'une part de traefik, et d'autre part de serveur web alakon (image whoami).
 
-Sources :
+Ok avec docker-compose, KO avec swarm( dans cet exemple, go cf. 06-traefik-swarm)
+
+```bash
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/04-traefik
+
+# Lancement de 3 whoami en arrière plan
+> docker-compose \
+  -f docker-compose-whoami.yml \
+  up \
+  -d \
+  --scale whoami=3
+
+# Lancement de traefik
+> docker-compose up
+
+# Tester
+
+# Arrêter
+> docker-compose -f docker-compose-whoami.yml down
+```
+
+Tests:
+
+- [localhost r proxy](http://whoami.docker.localhost/) / Load balancer en place, l'IP switch sur l'un des 3 conteneurs en place lors de l'actualisation
+- [Traefik web UI / Localhost:8069](http://localhost:8069/)
+
+Sources:
 
 - *Fichier docker-compose.yml*
 - *Fichier docker-compose-whoami.yml*
-
-
 
 ## Principales commandes
 
@@ -34,7 +58,7 @@ Arrêt du service
 
 Puis test sur le [localhost r proxy](http://whoami.docker.localhost/)
 
-**Notes**
+Notes
 
 - Possibilité de lancer via `docker-compose up` pour avoir de meilleurs logs des différents containers.
 
@@ -43,17 +67,15 @@ Puis test sur le [localhost r proxy](http://whoami.docker.localhost/)
 Rentrer dans un container monté pour vérifier contenu ou conf :
 
 ```bash
-# Récupérer le nom du container (Selec + clic droit (copier), puis clic droit (coller)) 
-> docker container ls 
+# Récupérer le nom du container (Selec + clic droit (copier), puis clic droit (coller))
+> docker container ls
 
 # bash (bases ubuntu/classiques)
-> docker exec -it NOM_CONTAINER bash 
+> docker exec -it NOM_CONTAINER bash
 
-# **alpine ne possède pas bash**
-> docker exec -it NOM_CONTAINER /bin/ash 
+# alpine ne possède pas bash
+> docker exec -it NOM_CONTAINER /bin/ash
 ```
-
-
 
 ## Ressources & tests
 
@@ -61,11 +83,9 @@ Rentrer dans un container monté pour vérifier contenu ou conf :
 - [Doc officielle](https://docs.traefik.io/)
 - [Dockerhub](https://hub.docker.com/_/traefik)
 
-
 Exemple dockerhub KO ?
 
 Essai avec le [docker-compose de la doc](https://docs.traefik.io/getting-started/quick-start/) // OK :)
-
 
 ### Test via docker-compose
 
@@ -98,7 +118,7 @@ Séparation du docker-compose whoami pour des raisons de convénience
 
 Test whoami avec des répliques
 
-**Besoin d'une configuration spéciale pour swarm, pour le moment utiliser docker-compose CLI**
+Besoin d'une configuration spéciale pour swarm, pour le moment utiliser docker-compose CLI
 
 ```bash
 # Attention, -f est avant up, le reste après --"
@@ -110,7 +130,6 @@ Test whoami avec des répliques
 ```
 
 Test sur le [localhost r proxy](http://whoami.docker.localhost/) // OK, + hostname & IP change
-
 
 #### ~~Tests KO via swarm (labels KO)~~
 
@@ -162,34 +181,3 @@ Mise en place de traefik + swarm dans le test suivant
 Note : Je ne suis pas rentré dans la config (statique) de traefik ; je vais voir si il y en a besoin dans l'implémentation avec swarm
 
 Edit : il existe un [exemple](https://docs.traefik.io/user-guides/docker-compose/basic-example/) dans la doc officielle sur lequel je ne suis pas passé..
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//
-

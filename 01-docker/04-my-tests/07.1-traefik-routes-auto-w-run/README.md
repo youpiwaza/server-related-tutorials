@@ -2,9 +2,7 @@
 
 .. A partir de l'exemple précédent. Petit test rapide avec un réseau externe voir si ça peut marcher pour `docker run`.
 
-
 ## Principales commandes
-
 
 ```bash
 # Création du réseau publique, attention --attachable
@@ -19,10 +17,10 @@
 
 # run
 > docker run -d \
--P \
---name whorun \
---network traefik-public \
-containous/whoami
+  -P \
+  --name whorun \
+  --network traefik-public \
+  containous/whoami
 
 # swarm + répliques
 > docker stack deploy -c who-swarm.yml who-replicas
@@ -30,7 +28,7 @@ containous/whoami
 
 Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http://helloworld3.localhost/](http://helloworld3.localhost/).
 
-*Arrêt des containers*
+Arrêt des containers
 
 ```bash
 > docker-compose -f traefik.yml down
@@ -41,7 +39,6 @@ Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http
 > docker stack rm who-replicas
 > docker system prune
 ```
-
 
 ## Ajout du réseau
 
@@ -79,21 +76,17 @@ networks:
 
 Route OK :)
 
-
-
 ## Création du container via run
 
 ```bash
 > docker run -d \
--P \
---name whorun \
---network traefik-public \
-containous/whoami
+  -P \
+  --name whorun \
+  --network traefik-public \
+  containous/whoami
 ```
 
 Vérif [http://whorun.localhost/](http://whorun.localhost/) // **OK /o/**
-
-
 
 ## Essai avec swarm
 
@@ -105,9 +98,7 @@ Parce qu'on est joueurs.
 
 Vérif (traefik ui) [http://whoswarm_who.localhost/](http://whoswarm_who.localhost/) // **OK /o/**
 
-
 ### Avec repliques
-
 
 ```bash
 > docker stack deploy -c who-swarm.yml who-replicas
@@ -115,6 +106,4 @@ Vérif (traefik ui) [http://whoswarm_who.localhost/](http://whoswarm_who.localho
 
 Problème sur UI > Les 3 répliques ont la même adresse, même si [http://who-replicas_who.localhost/](http://who-replicas_who.localhost/) tourne (1 instance au pif ?).
 
-
 TODO : ajuster routes auto ? // flemme, peu d'interêt
-

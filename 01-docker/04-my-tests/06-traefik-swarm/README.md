@@ -8,8 +8,6 @@ On repart de la configuration de traefik de base ([doc](https://docs.traefik.io/
 
 Enfin, on suit la [doc](https://docs.traefik.io/providers/docker/)
 
-
-
 ## Principales commandes
 
 Le but est de monter traefik en tant que service, puis de monter d'autres services et vérifier leur disponibilités sur localhost.
@@ -17,6 +15,8 @@ Le but est de monter traefik en tant que service, puis de monter d'autres servic
 Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
 
 ```bash
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/06-traefik-swarm
+
 # Créer le réseau externe à traefik (lien avec les autres services)
 > docker network create --driver=overlay traefik-public
 
@@ -29,25 +29,26 @@ Lancement en tant que service via [swarm](https://docs.docker.com/get-started/pa
 # Test avec scale
 #> docker service scale SERVICE=REPLICAS
 > docker service scale traefik_whoami=3
-
-# Supprimer le réseau
-> docker network prune
 ```
 
-Vérifications sur [http://whoami.localhost/](http://whoami.localhost/) et [http://hello.localhost/](http://hello.localhost/).
+Vérifications sur :
+
+- [http://whoami.localhost/](http://whoami.localhost/)
+- [http://hello.localhost/](http://hello.localhost/) # Attention, il y a un délai avant accès (~5-10s ?)
+- [Traefik web UI](http://localhost:8080/)
 
 - Possibilité de vérifier les réplicas via whoami (changement d'ip lors du rechargement de la page)
 
 Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels` > `- "traefik.http.routers.LE_SERVICE.rule=Host(URL_DU_SERVICE)"`
 
-*Arrêt du service*
+Arrêt du service
 
 ```bash
 > docker stack rm traefik
 > docker stack rm hello
+# Supprimer le réseau
+> docker network prune
 ```
-
-
 
 ## Configuration Discovery
 
@@ -74,7 +75,6 @@ services:
 ```
 
 Configuration dynamique via labels, options, valeurs & explications
-
 
 ### Traefik
 
@@ -111,26 +111,20 @@ dans **command**
 
 - tls stuff > plus tard
 
-
 dans **deploy: placement: constraints**
 
-- - node.role == manager
+- node.role == manager
   - [doc](https://docs.traefik.io/providers/docker/#docker-api-access_1) / [doc docker](https://docs.docker.com/compose/compose-file/#placement)
-
-
-
 
 dans **volumes**
 
-- - /var/run/docker.sock:/var/run/docker.sock
+- /var/run/docker.sock:/var/run/docker.sock
   - [doc](https://docs.traefik.io/providers/docker/#provider-configuration)
   - // The docker-compose file shares the docker sock with the Traefik container
 
-
-
 ### hellow
 
-*Attention : lors de l'utilisation de swarm avec traefik, les labels doivent être ceux des services (et non des containers), ils sont donc à définir dans deploy*
+Attention : lors de l'utilisation de swarm avec traefik, les labels doivent être ceux des services (et non des containers), ils sont donc à définir dans deploy
 
 dans **deploy: labels**
 
@@ -141,8 +135,6 @@ dans **deploy: labels**
 - "traefik.enable=true"
   - [doc](https://docs.traefik.io/providers/docker/#exposedbydefault)
   - Exposer le conteneur au web
-
-
 
 ## Routing & load balancing
 
