@@ -13,7 +13,7 @@ Straight extracted from [grafikart ansible tutorial](https://www.grafikart.fr/tu
 # Pass phrase
 
 # Acceder au projet
-> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/05-basic-project/ansible
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/05-usual-functions/ansible
 # Configurer l'agent SSH en local
 > eval `ssh-agent`
 > ssh-add ~/.ssh/masamune-ssh-key-ed25519-yay
