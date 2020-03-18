@@ -1,0 +1,40 @@
+---
+- name: "Installation d'un truc avec le premier user {{ my_remote_user }}"
+  hosts: likorne
+  remote_user: '{{ my_remote_user }}'
+  # become: yes
+  vars_files:
+  - vars/main.yml
+
+  # Commandes ansible classiques
+  tasks:
+    - name: Installation de git
+      become: yes
+      apt:
+        name: git
+        update_cache: yes
+    - name: Who am i ? 
+      command: 'whoami'
+      register: whoami_result
+    - debug:
+        # root if become is used
+        msg: '{{ whoami_result.stdout }} / user is root if become \: yes is used on whole playbook, but not on a single task'
+
+- name: "Installation d'un truc avec un autre user {{ my_second_remote_user }}"
+  hosts: likorne
+  remote_user: '{{ my_second_remote_user }}'
+  # become: yes
+  vars_files:
+  - vars/main.yml
+
+  # Besoin de sudo si le package n'est pas déjà présent
+  tasks:
+    - name: Installation de curl
+      apt:
+        name: curl
+    - name: Who am i ? 
+      command: 'whoami'
+      register: whoami_result
+    - debug:
+        msg: '{{ whoami_result.stdout }}'
+...
