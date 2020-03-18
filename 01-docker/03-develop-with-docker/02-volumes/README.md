@@ -158,7 +158,7 @@ Résultat
 Nouvelle image Dockerfile à partir d'un autre dossier. Le contenu html est différent ("Un autre site")
 
 ```bash
-# Arrêt et suppression du conteneur en cours, conservation du volume 
+# Arrêt et suppression du conteneur en cours, conservation du volume
 # Création du nouveau build
 >  docker build \
   -f Dockerfile3 \
@@ -175,7 +175,7 @@ Nouvelle image Dockerfile à partir d'un autre dossier. Le contenu html est diff
 
 Résultat
 
-- L'ancien contenu est affiché ("Heya..") : le volume a obfusqué le nouveau contenu 
+- L'ancien contenu est affiché ("Heya..") : le volume a obfusqué le nouveau contenu
 
 ```bash
 # Arrêt et suppression du conteneur en cours
