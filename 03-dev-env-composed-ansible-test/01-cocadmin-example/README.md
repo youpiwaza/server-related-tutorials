@@ -8,6 +8,8 @@ Ansible fonctionnant en SSH, les conteneurs seront connectés de cette manière.
 
 Un `volume:bind` (/playbooks) est monté afin de pouvoir continuer à éditer les fichiers depuis l'extérieur.
 
+J'ai également mis une [version actualisée ⚡️](https://github.com/youpiwaza/server-related-tutorials/tree/master/03-dev-env-composed-ansible-test/02-example-updated) en ligne, avec ansible:alpine et ubuntu:18.04.
+
 ## Commandes de base
 
 ```bash
