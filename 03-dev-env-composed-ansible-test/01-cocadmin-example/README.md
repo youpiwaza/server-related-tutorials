@@ -1,12 +1,12 @@
 # Création d'un environnement de developpement pour tester les recettes ansible
 
-Basé sur la [vidéo](https://www.youtube.com/watch?v=yqLPUOsy-8M) et les sources de [cocadmin](https://gist.github.com/ttwthomas/017891e536f745dcbcc5d0bc160a2643), ainsi que sur le [repo recommandé](https://hub.docker.com/r/williamyeh/ansible/) des images ansible.
+Basé sur la [vidéo](https://www.youtube.com/watch?v=yqLPUOsy-8M) et les sources de [cocadmin 🥤](https://gist.github.com/ttwthomas/017891e536f745dcbcc5d0bc160a2643), ainsi que sur le [repo recommandé](https://hub.docker.com/r/williamyeh/ansible/) des images ansible.
 
 Le but est d'avoir un docker compose comprenant un conteneur Ansible, ainsi qu'un ou plusieurs conteneurs de tests (ubuntu ou autre) sur lesquels seront testés les recettes.
 
 Ansible fonctionnant en SSH, les conteneurs seront connectés de cette manière.
 
-Un volume:bind (/playbooks) est monté afin de pouvoir continuer à éditer les fichiers depuis l'extérieur.
+Un `volume:bind` (/playbooks) est monté afin de pouvoir continuer à éditer les fichiers depuis l'extérieur.
 
 ## Commandes de base
 
