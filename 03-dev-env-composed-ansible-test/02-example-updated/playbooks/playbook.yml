@@ -1,0 +1,13 @@
+---
+- name: Test basique / installation d un repo
+  # cf. hosts
+  hosts: webhoy
+  # remote_user: root
+  # become: yes
+
+  tasks:
+    - name: Installation de git
+      apt:
+        name: git
+        update_cache: yes
+...
