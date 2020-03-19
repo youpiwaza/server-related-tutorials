@@ -1,0 +1,49 @@
+---
+- name: Test basique / installation d un serveur web
+  # cf. hosts
+  hosts: webhoy
+  remote_user: root
+  become: yes
+
+  tasks:
+    - name: Installation de nginx
+      apt:
+        name: nginx
+        update_cache: yes
+        state: latest
+
+    - name: Start nginx
+      service:
+        name: nginx
+        # Lancement au démarrage du sytème
+        enabled: true
+        # Lancement lors de l'execution de ce cookbook
+        state: started
+
+    - name: Replace website title
+      lineinfile:
+        line: '<h1>Yay tout fonctionne !</h1>'
+        path: '/var/www/html/index.nginx-debian.html'
+        regexp: '^<h1>'
+
+    ## Tester la bonne mise en place
+    # # curl non recommandé par ansible
+    # # - name: Recuperer le localhost sur le port 8080
+    # #   command: 'curl webyay:8080/'
+    # #   register: curl_result
+
+    - name: Check that you can connect (GET) to a page and it returns a status 200
+      uri:
+        # url: http://webyay:80 # OK
+        url: http://localhost:80 # OK
+
+    - name: "Check that a page returns a status 200 and fail if the words 'Yay tout fonctionne !' is not in the page contents"
+      uri:
+        url: http://localhost:80
+        return_content: yes
+      register: da_webpage
+      failed_when: "'Yay tout fonctionne !' not in da_webpage.content"
+
+    - debug:
+        msg: 'Affichage du contenu de la page :\n\n{{ da_webpage.content }}'
+...

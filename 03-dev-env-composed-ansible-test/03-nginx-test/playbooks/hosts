@@ -1,0 +1,8 @@
+[webhoy]
+# cf. docker-compose.yml
+webyay
+
+# Définir les accès de connexion, cf. server.Dockerfile
+[all:vars]
+ansible_ssh_user=root
+ansible_ssh_pass=ansible

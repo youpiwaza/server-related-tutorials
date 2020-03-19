@@ -1,0 +1,22 @@
+version: '3'
+services:
+  master:
+    build:
+      context: .
+      dockerfile: ./master.Dockerfile
+    working_dir: /root/playbooks
+    volumes:
+      # Surcharge de la configuration d'ansible, afin de ne pas vérifier la clé ssh avant de l'accepter
+      - ./ansible/config:/etc/ansible
+      # Utilisation des playbooks depuis notre poste
+      - ./playbooks:/root/playbooks
+    command: tail -f /dev/null
+  
+  # webyay est utilisé dans playbooks/hosts, ainsi que pour la connexion ssh directe
+  webyay:
+    build:
+      context: .
+      dockerfile: ./server.Dockerfile
+    # Envoyer le flux du serveur sur localhost:8080
+    ports:
+    - '8080:80'
