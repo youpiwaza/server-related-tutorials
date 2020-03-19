@@ -2,6 +2,8 @@
 
 Basé sur ce [boilerplate](https://github.com/youpiwaza/server-related-tutorials/tree/master/03-dev-env-composed-ansible-test/02-example-updated)
 
+Juste besoin de docker qui tourne.
+
 ---
 
 Le but ici est d'installer, faire tourner et valider un serveur web nginx.
