@@ -8,7 +8,7 @@ Juste besoin de docker qui tourne.
 
 Le but ici est d'installer, faire tourner et valider un serveur web nginx.
 
-En gros exploiter le côté playbook et vérifier que tout roule *bieng*.
+En gros exploiter le côté playbook et vérifier que tout roule *bieng* via [ansible uri](https://docs.ansible.com/ansible/latest/modules/uri_module.html).
 
 ## Commandes de base
 
