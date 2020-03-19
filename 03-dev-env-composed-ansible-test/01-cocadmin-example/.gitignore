@@ -1,0 +1,11 @@
+# Ignore files/folders in git repositories
+# https://git-scm.com/docs/gitignore
+
+# Mac folder BS
+.DS_Store
+._.DS_Store
+**/.DS_Store
+**/._.DS_Store
+
+# Exclude playbooks retries
+**/playbook.retry

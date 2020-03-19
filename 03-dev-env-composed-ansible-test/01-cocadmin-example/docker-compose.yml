@@ -1,0 +1,18 @@
+version: '3'
+services:
+  master:
+    build:
+      context: .
+      dockerfile: ./master.Dockerfile
+    working_dir: /root/playbooks
+    volumes:
+      # - /c/repos/ansible/playbooks:/root/playbooks
+      # - /c/repos/ansible/config:/etc/ansible
+      - ./playbooks:/root/playbooks
+    command: tail -f /dev/null
+  
+  # Utilisé dans playbooks/hosts
+  webyay:
+    build:
+      context: .
+      dockerfile: ./server.Dockerfile
