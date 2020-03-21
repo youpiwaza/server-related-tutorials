@@ -1,0 +1,68 @@
+---
+- name: Test basique / installation de docker en tant que root
+  # https://docs.docker.com/install/linux/docker-ce/ubuntu/#install-using-the-repository
+  # https://github.com/do-community/ansible-playbooks/blob/master/docker_ubuntu1804/playbook.yml
+
+  # cf. hosts
+  hosts: webhoy
+  remote_user: root
+  become: yes
+
+  tasks:
+    - name: Install pip on self (ansible host)
+      # Alpine package manager is apk
+      #   https://docs.ansible.com/ansible/latest/modules/apk_module.html
+      # Packages have different names
+      #   https://stackoverflow.com/a/44634480/12026487
+      apk:
+        name: py-pip, py3-setuptools, py3-virtualenv
+        update_cache: yes
+        state: latest
+      delegate_to: 127.0.0.1
+
+    - name: Uninstall old versions
+      apt:
+        name: ['docker', 'docker-engine', docker.'io', 'containerd', 'runc']
+        state: absent
+
+    - name: Run the equivalent of "apt-get update"
+      apt:
+        cache_valid_time: '3600'
+        force_apt_get: yes
+        update_cache: yes
+
+    - name: Install Docker required packages, and pip (python packages)
+    # Required pip packages : 'python3-pip', 'python3-setuptools', 'virtualenv'
+    #   https://docs.ansible.com/ansible/latest/modules/pip_module.html
+      apt:
+        name: ['apt-transport-https', 'ca-certificates', 'curl', 'gnupg-agent', 'python3-pip', 'python3-setuptools', 'software-properties-common', 'virtualenv']
+        state: latest
+
+    - name: Add Docker GPG apt Key
+      apt_key:
+        state: present
+        url: https://download.docker.com/linux/ubuntu/gpg
+
+    - name: Add Docker Repository
+      apt_repository:
+        repo: deb https://download.docker.com/linux/ubuntu bionic stable
+        state: present
+
+    - name: Update apt and install docker-ce
+      apt:
+        name: ['docker-ce', 'docker-ce-cli', 'containerd.io']
+        state: latest
+        update_cache: yes
+
+    - name: Start Docker
+      service:
+        name: docker
+        enabled: true
+        state: started
+    
+    # KO
+    - name: Install Docker Module for Python, through pip
+      pip:
+        executable: pip3
+        name: docker
+...
