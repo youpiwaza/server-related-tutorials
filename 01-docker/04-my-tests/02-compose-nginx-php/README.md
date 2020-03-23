@@ -5,6 +5,8 @@
 > docker-compose up
 ```
 
+Résultat sur [localhost:8080](http://localhost:8080/)
+
 Sources :
 
 - *Fichier docker-compose.yml*
