@@ -21,4 +21,10 @@
         # another_var: 'msg: Goodbye'
         task_arguments: 
           msg: Goodbye
+
+    # # KO
+    # - include: task-template-override.yml
+    #   vars:
+    #     task_arguments: 
+    #       msg: Not the original message
 ...

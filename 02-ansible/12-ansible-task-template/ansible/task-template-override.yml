@@ -1,0 +1,6 @@
+---
+- name: 'Templatated task with orginal arg to override with var containing same tasks arguments "{{ task_arguments }}"'
+  debug:
+    msg: Original message
+    '{{ task_arguments }}'
+... 
