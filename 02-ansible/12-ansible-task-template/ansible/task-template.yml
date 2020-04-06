@@ -1,0 +1,5 @@
+---
+- name: 'Templatated task to run with var "{{ the_var }}"'
+  debug:
+    msg: '{{ the_var }}'
+...

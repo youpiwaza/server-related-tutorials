@@ -1,0 +1,24 @@
+---
+- name: Tester le templating YAML
+  hosts: 127.0.0.1
+  remote_user: root
+
+  tasks:
+    - include: task-template.yml
+      vars:
+        the_var: My first var
+
+    - include: task-template.yml
+      vars:
+        the_var: My second var
+
+    - include: task-template.yml
+      vars:
+        the_var: Hellow
+
+    - include: task-template-plus.yml
+      vars:
+        # another_var: 'msg: Goodbye'
+        task_arguments: 
+          msg: Goodbye
+...

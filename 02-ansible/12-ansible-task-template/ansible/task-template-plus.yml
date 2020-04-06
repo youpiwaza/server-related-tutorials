@@ -1,0 +1,5 @@
+---
+- name: 'Templatated task to run with var containing tasks arguments "{{ task_arguments }}"'
+  debug:
+    '{{ task_arguments }}'
+...
