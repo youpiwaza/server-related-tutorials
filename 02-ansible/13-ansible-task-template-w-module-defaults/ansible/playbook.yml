@@ -1,0 +1,35 @@
+---
+- name: Tester le templating YAML via module_defaults
+  hosts: 127.0.0.1
+  module_defaults:
+    debug:
+      msg: Le message par defaut du playbook
+  remote_user: root
+
+  tasks:
+    # Use module defaults
+    - debug:
+
+    # Override
+    - debug:
+        msg: "Un message overide spécifié lors de l'appel de debug"
+    
+    # Using default debug message defined in the file
+    - include: task-template-override.yml
+
+    # Overriding from the outside
+    # KO, priority : task > block > play
+    - include: task-template-override.yml
+      module_defaults:
+        debug:
+          msg: "Un message par defaut lors de l'appel de l'include qui contient des defaults"
+
+    # Include a task using debug, without msg defaults. Should use the play defaults # OK
+    - include: task-template-wo-defaults.yml
+
+    # Include a task using debug, with msg arguments. Should override the play defaults
+    - include: task-template-wo-defaults.yml
+      module_defaults:
+        debug:
+          msg: "Un message par defaut lors de l'appel de l'include qui ne contient pas de defaults"
+...

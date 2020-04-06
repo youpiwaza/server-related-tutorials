@@ -1,0 +1,8 @@
+---
+- name: Tester le templating YAML via module_defaults, dans un include
+  module_defaults:
+    debug:
+      msg: Un message par defaut fixé dans un include
+  # Utilisation de debug sans msg, qui sera populé soit par les défaults, soit par surcharge
+  debug:
+... 

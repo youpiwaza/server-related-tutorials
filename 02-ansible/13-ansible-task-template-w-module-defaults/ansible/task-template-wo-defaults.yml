@@ -1,0 +1,4 @@
+---
+- name: "Tester le templating YAML via module_defaults, dans un include qui ne contient pas de defaults. Il devrait utiliser le message par defaut du playbook si rien n'est fourni"
+  debug:
+...
