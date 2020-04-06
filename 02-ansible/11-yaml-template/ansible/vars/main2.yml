@@ -1,0 +1,9 @@
+---
+# # Nope
+# - include: vars/main.yml
+
+# # KO Template not found
+# templateAndMoreAndMore:
+#   <<: *my_test_template
+#   moreMoreFoo: moreMoreBar
+...

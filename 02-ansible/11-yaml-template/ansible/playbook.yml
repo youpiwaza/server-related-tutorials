@@ -1,0 +1,26 @@
+---
+- name: Tester le templating YAML
+  hosts: 127.0.0.1
+  remote_user: root
+  # become: yes
+  vars_files:
+  - vars/main.yml
+  - vars/main2.yml
+
+  tasks:
+    - name: Include template variable
+      debug:
+        msg: '{{ test_template }}'
+    
+    - name: Include templateD variable
+      debug:
+        msg: '{{ templateAndMore }}'
+
+    # # KO
+    # - name: Include included templateD variable
+    #   debug:
+    #     msg:
+    #       templateAndMoreAndMore:
+    #         <<: *my_test_template
+    #         moreMoreFoo: moreMoreBar
+...

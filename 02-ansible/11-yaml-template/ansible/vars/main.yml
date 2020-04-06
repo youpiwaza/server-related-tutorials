@@ -1,0 +1,8 @@
+---
+test_template: &my_test_template
+  foo: bar
+
+templateAndMore:
+  <<: *my_test_template
+  moreFoo: moreBar
+...
