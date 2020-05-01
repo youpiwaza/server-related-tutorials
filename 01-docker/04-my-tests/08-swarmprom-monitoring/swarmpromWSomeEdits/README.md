@@ -40,7 +40,6 @@ Services:
 * unsee (alert manager dashboard) `http://<swarm-ip>:9094`
 * caddy (reverse proxy and basic auth provider for prometheus, alertmanager and unsee)
 
-
 ## Alternative install with Traefik and HTTPS
 
 If you have a Docker Swarm cluster with a global Traefik set up as described in [DockerSwarm.rocks](https://dockerswarm.rocks), you can deploy Swarmprom integrated with that global Traefik proxy.
@@ -60,8 +59,8 @@ These instructions assume you already have Traefik set up following that guide a
 * Clone this repository and enter into the directory:
 
 ```bash
-$ git clone https://github.com/stefanprodan/swarmprom.git
-$ cd swarmprom
+> git clone https://github.com/stefanprodan/swarmprom.git
+> cd swarmprom
 ```
 
 * Set and export an `ADMIN_USER` environment variable:
@@ -71,7 +70,6 @@ export ADMIN_USER=admin
 ```
 
 * Set and export an `ADMIN_PASSWORD` environment variable:
-
 
 ```bash
 export ADMIN_PASSWORD=changethis
@@ -91,7 +89,7 @@ echo $HASHED_PASSWORD
 
 it will look like:
 
-```
+```bash
 $apr1$89eqM5Ro$CxaFELthUKV21DpI3UTQO.
 ```
 
@@ -130,7 +128,6 @@ export SLACK_USER=alertmanager
 
 * Deploy the Traefik version of the stack:
 
-
 ```bash
 docker stack deploy -c docker-compose.traefik.yml swarmprom
 ```
@@ -142,7 +139,6 @@ To test it, go to each URL:
 * `https://unsee.example.com`
 * `https://prometheus.example.com`
 
-
 ## Setup Grafana
 
 Navigate to `http://<swarm-ip>:3000` and login with user ***admin*** password ***admin***.
@@ -153,7 +149,7 @@ Swarmprom Grafana is preconfigured with two dashboards and Prometheus as the def
 
 * Name: Prometheus
 * Type: Prometheus
-* Url: http://prometheus:9090
+* Url: [http://prometheus:9090](http://prometheus:9090)
 * Access: proxy
 
 After you login, click on the home drop down, in the left upper corner and you'll see the dashboards there.
@@ -206,7 +202,6 @@ URL: `http://<swarm-ip>:3000/dashboard/db/prometheus`
 * Chunks to persist and persistence urgency graphs
 * Chunks ops and checkpoint duration graphs
 * Target scrapes, rule evaluation duration, samples ingested rate and scrape duration graphs
-
 
 ## Prometheus service discovery
 
@@ -279,7 +274,7 @@ Now that you have a metric containing the Docker Swarm node ID and name, you can
 
 Let's say you want to find the available memory on each node, normally you would write something like this:
 
-```
+```bash
 sum(node_memory_MemAvailable) by (instance)
 
 {instance="10.0.0.5:9100"} 889450496
@@ -311,7 +306,7 @@ Let's write a query to find out how many containers are running on a Swarm node.
 Knowing from the `node_meta` metric all the nodes IDs you can define a filter with them in Grafana.
 Assuming the filter is `$node_id` the container count query should look like this:
 
-```
+```bash
 count(rate(container_last_seen{container_label_com_docker_swarm_node_id=~"$node_id"}[5m]))
 ```
 
@@ -320,7 +315,7 @@ Docker engine doesn't have a label with the node ID attached on every metric, bu
 metric that has this label.  If you want to find out the number of failed health checks on a Swarm node
 you would write a query like this:
 
-```
+```bash
 sum(engine_daemon_health_checks_failed_total) * on(instance) group_left(node_id) swarm_node_info{node_id=~"$node_id"})
 ```
 
@@ -330,7 +325,7 @@ the experimental feature and set the metrics address to `0.0.0.0:9323`.
 If you are running Docker with systemd create or edit
 /etc/systemd/system/docker.service.d/docker.conf file like so:
 
-```
+```bash
 [Service]
 ExecStart=
 ExecStart=/usr/bin/dockerd \
@@ -403,7 +398,7 @@ The Prometheus swarmprom comes with the following alert rules:
 
 Alerts when a node CPU usage goes over 80% for five minutes.
 
-```
+```bash
 ALERT node_cpu_usage
   IF 100 - (avg(irate(node_cpu{mode="idle"}[1m])  * on(instance) group_left(node_name) node_meta * 100) by (node_name)) > 80
   FOR 5m
@@ -413,11 +408,12 @@ ALERT node_cpu_usage
       description = "Swarm node {{ $labels.node_name }} CPU usage is at {{ humanize $value}}%.",
   }
 ```
+
 ***Swarm Node Memory Alert***
 
 Alerts when a node memory usage goes over 80% for five minutes.
 
-```
+```bash
 ALERT node_memory_usage
   IF sum(((node_memory_MemTotal - node_memory_MemAvailable) / node_memory_MemTotal) * on(instance) group_left(node_name) node_meta * 100) by (node_name) > 80
   FOR 5m
@@ -427,11 +423,12 @@ ALERT node_memory_usage
       description = "Swarm node {{ $labels.node_name }} memory usage is at {{ humanize $value}}%.",
   }
 ```
+
 ***Swarm Node Disk Alert***
 
 Alerts when a node storage usage goes over 85% for five minutes.
 
-```
+```bash
 ALERT node_disk_usage
   IF ((node_filesystem_size{mountpoint="/rootfs"} - node_filesystem_free{mountpoint="/rootfs"}) * 100 / node_filesystem_size{mountpoint="/rootfs"}) * on(instance) group_left(node_name) node_meta > 85
   FOR 5m
@@ -446,7 +443,7 @@ ALERT node_disk_usage
 
 Alerts when a node storage is going to remain out of free space in six hours.
 
-```
+```bash
 ALERT node_disk_fill_rate_6h
   IF predict_linear(node_filesystem_free{mountpoint="/rootfs"}[1h], 6*3600) * on(instance) group_left(node_name) node_meta < 0
   FOR 1h
@@ -542,7 +539,7 @@ To use Grafana with Weave Cloud you have to reconfigure the Prometheus data sour
 
 * Name: Prometheus
 * Type: Prometheus
-* Url: https://cloud.weave.works/api/prom
+* Url: [https://cloud.weave.works/api/prom](https://cloud.weave.works/api/prom)
 * Access: proxy
 * Basic auth: use your service token as password, the user value is ignored
 
