@@ -90,7 +90,7 @@ networks:
 ### Configuration des services déployés
 
 - Besoin d'un [reseau overlay dédié](https://docs.traefik.io/providers/docker/#network)
-- Besoin de [spécifier le port](https://docs.traefik.io/providers/docker/#port-detection_1) (obligatoire avec swarm)
+- Besoin de [spécifier le port PRIVÉ](https://docs.traefik.io/providers/docker/#port-detection_1) (obligatoire avec swarm)
 - Besoin d'[exposer le conteneur](https://docs.traefik.io/providers/docker/#exposedbydefault)
 - Besoin de [spécifier la route](https://docs.traefik.io/routing/providers/docker/#routers) + [doc routes](https://docs.traefik.io/routing/routers/#rule)
 

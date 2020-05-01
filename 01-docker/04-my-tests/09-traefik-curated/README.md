@@ -21,6 +21,7 @@ Et cleaner un peu le bordel des anciens tests :')
 
 ## Traefik concept simple
 
-1. Entrypoints (ports depuis internet, ex: port 80)
-2. Envoie vers les routes
-3. Qui envoient vers les services associés
+1. (DNS, transforme test.DOMAIN.COM vers IP.SE.RV.EUR:80)
+2. Entrypoints (ports depuis internet, ex: port 80)
+3. Envoie vers les routes
+4. Qui envoient vers les services associés
