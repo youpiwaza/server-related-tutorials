@@ -1,0 +1,30 @@
+version: '3.7'
+services:
+  helloworld2:
+    deploy:
+      labels:
+        - "traefik.docker.network=traefik-public"
+        - "traefik.enable=true"
+        # http://hello2.localhost/
+        - "traefik.http.routers.helloworld2.rule=Host(`hello2.localhost`)"
+        - "traefik.http.services.helloworld2.loadbalancer.server.port=80"
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+
+  helloworld3:
+    deploy:
+      labels:
+        - "traefik.docker.network=traefik-public"
+        - "traefik.enable=true"
+        # Test dedicated sub folders
+        # http://hello.localhost/sub/
+        - "traefik.http.routers.helloworld3.rule=(Host(`hello.localhost`) && Path(`/sub`))"
+        - "traefik.http.services.helloworld3.loadbalancer.server.port=80"
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true

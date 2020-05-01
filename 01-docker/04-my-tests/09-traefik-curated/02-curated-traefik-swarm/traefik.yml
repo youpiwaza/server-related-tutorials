@@ -1,0 +1,33 @@
+version: "3.7"
+
+services:
+  traefik:
+    command:
+      - "--entrypoints.web.address=:80"
+      # Redirect http towards https
+      # TODO: test
+      # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.websecure.address=:443"
+      #- "--log.level=DEBUG"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.network=traefik-public"
+      - "--providers.docker.swarmMode=true"
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 2
+    image: "traefik:chevrotin"
+    ports:
+      - "80:80"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - traefik-public
+
+networks:
+  # Needs v before
+  # > docker network create --driver=overlay traefik-public
+  traefik-public:
+    external: true
