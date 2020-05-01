@@ -1,0 +1,36 @@
+version: "3.7"
+
+services:
+
+  traefik:
+    #image: "traefik:v2.0.0-rc3"
+    image: "traefik:v2.1.1"
+    command:
+      #- "--log.level=DEBUG"
+      # UI accessible mais non populée
+      - "--api.insecure=true"
+      #- "--providers.docker=true"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--entrypoints.web.address=:80"
+      #- "--providers.docker.network=traefik-public"
+    ports:
+      - "80:80"
+      # UI
+      - "8080:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    networks:
+      - traefik
+      - traefik-public
+
+networks:
+  traefik:
+
+  # Needs v before
+  # > docker network create --driver=overlay traefik-public
+
+  # Nécéssaire si lancement du service depuis un autre fichier .yml (swarm préfixe le nom du réseau)
+  # Exemple avec hello.yml
+  traefik-public:
+    external: true
