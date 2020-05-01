@@ -1,164 +1,116 @@
 # Traefik / Implementation avec docker swarm
 
-Reprise de server-related-tutorials/01-docker/04-my-tests/06-traefik-swarm
+Reprise de server-related-tutorials/01-docker/04-my-tests/06-traefik-swarm, cf. ce projet pour plus de doc
+
+Pas touché au code de l'exemple précédent, juste cleané la doc
 
 ---
 
-.. A partir de la [doc officielle](https://docs.traefik.io/providers/docker/#docker-swarm-mode) et étape par étape
-
-On repart de la configuration de traefik de base ([doc](https://docs.traefik.io/getting-started/configuration-overview/) + exemple 04-traefik)
-
-& Clean des fichiers .yml avec la syntaxe docker actualisée.
-
-Enfin, on suit la [doc](https://docs.traefik.io/providers/docker/).
-
-## Principales commandes
-
-Le but est de monter traefik en tant que service, puis de monter d'autres services et vérifier leur disponibilités sur localhost.
-
-Lancement en tant que service via [swarm](https://docs.docker.com/get-started/part4/)
+## Commandes de base
 
 ```bash
-> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/06-traefik-swarm
+# Autoriser connexion a docker via WLS
+> export DOCKER_HOST=tcp://localhost:2375
 
-# Créer le réseau externe à traefik (lien avec les autres services)
+# Initier docker swarm
+> docker swarm init
+
+
+# Acceder au projet
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/01-basic-traefik-swarm
+
+# Créer un réseau overlay public, différent de ingress (defaut docker)
 > docker network create --driver=overlay traefik-public
 
-# déploiement de traefik & whoami
-> docker stack deploy -c traefik.yml traefik
+# Déploiement de traefik & des deux hello world
+> docker stack deploy -c traefik.yml traefik && docker stack deploy -c hello.yml hello && docker stack deploy -c hello2.yml hello2
+# Tests & admin
+# http://hello.localhost/   // hello world 1, load balanced between 3 replicas
+# http://hello2.localhost/  // hello world 2
+# http://localhost/         // 404
+# http://localhost:8080/    // Traefik backend
 
-# Déploiement d'un hello world
-> docker stack deploy -c hello.yml hello
+# Suppression de l'exemple
+> docker stack rm traefik && docker stack rm hello && docker stack rm hello2 && docker network rm traefik-public
 
-# Test avec scale
-#> docker service scale SERVICE=REPLICAS
-> docker service scale traefik_whoami=3
 ```
 
-Vérifications sur :
+## Exemple de base
 
-- [http://whoami.localhost/](http://whoami.localhost/)
-- [http://hello.localhost/](http://hello.localhost/) # Attention, il y a un délai avant accès (~5-10s ?)
-- [Traefik web UI](http://localhost:8080/)
+Implémentation d'une base Traefik avec Docker swarm :
 
-- Possibilité de vérifier les réplicas via whoami (changement d'ip lors du rechargement de la page)
+- Monter une stack Traefik
+- Monter une stack hello world (répliqué 3 fois) avec [adresse](http://hello.localhost/) spécifiée en label
+- Monter une stack hello world 2 (sans réplique) avec [adresse](http://hello2.localhost/) spécifiée en label
 
-Les adresses sont fixées dans les .yml dans `services:LE_SERVICE:deploy:labels` > `- "traefik.http.routers.LE_SERVICE.rule=Host(URL_DU_SERVICE)"`
+### Configuration de Traefik nécessaire pour swarm
 
-Arrêt du service
+- Set the [swarmMode directive to true](https://docs.traefik.io/providers/docker/#docker-swarm-mode)
+- Autoriser l'accès la [socket de docker](https://docs.traefik.io/providers/docker/#provider-configuration)
+- Seulement les [conteneurs souhaités](https://docs.traefik.io/providers/docker/#exposedbydefault)
+- Besoin d'un [reseau overlay dédié](https://docs.traefik.io/providers/docker/#network)
+- Spécifier les [entrypoints](https://docs.traefik.io/v2.2/routing/entrypoints/) de Traefik (Ports/Headers sur lesquels écouter)
 
 ```bash
-> docker stack rm traefik
-> docker stack rm hello
-# Supprimer le réseau
-> docker network prune
+> docker network create --driver=overlay traefik-public
 ```
 
-## Configuration Discovery
-
-Doc imbitable, avec l'ensemble écrit pour un fichier de configuration externe, alors que la doc elle même ne le recommande pas (mais plutôt la conf dynamique).
-
-Recherce d'un [tuto](https://creekorful.me/how-to-install-traefik-2-docker-swarm/) afin de voir un minimum la syntaxe -_-. Edit : [doc](https://docs.traefik.io/routing/providers/docker/) // Descendre un peu
-
-**Note concernant la doc docker** / Même si *extrèmement mal branlée à un niveau ou ça en devient du sport*, pour définir les options en dynamique, prendre la configuration au format File (YAML) et remplacer les niveaux par des points ; et mettre dans `command` avec `--` .
-
-EXEMPLE :
-
-```yaml
-# Doc swarm mode / https://docs.traefik.io/providers/docker/#swarmmode
-providers:
-  docker:
-    swarmMode: true
-    # ...
-
-# Ce qu'il faut faire dans le docker-compose
+```yml
+# traefik.yml
 services:
   traefik:
-    command:
-      - "--providers.docker.swarmMode=true"
+      image: "traefik:v2.1.1"
+      command:
+        # Affichage du backend Traefik
+        - "--api.insecure=true"
+        # Ports sur lesquels Traefik écoute
+        - "--entrypoints.web.address=:80"
+        # Provider : docker swarm
+        - "--providers.docker.swarmMode=true"
+        # Uniquement les conteneurs souhaités
+        - "--providers.docker.exposedbydefault=false"
+      networks:
+      - traefik-public
+      ports:
+      # Publication sur le port 80
+      - "80:80"
+      # Affichage du backend Traefik
+      - "8080:8080"
+      volumes:
+      # Connexion à la socket docker, afin d'espionner les montages/démontages de conteneurs
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+
+# Nécéssaire si lancement du service depuis un autre fichier .yml (swarm préfixe le nom du réseau)
+# Exemple avec hello.yml
+networks:
+  traefik-public:
+    external: true
 ```
 
-Configuration dynamique via labels, options, valeurs & explications
+### Configuration des services déployés
 
-### Traefik
+- Besoin d'un [reseau overlay dédié](https://docs.traefik.io/providers/docker/#network)
+- Besoin de [spécifier le port](https://docs.traefik.io/providers/docker/#port-detection_1) (obligatoire avec swarm)
+- Besoin d'[exposer le conteneur](https://docs.traefik.io/providers/docker/#exposedbydefault)
+- Besoin de [spécifier la route](https://docs.traefik.io/routing/providers/docker/#routers) + [doc routes](https://docs.traefik.io/routing/routers/#rule)
 
-dans **command**
+```yml
+services:
+  helloworld:
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+    deploy:
+      labels:
+        # Uniquement les conteneurs souhaités
+        - "traefik.enable=true"
+        # Url à laquelle est associé le service, ici http://hello.localhost/
+        - "traefik.http.routers.helloworld.rule=Host(`hello.localhost`)"
+        # Obligatiion de spécifier le port avec docker swarm ; hello world publie sur le port 80 par défaut
+        - "traefik.http.services.helloworld.loadbalancer.server.port=80"
+      replicas: 3
 
-- "--providers.docker.swarmMode=true"
-  - [doc](https://docs.traefik.io/providers/docker/#docker-swarm-mode)
-  - // Autorise swarm
-
-- "--providers.docker.endpoint=unix:///var/run/docker.sock"
-  - [doc](https://docs.traefik.io/providers/docker/#provider-configuration)
-  - Default="unix:///var/run/docker.sock"
-  - Récupération via le volume (bind ?) qui expose le socket Docker
-
-- "--providers.docker.exposedbydefault=false"
-  - [doc](https://docs.traefik.io/providers/docker/#exposedbydefault)
-  - Meilleure sécurité, mais besoin de déclarer `traefik.enable=true` dans les conteneurs
-    - Conteneurs ou services ?
-
-- "--providers.docker.network=traefik-public"
-  - [doc](https://docs.traefik.io/providers/docker/#network)
-  - Réseau de connexion à l'ensemble des conteneurs
-    - **Note : à voir pour différencier du réseau de connexion externe**
-
-- "--providers.docker.defaultRule"
-  - Par défaut > Host(`{{ normalize .Name }}`)
-
-- "--providers.docker.swarmModeRefreshSeconds"
-  - Par défaut // 15s / 15 ?
-
-- "--providers.docker.constraints"
-  - Par défaut // ""
-  - Pas de contraintes, choix des conteneurs via traefik.enabled=true
-
-- tls stuff > plus tard
-
-dans **deploy: placement: constraints**
-
-- node.role == manager
-  - [doc](https://docs.traefik.io/providers/docker/#docker-api-access_1) / [doc docker](https://docs.docker.com/compose/compose-file/#placement)
-
-dans **volumes**
-
-- /var/run/docker.sock:/var/run/docker.sock
-  - [doc](https://docs.traefik.io/providers/docker/#provider-configuration)
-  - // The docker-compose file shares the docker sock with the Traefik container
-
-### hellow
-
-Attention : lors de l'utilisation de swarm avec traefik, les labels doivent être ceux des services (et non des containers), ils sont donc à définir dans deploy
-
-dans **deploy: labels**
-
-- "traefik.http.services.helloworld.loadbalancer.server.port=80"
-  - [doc](https://docs.traefik.io/providers/docker/#port-detection_1)
-  - // Docker Swarm does not provide any port detection information to Traefik.
-  - // Therefore you **must** specify the port to use for communication
-- "traefik.enable=true"
-  - [doc](https://docs.traefik.io/providers/docker/#exposedbydefault)
-  - Exposer le conteneur au web
-
-## Routing & load balancing
-
-[Doc concepts](https://docs.traefik.io/routing/overview/), puis [Doc pour Docker](https://docs.traefik.io/routing/providers/docker/)
-
----
-
-Edit : L'envoie de vivre m'a quittée
-
----
-
-Essai : repartir de [l'exemple de base docker-compose](https://docs.traefik.io/user-guides/docker-compose/basic-example/) et le migrer vers docker swarm en suivant les recos
-
-// **WORKS**, cf. traefik.yml
-
-Création d'un nouveau (hello).yml afin de lancer un service indépendant et tester la conf.
-
->> Trop rien de différent, hormis la création du réseau public (swarm préfixe)
-
-- ✓ Vérifier bon fonctionnement avec répliques
-- ✓ Vérifier les conflits de ports, par exemple si je lance un deuxième service hello
-
-`docker stack deploy -c hello2.yml hello2` // Même chose avec [http://hello2.localhost/](http://hello2.localhost/), aucun souci :D
+networks:
+  traefik-public:
+    external: true
+```

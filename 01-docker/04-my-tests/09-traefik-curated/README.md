@@ -16,28 +16,11 @@ Et cleaner un peu le bordel des anciens tests :')
 # Initier docker swarm
 > docker swarm init
 
-
-## Exemple 1 / Base stacks traefik + hello world
-> cd 01-basic-traefik-swarm
-# Créer un réseau overlay public, différent de ingress (defaut docker)
-> docker network create --driver=overlay traefik-public
-
-# Déploiement de traefik & hello world
-> docker stack deploy -c traefik.yml traefik && docker stack deploy -c hello.yml hello
-# Tests & admin
-# hello.localhost
-# localhost:8080
-
-# Suppression de l'exemple
-> docker stack rm traefik && docker stack rm hello && docker network rm traefik-public
-
+# cf. différents sous dossiers
 ```
 
-## Exemple de base
+## Traefik concept simple
 
-/01-basic-traefik-swarm
-
-Implémentation d'une base Traefik avec Docker swarm :
-
-- Monter une stack Traefik
-- Monter une stack hello world avec adresse spécifiée en labels
+1. Entrypoints (ports depuis internet, ex: port 80)
+2. Envoie vers les routes
+3. Qui envoient vers les services associés
