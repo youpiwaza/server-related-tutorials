@@ -19,12 +19,14 @@ services:
           - node.role == manager
       replicas: 2
     image: "traefik:chevrotin"
-    ports:
-      - "80:80"
-    volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
     networks:
       - traefik-public
+    ports:
+      - "80:80"
+      # - "443:443"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    
 
 networks:
   # Needs v before
