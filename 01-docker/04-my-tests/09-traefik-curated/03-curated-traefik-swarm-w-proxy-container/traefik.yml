@@ -1,0 +1,66 @@
+version: "3.7"
+
+services:
+  dockersocketproxy:
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+    environment:
+      # Authorize access
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+    image: tecnativa/docker-socket-proxy
+    networks:
+      - dockersocket4traefiknet
+    ports:
+      # Publish on usual port
+      - 2375
+    volumes:
+      # Access to socket, read-only for security
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  
+  traefik:
+    command:
+      - "--entrypoints.web.address=:80"
+      # Redirect http towards https
+      # TODO: test
+      # - "--entrypoints.web.http.redirections.entryPoint.to=websecure"
+      # - "--entrypoints.web.http.redirections.entryPoint.scheme=https"
+      - "--entryPoints.websecure.address=:443"
+      #- "--log.level=DEBUG"
+      # Traefik socket access from the proxy container, on the defined port
+      - "--providers.docker.endpoint=tcp://dockersocketproxy:2375"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.swarmMode=true"
+    depends_on:
+      - dockersocketproxy
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
+      replicas: 2
+    # Traefik 2.2
+    image: "traefik:chevrotin"
+    networks:
+      # Traefik's docker socket access on dedicated network
+      - dockersocket4traefiknet
+      # Traefik access to web server containers, to allow reverse proxy serving
+      - traefik-public
+    ports:
+      - "80:80"
+      # - "443:443"
+    # Remove direct access to docker socket
+    # volumes:
+    #   - "/var/run/docker.sock:/var/run/docker.sock"
+
+networks:
+  dockersocket4traefiknet:
+    # Prevent access to this network from other containers
+    attachable: false
+
+  # Needs v before
+  # > docker network create --driver=overlay traefik-public
+  traefik-public:
+    external: true
