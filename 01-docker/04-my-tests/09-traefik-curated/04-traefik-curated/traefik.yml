@@ -160,8 +160,18 @@ networks:
   dockersocket4traefiknet:
     # Prevent access to this network from other containers
     attachable: false
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'docker socket proxy dedicated network'
+      fr.masamune.type: 'core'
 
   # Needs v before
   # > docker network create --driver=overlay traefik-public
   traefik-public:
     external: true
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'traefik outside internet access network'
+      fr.masamune.type: 'core'
