@@ -39,8 +39,9 @@ Reprise de l'exemple précédent, en corrigeant pour s'approcher du produit fina
 Implémentation d'une base Traefik avec Docker swarm :
 
 - Monter une stack Traefik
-- Monter une stack hello world (répliqué 3 fois) avec [adresse](http://hello.localhost/) spécifiée en label
-- Monter une stack hello world 2 (sans réplique) avec [adresse](http://hello2.localhost/) spécifiée en label
+- Monter une stack hello world (répliqué 3 fois) sur [http://hello.localhost/](http://hello.localhost/) spécifiée en label, utilisant le load balancing
+- Monter une stack hello world 2 (sans réplique) sur [http://hello2.localhost/](http://hello2.localhost/) spécifiée en label
+- Monter une stack hello world 3 (sans réplique) sur un sous dossier avec [http://hello.localhost/sub/](http://hello.localhost/sub/) spécifiée en label
 
 ### Configuration de Traefik nécessaire pour swarm
 
