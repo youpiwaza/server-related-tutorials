@@ -22,7 +22,7 @@ Docs:
 
 
 # Acceder au projet
-> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/03-curated-traefik-swarm-w-proxy-container
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/03-traefik-swarm-w-proxy-container
 
 # Créer un réseau overlay public, différent de ingress (defaut docker)
 > docker network create --driver=overlay traefik-public
