@@ -1,4 +1,4 @@
-# Curation
+# Add a proxy container for docker socket
 
 Reprise de l'exemple précédent, en utilisant un [conteneur proxy](https://chriswiegman.com/2019/11/protecting-your-docker-socket-with-traefik-2/) pour l'accès à la socket de docker.
 
