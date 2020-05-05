@@ -1,6 +1,6 @@
 # Curation
 
-Reprise de l'exemple précédent, en appliquant les majs & les recos de sécurité
+Reprise de l'exemple précédent, en corrigeant pour s'approcher du produit final
 
 ---
 
