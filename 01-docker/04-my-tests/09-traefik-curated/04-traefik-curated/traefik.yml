@@ -45,7 +45,14 @@ services:
       NETWORKS: 1
       SERVICES: 1
       TASKS: 1
-    # LATER: healthcheck
+    # LATER: docker socket proxy healthcheck
+    #   https://github.com/Tecnativa/docker-socket-proxy/issues/24
+    # healthcheck:
+    #   test: 'curl -fail http://localhost:2375/version || exit 1'
+    #   interval: 10s
+    #   timeout: 10s
+    #   retries: 3
+    #   start_period: 0s
     image: tecnativa/docker-socket-proxy
     labels:
       fr.masamune.client: 'masamune'

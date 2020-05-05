@@ -35,6 +35,20 @@ Recommandations tirées du [repo d'exemple](https://github.com/youpiwaza/docker-
 > docker stack rm traefik && docker stack rm hello && docker stack rm hello2 && docker network rm traefik-public
 ```
 
+## Docker socket proxy healthcheck
+
+[Official image issue](https://github.com/Tecnativa/docker-socket-proxy/issues/24) / KO
+
+```yaml
+healthcheck:
+  # KO, prevent stack from running
+  test: 'curl -fail http://localhost:2375/version || exit 1'
+  interval: 10s
+  timeout: 10s
+  retries: 3
+  start_period: 0s
+```
+
 ## Traefik 2.0 healthcheck
 
 - [discussion](https://community.containo.us/t/how-to-do-healthcheck-on-traefik-itself/1462/6)
