@@ -130,8 +130,15 @@ services:
         - "traefik.http.routers.helloworld.rule=Host(`hello.localhost`)"
         # Container on subfoldeer, ici http://hello.localhost/sub/
         - "traefik.http.routers.helloworld3.rule=(Host(`hello.localhost`) && Path(`/sub`))"
+         # Strip prefix to allow correct assets path
+        #   https://docs.traefik.io/v2.0/middlewares/overview/
+        #   https://docs.traefik.io/v2.0/middlewares/stripprefix/
+        # Create a middleware named 'helloworld3pathstrip' that strips the prefix '/sub', added in routers.helloworld3.rule ^
+        - "traefik.http.middlewares.helloworld3pathstrip.stripprefix.prefixes=/sub"
+        # Apply the middleware 'helloworld3pathstrip' to routers.helloworld3
+        - "traefik.http.routers.helloworld3.middlewares=helloworld3pathstrip@docker"
 
-        # Obligatiion de spécifier le port avec docker swarm ; hello world publie sur le port 80 par défaut
+        # Obligation de spécifier le port avec docker swarm ; hello world publie sur le port 80 par défaut
         - "traefik.http.services.helloworld.loadbalancer.server.port=80"
     image: tutum/hello-world:latest
     networks:
