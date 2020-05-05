@@ -17,9 +17,8 @@ services:
       labels:
         - "traefik.docker.network=traefik-public"
         - "traefik.enable=true"
-        # Test dedicated sub folders
+        # Test container on dedicated sub folders
         # http://hello.localhost/sub/
-        # - "traefik.http.routers.helloworld3.rule=(Host(`hello.localhost`) && Path(`/sub`))"
         - "traefik.http.routers.helloworld3.rule=(Host(`hello.localhost`) && PathPrefix(`/sub`))"
         # Strip prefix to allow correct assets path
         #   https://docs.traefik.io/v2.0/middlewares/overview/
