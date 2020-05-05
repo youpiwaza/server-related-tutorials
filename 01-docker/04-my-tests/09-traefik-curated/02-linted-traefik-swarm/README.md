@@ -130,7 +130,7 @@ services:
         - "traefik.http.routers.helloworld.rule=Host(`hello.localhost`)"
         # Container on subfoldeer, ici http://hello.localhost/sub/
         - "traefik.http.routers.helloworld3.rule=(Host(`hello.localhost`) && Path(`/sub`))"
-         # Strip prefix to allow correct assets path
+        # Strip prefix to allow correct assets path
         #   https://docs.traefik.io/v2.0/middlewares/overview/
         #   https://docs.traefik.io/v2.0/middlewares/stripprefix/
         # Create a middleware named 'helloworld3pathstrip' that strips the prefix '/sub', added in routers.helloworld3.rule ^
