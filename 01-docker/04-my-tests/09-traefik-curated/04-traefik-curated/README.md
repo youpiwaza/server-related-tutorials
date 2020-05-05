@@ -2,6 +2,8 @@
 
 Reprise de l'exemple précédent, en utilisant les bonnes pratiques, les recos de sécurité, et les labels.
 
+Recommandations tirées du [repo d'exemple](https://github.com/youpiwaza/docker-compose-curated-example/blob/master/docker-compose.yml).
+
 ---
 
 ## Commandes de base
@@ -33,6 +35,22 @@ Reprise de l'exemple précédent, en utilisant les bonnes pratiques, les recos d
 > docker stack rm traefik && docker stack rm hello && docker stack rm hello2 && docker network rm traefik-public
 ```
 
-## Exemple curated
+## Traefik 2.0 healthcheck
 
-hey
+- [discussion](https://community.containo.us/t/how-to-do-healthcheck-on-traefik-itself/1462/6)
+- [Official docs](https://docs.traefik.io/v2.0/operations/cli/#healthcheck)
+- [Enable ping](https://docs.traefik.io/v2.0/operations/ping/)
+
+```yaml
+traefik:
+    command:
+      # Enable ping
+      - "--ping=true"
+    healthcheck:
+      # Ping da container
+      test: 'traefik healthcheck --ping'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+```
