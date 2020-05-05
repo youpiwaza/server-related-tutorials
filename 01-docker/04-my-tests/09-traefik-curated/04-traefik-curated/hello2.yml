@@ -1,0 +1,37 @@
+version: '3.7'
+services:
+  helloworld2:
+    deploy:
+      labels:
+        - "traefik.docker.network=traefik-public"
+        - "traefik.enable=true"
+        # http://hello2.localhost/
+        - "traefik.http.routers.helloworld2.rule=Host(`hello2.localhost`)"
+        - "traefik.http.services.helloworld2.loadbalancer.server.port=80"
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+
+  helloworld3:
+    deploy:
+      labels:
+        - "traefik.docker.network=traefik-public"
+        - "traefik.enable=true"
+        # Test container on dedicated sub folders
+        # http://hello.localhost/sub/
+        - "traefik.http.routers.helloworld3.rule=(Host(`hello.localhost`) && PathPrefix(`/sub`))"
+        # Strip prefix to allow correct assets path
+        #   https://docs.traefik.io/v2.0/middlewares/overview/
+        #   https://docs.traefik.io/v2.0/middlewares/stripprefix/
+        # Create a middleware named 'helloworld3pathstrip' that strips the prefix '/sub', added in routers.helloworld3.rule ^
+        - "traefik.http.middlewares.helloworld3pathstrip.stripprefix.prefixes=/sub"
+        # Apply the middleware 'helloworld3pathstrip' to routers.helloworld3
+        - "traefik.http.routers.helloworld3.middlewares=helloworld3pathstrip@docker"
+        - "traefik.http.services.helloworld3.loadbalancer.server.port=80"
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+
+networks:
+  traefik-public:
+    external: true
