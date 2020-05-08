@@ -61,10 +61,11 @@ services:
 ```
 
 1. 🌱 Résoudre les éventuels problèmes dans les logs
-2. 🚀 Alpha reorder
-3. Comments
-4. Proper renaming
+2. ✅ Alpha reorder
+3. ✅ Comments
+4. 🚀 Proper renaming
    1. Nomenclature clients pour services et autres conneries traefik
+   2. Nomenclature ports exterieurs services (pas de doublons) / Regarder pour gestion automatique
 5. Minor linting
 
 networks:

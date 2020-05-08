@@ -1,5 +1,23 @@
 version: "3.7"
 
+# Issues & fixes
+#   Access to docker socket is a security risk
+#   > Grant access through a proxy container
+#   TODO: > read only ?
+
+#   Privileged is mandatory to access docker socket, and is also a security risk
+#   > Only the proxy container is privileged
+#     Priviledged incompatible with user namespace remap.
+#     > Force disable user namespace remap on proxy
+#       userns_mode: "host" not compatible with docker stack
+#       > Will be used through docker compose
+#       > Also enable the use of a bridge network
+
+#   Stack only allow overlay networks > security risk
+#   > Use docker compose for Traefik & proxy, and set a custom bridge network
+#     > non attachable
+#     TODO: > encrypted
+
 services:
   dockersocketproxy:
     environment:
@@ -13,14 +31,13 @@ services:
       options:
         max-size: "50m"
     image: tecnativa/docker-socket-proxy
+    # Traefik's docker socket access on dedicated bridge network
     networks:
       - dockersocket4traefiknetwork
     ports:
       # Publish on (usual) tcp port
       - 2375
-    # Priviledge incompatible avec user namespace remap.
     privileged: true
-    # userns_mode: "host" incompatible avec docker stack
     userns_mode: "host"
     volumes:
       # Access to socket, read-only for security
@@ -28,6 +45,7 @@ services:
   
   traefik:
     command:
+      # Specify internet access > Port 80
       - "--entrypoints.web.address=:80"
       # Enable logs
       # - "--log.filePath=/var/log/traefik.log"
@@ -35,10 +53,13 @@ services:
       - "--log.level=DEBUG"
       # Traefik socket access from the proxy container, on the defined port
       - "--providers.docker.endpoint=tcp://dockersocketproxy:2375"
+      # Only specified containers exposed on the internet
       - "--providers.docker.exposedbydefault=false"
-      # Tell Traefik to get the contents provided by this service using that shared network.
+      # Tell Traefik to get the contents provided by this service using a dedicated shared attachable overlay network.
       - "--providers.docker.network=traefik-public"
+      # Enable docker swarm
       - "--providers.docker.swarmMode=true"
+      # TODO:
       # "traefik.http.routers.helloworld.entrypoints=web"  ????
     depends_on:
       - dockersocketproxy
@@ -66,7 +87,11 @@ networks:
     # Prevent access to this network from other containers
     attachable: false
 
-  # Needs v before
+  # Needs to be created before using docker compose
+  #   In order to:
+  #   - be accessible to futur stacks
+  #   - have a set name without automatic prefix
   # > docker network create --driver=overlay --attachable traefik-public
   traefik-public:
+    # Connect to an existing network
     external: true
