@@ -71,7 +71,9 @@ services:
    2. ✅ socket volume > force read only
    3. ✅ Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
    4. ✅ Lancer traefik as read only, cf bret ^
-   5. Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
+   5. ✅ Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
+   6. Specific user > docker peon
+   7. Traefik stats > Stats collection is disabled. Help us improve Traefik by turning this feature on :). More details [here](https://docs.traefik.io/contributing/data-collection/)
 6. Résoudre problèmes divers
    1. healthcheck traefik
    2. "traefik.http.routers.helloworld.entrypoints=web" ???
