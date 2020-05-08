@@ -83,7 +83,10 @@ services:
       - "80:80"
       # - "443:443"
     # Assign the_docker_peon unprivileged user
-    # user: 1003:1003
+    user: 1003:1003
+    # Specific unprivileged user needs access to ports < 1024
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 0
     read_only: true
 
 networks:

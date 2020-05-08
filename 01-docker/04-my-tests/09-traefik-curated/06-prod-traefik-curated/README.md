@@ -72,7 +72,11 @@ services:
    3. ✅ Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
    4. ✅ Lancer traefik as read only, cf bret ^
    5. ✅ Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
-   6. Specific user > docker peon
+   6. ✅ Specific user > docker peon
+      1. command traefik error: error while building entryPoint web: error preparing server: error opening listener: listen tcp :80: bind: permission denied
+      2. // Specific unprivileged user needs access to ports < 1024
+         - sysctls:
+           - net.ipv4.ip_unprivileged_port_start: 0
    7. Traefik stats > Stats collection is disabled. Help us improve Traefik by turning this feature on :). More details [here](https://docs.traefik.io/contributing/data-collection/)
 6. Résoudre problèmes divers
    1. healthcheck traefik
