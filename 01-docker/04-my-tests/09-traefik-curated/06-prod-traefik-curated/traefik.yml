@@ -21,6 +21,16 @@ version: "3.7"
 # Cpu & memory restrictions not available in docker compose v3
 #   https://docs.docker.com/compose/compose-file/#resources
 
+# Scaling > Nothing in docker-compose file syntax
+#   deploy > replicas is for swarm (and ignored in dc)
+#   scale: 2 is for dc v2
+# > scale on startup
+#     docker-compose -f traefik.yml up --scale dockersocketproxy=2
+# Only scale the proxy, as traefik has host port 80 published, and 2nd replicas can't have it too
+#   Starting tests_traefik_1                        ... done                                                                                                                                                                      Creating tests_traefik_2                        ...
+#   Creating tests_traefik_2                        ... error 
+#   Bind for 0.0.0.0:80 failed: port is already allocated
+
 services:
   dockersocketproxy:
     environment:

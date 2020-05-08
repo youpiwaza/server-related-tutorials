@@ -15,6 +15,9 @@ docker network create --driver=overlay --attachable traefik-public
 # docker stack deploy -c traefik17.yml traefik # KO stack peut pas privileged
 # docker_guy / Lancement via docker compose, sans -d, afin de voir les logs (forcés en json-file)
 docker-compose -f traefik.yml up
+# Scaling/replicas
+docker-compose -f traefik.yml up --scale dockersocketproxy=2
+# docker-compose -f traefik.yml up --scale traefik=2 # KO, as port 80 can be published to one instance only
 
 # docker_guy / Stack de test, sur http://test.masamune.fr/
 docker stack deploy -c hello.yml hello
@@ -94,10 +97,11 @@ services:
    1. ✅ Proxy
    2. ✅ Traefik
    3. ✅ Tests hello
-8. 🚀 Répliques
+8. 🌱 Répliques
    1. ✅ Tests hello
-   2. Proxy
-   3. Traefik
+   2. ✅ Proxy
+   3. ❌ Traefik / Published port 80 can be allocated to one container only (traefik + replicas = 2 containers)
+      1. TODO: Fix ?
 9. ✅ Test avec 2 services
 10. Test sur sous dossier
 11. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
