@@ -3,7 +3,7 @@ version: "3.7"
 # Issues & fixes
 #   Access to docker socket is a security risk
 #   > Grant access through a proxy container
-#   TODO: > read only ?
+#   > Socket access with read-only volume
 
 #   Privileged is mandatory to access docker socket, and is also a security risk
 #   > Only the proxy container is privileged
@@ -41,7 +41,7 @@ services:
     userns_mode: "host"
     volumes:
       # Access to socket, read-only for security
-      - "/var/run/docker.sock:/var/run/docker.sock"
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
   
   traefik:
     command:
