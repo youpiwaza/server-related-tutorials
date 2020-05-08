@@ -63,20 +63,20 @@ services:
 1. 🌱 Résoudre les éventuels problèmes dans les logs
 2. ✅ Alpha reorder
 3. ✅ Comments
-4. 🚀 Proper renaming
+4. Proper renaming
    1. Nomenclature clients pour services et autres conneries traefik
    2. Nomenclature ports exterieurs services (pas de doublons) / Regarder pour gestion automatique
-5. Minor linting
-   1. Force bridge driver for socket network
-   2. socket volume > force read only
+5. 🚀 Minor linting/tweaks
+   1. ✅ Force bridge driver for socket network
+   2. ✅ socket volume > force read only
+   3. ✅ Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
+   4. Lancer traefik as read only, cf bret ^
+   5. Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
 6. Résoudre problèmes divers
    1. healthcheck traefik
    2. "traefik.http.routers.helloworld.entrypoints=web" ???
       1. WARN > No entryPoint defined for this router, using the default one(s) instead: [web]
       2. Vérifier pour https
-   3. Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
-   4. Lancer traefik as read only, cf bret ^
-   5. Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
 7. Rajouter mes recos de sécurité
 8. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
 9. Répliques

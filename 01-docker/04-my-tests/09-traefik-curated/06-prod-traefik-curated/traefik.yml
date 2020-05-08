@@ -88,6 +88,9 @@ networks:
     attachable: false
     # Force default driver as it will be used from docker compose, exclusively for proxy & traefik
     driver: bridge
+    driver_opts:
+      # Since we're passing docker socket stuff over TCP, lets IPSec
+      encrypted: 'true'
 
   # Needs to be created before using docker compose
   #   In order to:
