@@ -68,12 +68,6 @@ services:
    2. Nomenclature ports exterieurs services (pas de doublons) / Regarder pour gestion automatique
 5. Minor linting
 
-networks:
-  dockersocket4traefiknet:
-# Force default driver as it will be used from docker compose
-    # Also adds more security
-    driver: bridge
-
 services:
   dockersocketproxy:
        volumes:

@@ -86,6 +86,8 @@ networks:
   dockersocket4traefiknetwork:
     # Prevent access to this network from other containers
     attachable: false
+    # Force default driver as it will be used from docker compose, exclusively for proxy & traefik
+    driver: bridge
 
   # Needs to be created before using docker compose
   #   In order to:
