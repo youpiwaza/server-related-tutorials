@@ -25,12 +25,17 @@ services:
       NETWORKS: 1
       SERVICES: 1
       TASKS: 1
+    image: tecnativa/docker-socket-proxy
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'docker socket proxy'
+      fr.masamune.type: 'core'
     # dockersocketproxy doesn't support syslog
     logging:
       driver: "json-file"
       options:
         max-size: "50m"
-    image: tecnativa/docker-socket-proxy
     # Traefik's docker socket access on dedicated bridge network
     networks:
       - dockersocket4traefiknetwork
@@ -38,6 +43,10 @@ services:
       # Publish on (usual) tcp port
       - 2375
     privileged: true
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     userns_mode: "host"
     volumes:
       # Access to socket, read-only for security
@@ -51,6 +60,7 @@ services:
     command:
       # Specify internet access > Port 80
       - "--entrypoints.web.address=:80"
+      # - "--entryPoints.websecure.address=:443"
       # Send Traefik anonymous usage data / https://docs.traefik.io/contributing/data-collection/
       - "--global.sendAnonymousUsage"
       # Enable logs
@@ -67,8 +77,6 @@ services:
       - "--providers.docker.network=traefik-public"
       # Enable docker swarm
       - "--providers.docker.swarmMode=true"
-      # TODO:
-      # "traefik.http.routers.helloworld.entrypoints=web"  ????
     depends_on:
       - dockersocketproxy
     healthcheck:
