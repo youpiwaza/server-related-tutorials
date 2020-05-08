@@ -83,8 +83,8 @@ services:
          - sysctls:
            - net.ipv4.ip_unprivileged_port_start: 0
    7. ✅ Traefik stats > Stats collection is disabled. Help us improve Traefik by turning this feature on :). More details [here](https://docs.traefik.io/contributing/data-collection/)
-6. Résoudre problèmes divers
-   1. healthcheck traefik
+6. 🚀 Résoudre problèmes divers
+   1. ✅ healthcheck traefik > OK direct
    2. "traefik.http.routers.helloworld.entrypoints=web" ???
       1. WARN > No entryPoint defined for this router, using the default one(s) instead: [web]
       2. Vérifier pour https

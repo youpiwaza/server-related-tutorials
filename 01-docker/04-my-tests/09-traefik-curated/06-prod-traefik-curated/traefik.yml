@@ -57,6 +57,8 @@ services:
       # - "--log.filePath=/var/log/traefik.log"
       - "--log.format=json"
       - "--log.level=DEBUG"
+      # Allow pings, for healthchecks
+      - "--ping=true"
       # Traefik socket access from the proxy container, on the defined port
       - "--providers.docker.endpoint=tcp://dockersocketproxy:2375"
       # Only specified containers exposed on the internet
@@ -69,6 +71,12 @@ services:
       # "traefik.http.routers.helloworld.entrypoints=web"  ????
     depends_on:
       - dockersocketproxy
+    healthcheck:
+      test: 'traefik healthcheck --ping'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
     # Traefik 2.2
     image: "traefik:chevrotin"
     # Traefik doesn't support syslog
