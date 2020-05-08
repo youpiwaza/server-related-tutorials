@@ -19,11 +19,8 @@ services:
     networks:
       - traefik-public
     ports:
-      # - "80:80"
       - "8080:80"
 
 networks:
   traefik-public:
     external: true
-
-# Autoriser les ports !

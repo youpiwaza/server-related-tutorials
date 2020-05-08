@@ -60,9 +60,26 @@ services:
       - "8080:80"
 ```
 
-1. Résoudre les éventuels problèmes dans les logs
-2. Alpha reorder
-3. Résoudre problèmes divers
+1. 🌱 Résoudre les éventuels problèmes dans les logs
+2. 🚀 Alpha reorder
+3. Comments
+4. Proper renaming
+   1. Nomenclature clients pour services et autres conneries traefik
+5. Minor linting
+
+networks:
+  dockersocket4traefiknet:
+# Force default driver as it will be used from docker compose
+    # Also adds more security
+    driver: bridge
+
+services:
+  dockersocketproxy:
+       volumes:
+      # Access to socket, read-only for security
+      - "/var/run/docker.sock:/var/run/docker.sock: ROOOOOOOO"
+
+5. Résoudre problèmes divers
    1. healthcheck traefik
    2. "traefik.http.routers.helloworld.entrypoints=web" ???
       1. WARN > No entryPoint defined for this router, using the default one(s) instead: [web]
@@ -70,14 +87,13 @@ services:
    3. Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
    4. Lancer traefik as read only, cf bret ^
    5. Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
-4. Rajouter mes recos de sécurité
-5. Nomenclature clients pour services et autres conneries traefik
-6. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
-7. Répliques
-8. Test avec 2 services
-9. Test sur sous dossier
-10. Ajout https
-11. Cleaner repertoire home hecarim
+6. Rajouter mes recos de sécurité
+7. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
+8. Répliques
+9.  Test avec 2 services
+10. Test sur sous dossier
+11. Ajout https
+12. Cleaner repertoire home hecarim
 
 ## Docs
 
