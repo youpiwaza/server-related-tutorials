@@ -51,6 +51,8 @@ services:
     command:
       # Specify internet access > Port 80
       - "--entrypoints.web.address=:80"
+      # Send Traefik anonymous usage data / https://docs.traefik.io/contributing/data-collection/
+      - "--global.sendAnonymousUsage"
       # Enable logs
       # - "--log.filePath=/var/log/traefik.log"
       - "--log.format=json"
