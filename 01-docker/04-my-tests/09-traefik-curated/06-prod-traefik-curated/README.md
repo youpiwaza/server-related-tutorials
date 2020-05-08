@@ -89,11 +89,17 @@ services:
       1. WARN > No entryPoint defined for this router, using the default one(s) instead: [web]
       2. Vérifier pour https
       3. > Plus de trace dans les logs
-7. 🚀 Rajouter mes recos de sécurité
-8. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
-9. Répliques
-10. Test avec 2 services
-11. Test sur sous dossier
+7. ✅ Rajouter mes recos de sécurité
+   1. ✅ Proxy
+   2. ✅ Traefik
+   3. ✅ Tests hello
+8. 🚀 Répliques
+   1. Tests hello
+   2. Proxy
+   3. Traefik
+9. ✅ Test avec 2 services
+10. Test sur sous dossier
+11. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
 12. Ajout https
 13. Cleaner repertoire home hecarim
 

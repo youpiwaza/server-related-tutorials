@@ -3,6 +3,7 @@ version: '3.7'
 services:
   helloworld:
     deploy:
+      endpoint_mode: vip
       labels:
         # Tell Traefik to get the contents provided by this service using that shared network.
         - "traefik.docker.network=traefik-public"
@@ -19,6 +20,37 @@ services:
         # Create a service specifying the internal port
         # - "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=8080" # NO
         - "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
+
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='curated service helloworld'"
+        - "fr.masamune.type='test'"
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      rollback_config:
+        delay: 0s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+      update_config:
+        delay: 10s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
     image: tutum/hello-world:latest
     networks:
       # Connect to traefik dedicated overlay network, allow reverse proxy
