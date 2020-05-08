@@ -1,0 +1,82 @@
+Attaching to hecarim_the_docker_guy_57sq8jez6_traefik_1
+traefik_1  | time="2020-05-06T13:32:36Z" level=info msg="Configuration loaded from flags."
+
+
+traefik_1  | {"level":"error","msg":"Error while opening log file /var/log/traefik.log: open /var/log/traefik.log: is a directory","time":"2020-05-06T13:32:36Z"}
+
+
+traefik_1  | {"level":"info","msg":"Traefik version 2.2.1 built on 2020-04-29T18:02:09Z","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"debug","msg":"Static configuration loaded {\"global\":{\"checkNewVersion\":true},\"serversTransport\":{\"maxIdleConnsPerHost\":200},\"entryPoints\":{\"web\":{\"address\":\":80\",\"transport\":{\"lifeCycle\":{\"graceTimeOut\":10000000000},
+\"respondingTimeouts\":{\"idleTimeout\":180000000000}},\"forwardedHeaders\":{},\"http\":{}}},\"providers\":{\"providersThrottleDuration\":2000000000,\"docker\":{\"watch\":true,\"endpoint\":\"unix:///var/run/docker.sock\",\"defaultRule\":\"Host(`{{ normalize .Name }}`)\",\"swarmMode\":true,\"network\":\"traefik-public\",\"swarmModeRefreshSeconds\":15000000000}},\"log\":{\"level\":\"DEBUG\",\"filePath\":\"/var/log/traefik.log\",\"format\":\"json\"}}","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"info","msg":"\nStats collection is disabled.\nHelp us improve Traefik by turning this feature on :)\nMore details on: https://docs.traefik.io/contributing/data-collection/\n","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"info","msg":"Starting provider aggregator.ProviderAggregator {}","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"entryPointName":"web","level":"debug","msg":"Start TCP Server","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"info","msg":"Starting provider *docker.Provider {\"watch\":true,\"endpoint\":\"unix:///var/run/docker.sock\",\"defaultRule\":\"Host(`{{ normalize .Name }}`)\",\"swarmMode\":true,\"network\":\"traefik-public\",\"swarmModeRefreshSeconds\":15000000000}","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"info","msg":"Starting provider *traefik.Provider {}","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"debug","module":"api","msg":"FIXME: Got an status-code for which error does not match any expected type!!!: -1","status_code":"-1","time":"2020-05-06T13:32:36Z"}
+
+
+traefik_1  | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied","providerName":"docker","time":"2020-05-06T13:32:36Z"}
+
+
+
+
+traefik_1  | {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 505.193614ms","providerName":"docker","time":"2020-05-06T13:32:36Z"}
+
+
+traefik_1  | {"level":"debug","msg":"Configuration received from provider internal: {\"http\":{\"services\":{\"noop\":{}}},\"tcp\":{},\"tls\":{}}","providerName":"internal","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"debug","msg":"No default certificate, generating one","time":"2020-05-06T13:32:36Z"}
+traefik_1  | {"level":"debug","module":"api","msg":"FIXME: Got an status-code for which error does not match any expected type!!!: -1","status_code":"-1","time":"2020-05-06T13:32:37Z"}
+
+
+traefik_1  | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied","providerName":"docker","time":"2020-05-06T13:32:37Z"}
+
+
+
+
+traefik_1  | {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 481.363889ms","providerName":"docker","time":"2020-05-06T13:32:37Z"}
+
+
+traefik_1  | {"level":"debug","module":"api","msg":"FIXME: Got an status-code for which error does not match any expected type!!!: -1","status_code":"-1","time":"2020-05-06T13:32:37Z"}
+
+
+traefik_1  | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied","providerName":"docker","time":"2020-05-06T13:32:37Z"}
+
+
+
+
+traefik_1  | {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 1.604725433s","providerName":"docker","time":"2020-05-06T13:32:37Z"}
+
+
+traefik_1  | {"level":"debug","module":"api","msg":"FIXME: Got an status-code for which error does not match any expected type!!!: -1","status_code":"-1","time":"2020-05-06T13:32:39Z"}
+
+
+traefik_1  | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied","providerName":"docker","time":"2020-05-06T13:32:39Z"}
+
+
+
+
+traefik_1  | {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 1.193065828s","providerName":"docker","time":"2020-05-06T13:32:39Z"}
+
+
+traefik_1  | {"level":"debug","module":"api","msg":"FIXME: Got an status-code for which error does not match any expected type!!!: -1","status_code":"-1","time":"2020-05-06T13:32:40Z"}
+
+
+traefik_1  | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied","providerName":"docker","time":"2020-05-06T13:32:40Z"}
+
+
+
+
+traefik_1  | {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 3.128747976s","providerName":"docker","time":"2020-05-06T13:32:40Z"}
+
+
+traefik_1  | {"level":"debug","module":"api","msg":"FIXME: Got an status-code for which error does not match any expected type!!!: -1","status_code":"-1","time":"2020-05-06T13:32:43Z"}
+
+
+traefik_1  | {"level":"error","msg":"Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied","providerName":"docker","time":"2020-05-06T13:32:43Z"}
+
+
+
+
+traefik_1  | {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 3.931060349s","providerName":"docker","time":"2020-05-06T13:32:43Z"}
+

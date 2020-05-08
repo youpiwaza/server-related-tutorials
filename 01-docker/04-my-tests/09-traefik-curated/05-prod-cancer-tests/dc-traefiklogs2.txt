@@ -1,0 +1,25 @@
+ {"level":"error","msg":"Provider connection error Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\": dial unix /var/run/docker.sock: connect: permission denied, retrying in 18.064696383s","providerName":"docker","time":"2020-05-06T13:14:41Z"}
+
+      /var/run/docker.sock: connect: permission denied
+
+
+
+
+
+
+
+
+
+
+Failed to retrieve information of the docker client and server host: Got permission denied while trying to connect to the Docker daemon socket at unix:///var/run/docker.sock: Get \"http://%2Fvar%2Frun%2Fdocker.sock/v1.24/version\
+
+
+
+
+
+
+
+
+traefik_1            | {"level":"debug","msg":"'502 Bad Gateway' caused by: dial tcp 10.0.16.13:8080: connect: connection refused","time":"2020-05-06T15:54:33Z"}
+
+traefik_1            | {"Request":"{\"Method\":\"GET\",\"URL\":{\"Scheme\":\"\",\"Opaque\":\"\",\"User\":null,\"Host\":\"\",\"Path\":\"/favicon.ico\",\"RawPath\":\"\",\"ForceQuery\":false,\"RawQuery\":\"\",\"Fragment\":\"\"},\"Proto\":\"HTTP/1.1\",\"ProtoMajor\":1,\"ProtoMinor\":1,\"Header\":{\"Accept\":[\"image/webp,image/apng,image/*,*/*;q=0.8\"],\"Accept-Encoding\":[\"gzip, deflate\"],\"Accept-Language\":[\"fr-FR,fr;q=0.9,en-US;q=0.8,en;q=0.7,la;q=0.6\"],\"Cache-Control\":[\"no-cache\"],\"Connection\":[\"keep-alive\"],\"Cookie\":[\"__utmc=9661481; __utmz=9661481.1574161939.2.2.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); __utma=9661481.2100793429.1573645231.1577201329.1579188136.7\"],\"Pragma\":[\"no-cache\"],\"Referer\":[\"http://test.masamune.fr/\"],\"User-Agent\":[\"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/81.0.4044.129 Safari/537.36\"],\"X-Forwarded-Host\":[\"test.masamune.fr\"],\"X-Forwarded-Port\":[\"80\"],\"X-Forwarded-Proto\":[\"http\"],\"X-Forwarded-Server\":[\"839134e3cf2b\"],\"X-Real-Ip\":[\"77.207.62.73\"]},\"ContentLength\":0,\"TransferEncoding\":null,\"Host\":\"test.masamune.fr\",\"Form\":null,\"PostForm\":null,\"MultipartForm\":null,\"Trailer\":null,\"RemoteAddr\":\"77.207.62.73:52844\",\"RequestURI\":\"/favicon.ico\",\"TLS\":null}","level":"debug","msg":"vulcand/oxy/roundrobin/rr: completed ServeHttp on request","time":"2020-05-06T15:54:33Z"}

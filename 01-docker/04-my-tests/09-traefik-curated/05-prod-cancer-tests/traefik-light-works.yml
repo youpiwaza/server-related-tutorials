@@ -1,0 +1,74 @@
+version: "3.7"
+
+services:
+  dockersocketproxy:
+    # Traefik doesn't support syslog
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    environment:
+      # Authorize access
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+    image: tecnativa/docker-socket-proxy
+    networks:
+      - dockersocket4traefiknet
+    ports:
+      # Publish on usual port
+      - 2375
+    # Assign the_docker_peon unprivileged user
+    # user: 1003:1003
+    privileged: true
+    # Priviledge incompatible avec user namespace remap.
+    # userns_mode: "host" incompatible avec docker stack
+    userns_mode: "host"
+    volumes:
+      # Access to socket, read-only for security
+      - "/var/run/docker.sock:/var/run/docker.sock"
+  
+  traefik:
+    # Traefik doesn't support syslog
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    command:
+      - "--entrypoints.web.address=:80"
+      # Traefik socket access from the proxy container, on the defined port
+      - "--providers.docker.endpoint=tcp://dockersocketproxy:2375"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.swarmMode=true"
+      # Enable logs
+      - "--log.format=json"
+      - "--log.level=DEBUG"
+      # - "--log.filePath=/var/log/traefik.log"
+      # Tell Traefik to get the contents provided by this service using that shared network.
+      - "--providers.docker.network=traefik-public"
+      # "traefik.http.routers.helloworld.entrypoints=web"  ????
+    depends_on:
+      - dockersocketproxy
+    # Traefik 2.2
+    image: "traefik:chevrotin"
+    networks:
+      # Traefik's docker socket access on dedicated network
+      - dockersocket4traefiknet
+      # Traefik access to web server containers, to allow reverse proxy serving
+      - traefik-public
+    ports:
+      - "80:80"
+      # - "443:443"
+    # Assign the_docker_peon unprivileged user
+    # user: 1003:1003
+
+networks:
+  dockersocket4traefiknet:
+    # Prevent access to this network from other containers
+    attachable: false
+
+  # Needs v before
+  # FUCKING ATTACHABLE
+  # > docker network create --driver=overlay --attachable traefik-public
+  traefik-public:
+    external: true

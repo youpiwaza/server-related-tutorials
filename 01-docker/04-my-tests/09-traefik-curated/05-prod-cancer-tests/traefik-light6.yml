@@ -1,0 +1,38 @@
+version: "3.7"
+
+services:
+  traefik:
+    command:
+      - "--entrypoints.web.address=:80"
+      - "--log.filePath=/var/log/traefik.log"
+      - "--log.format=json"
+      - "--log.level=DEBUG"
+      - "--providers.docker.exposedbydefault=false"
+      - "--providers.docker.swarmMode=true"
+      - "--providers.docker.network=traefik-public"
+    deploy:
+      replicas: 1
+    image: "traefik:chevrotin"
+    # Traefik doesn't support syslog
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    networks:
+      - traefik-public
+    ports:
+      - "80:80"
+    # Assign the_docker_peon unprivileged user
+    # user: 1003:1003
+    volumes:
+      # Access to socket, read-only for security
+      - "/var/run/docker.sock:/var/run/docker.sock"
+      # Logs on host
+      - "/home/singed_the_docker_peon_9f3eqk4s9/traefik.log:/var/log/traefik.log"
+
+networks:
+  # Needs v before
+  # ATTACHABLE OBLIGATOIRE AU MOINS POUR docker compose
+  # > docker network create --driver=overlay --attachable traefik-public
+  traefik-public:
+    external: true

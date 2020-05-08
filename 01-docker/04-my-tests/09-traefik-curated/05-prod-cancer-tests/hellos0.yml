@@ -1,0 +1,20 @@
+version: '3.7'
+
+# WO traefik
+# Ok sur http://188.165.253.170/
+# Ok sur http://test.masamune.fr/
+
+
+services:
+  helloworld:
+    image: tutum/hello-world:latest
+    networks:
+      - traefik-public
+    ports:
+      - "80:80"
+
+networks:
+  traefik-public:
+    external: true
+
+# Autoriser les ports !
