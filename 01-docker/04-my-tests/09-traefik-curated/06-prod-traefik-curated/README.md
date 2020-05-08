@@ -14,10 +14,10 @@ docker network create --driver=overlay --attachable traefik-public
 # Traefik + proxy
 # docker stack deploy -c traefik17.yml traefik # KO stack peut pas privileged
 # docker_guy / Lancement via docker compose, sans -d, afin de voir les logs (forcés en json-file)
-docker-compose -f traefik-light-works.yml up
+docker-compose -f traefik.yml up
 
 # docker_guy / Stack de test, sur http://test.masamune.fr/
-docker stack deploy -c hellos-works.yml hello
+docker stack deploy -c hello.yml hello
 
 # [Online to curl/browser http://test.masamune.fr/](http://test.masamune.fr/)
 
@@ -30,13 +30,6 @@ docker stack rm traefik
 docker stack rm hello
 docker system prune
 ```
-
-## CURRENT FILES USED
-
-Online / Local
-
-- traefik17.yml / traefik-light7.yml
-- hello12.yml   / hellos3.yml
 
 ## TODO
 
