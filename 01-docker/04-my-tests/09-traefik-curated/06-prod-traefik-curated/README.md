@@ -93,3 +93,22 @@ ha-proxy a besoin de privileged, incompatible avec user namespaces.
 Listening on ports below 1024: the range of ports [0–1024] are privileged and thus require special capabilities. Either you can bind to port > 1024, or ensure you are able to grant the Linux Capability CAP_NET_BIND_SERVICEto Traefik.
 
 Docker socket membership: the socket file in /var/run/docker.sock is owned by the root user, and a group named docker. The unprivileged user of Traefik must be part of the group docker to allow access to the Docker API.
+
+## Curation
+
+### KO / syslog > networkd-dispatcher[1006]: ERROR:Unknown interface index
+
+```bash
+networkd-dispatcher[1006]: ERROR:Unknown interface index 40 seen even after reload
+networkd-dispatcher[1006]: WARNING:Unknown index 40 seen, reloading interface list
+```
+
+Some researches on google, didn't help
+
+### KO / ha-proxy > Can't open server state file '/var/lib/haproxy/server-state': No such file or directory
+
+- [github issue](https://github.com/Tecnativa/docker-socket-proxy/issues/4)
+- [other issue](https://github.com/mesosphere/marathon-lb/issues/214)
+- [official doc](https://www.haproxy.com/fr/blog/introduction-to-haproxy-logging/)
+
+Solutions seems to install ~rsyslog and force logs into it, not much time to dig into it..
