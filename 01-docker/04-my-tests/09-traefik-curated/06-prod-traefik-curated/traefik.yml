@@ -16,7 +16,10 @@ version: "3.7"
 #   Stack only allow overlay networks > security risk
 #   > Use docker compose for Traefik & proxy, and set a custom bridge network
 #     > non attachable
-#     TODO: > encrypted
+#     > encrypted
+
+# Cpu & memory restrictions not available in docker compose v3
+#   https://docs.docker.com/compose/compose-file/#resources
 
 services:
   dockersocketproxy:
@@ -87,6 +90,11 @@ services:
       start_period: 0s
     # Traefik 2.2
     image: "traefik:chevrotin"
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'reverse proxy / traefik'
+      fr.masamune.type: 'core'
     # Traefik doesn't support syslog
     logging:
       driver: "json-file"
@@ -100,6 +108,10 @@ services:
     ports:
       - "80:80"
       # - "443:443"
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     # Assign the_docker_peon unprivileged user
     user: 1003:1003
     # Specific unprivileged user needs access to ports < 1024
