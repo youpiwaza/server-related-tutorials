@@ -70,7 +70,7 @@ services:
    1. ✅ Force bridge driver for socket network
    2. ✅ socket volume > force read only
    3. ✅ Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
-   4. Lancer traefik as read only, cf bret ^
+   4. ✅ Lancer traefik as read only, cf bret ^
    5. Cap drop all + Cap_ADD "CAP_NET_BIND_SERVICE"
 6. Résoudre problèmes divers
    1. healthcheck traefik

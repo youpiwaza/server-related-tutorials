@@ -80,7 +80,7 @@ services:
       # - "443:443"
     # Assign the_docker_peon unprivileged user
     # user: 1003:1003
-    # read-only
+    read_only: true
 
 networks:
   dockersocket4traefiknetwork:
