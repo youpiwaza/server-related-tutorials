@@ -103,7 +103,7 @@ services:
    3. ❌ Traefik / Published port 80 can be allocated to one container only (traefik + replicas = 2 containers)
       1. TODO: Fix ?
 9. ✅ Test avec 2 services
-10. Test sur sous dossier
+10. ✅ Test sur sous dossier
 11. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
 12. Ajout https
 13. Cleaner repertoire home hecarim
