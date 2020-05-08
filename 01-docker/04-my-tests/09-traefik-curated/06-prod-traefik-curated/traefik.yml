@@ -128,6 +128,11 @@ networks:
     driver_opts:
       # Since we're passing docker socket stuff over TCP, lets IPSec
       encrypted: 'true'
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'docker socket proxy dedicated network'
+      fr.masamune.type: 'core'
 
   # Needs to be created before using docker compose
   #   In order to:
@@ -137,3 +142,8 @@ networks:
   traefik-public:
     # Connect to an existing network
     external: true
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'traefik outside internet access network'
+      fr.masamune.type: 'core'
