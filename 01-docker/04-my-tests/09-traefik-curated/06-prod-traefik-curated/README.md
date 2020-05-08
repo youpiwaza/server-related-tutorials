@@ -27,8 +27,9 @@ docker stack deploy -c helloDeux.yml helloDeux
 docker service ls
 
 # docker_guy / Suppression des services & réseaux
-docker stack rm traefik
+docker-compose -f traefik.yml down
 docker stack rm hello
+docker stack rm helloDeux
 docker system prune
 ```
 
@@ -94,7 +95,7 @@ services:
    2. ✅ Traefik
    3. ✅ Tests hello
 8. 🚀 Répliques
-   1. Tests hello
+   1. ✅ Tests hello
    2. Proxy
    3. Traefik
 9. ✅ Test avec 2 services

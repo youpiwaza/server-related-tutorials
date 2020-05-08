@@ -25,6 +25,8 @@ services:
         - "fr.masamune.maintainer='masamune.code@gmail.com'"
         - "fr.masamune.project='curated service helloworld'"
         - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 2
       resources:
         limits:
           cpus: '0.50'
