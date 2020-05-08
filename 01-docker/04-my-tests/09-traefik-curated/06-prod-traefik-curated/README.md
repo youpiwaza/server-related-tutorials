@@ -18,12 +18,13 @@ docker-compose -f traefik.yml up
 
 # docker_guy / Stack de test, sur http://test.masamune.fr/
 docker stack deploy -c hello.yml hello
+docker stack deploy -c helloDeux.yml helloDeux
 
 # [Online to curl/browser http://test.masamune.fr/](http://test.masamune.fr/)
+# [Online to curl/browser http://grafana.masamune.fr/](http://grafana.masamune.fr/)
 
-# docker_guy / Vérifications
+# docker_guy / Vérifications attributions des containers
 docker service ls
-# http://test.masamune.fr/
 
 # docker_guy / Suppression des services & réseaux
 docker stack rm traefik
@@ -63,10 +64,14 @@ services:
 1. 🌱 Résoudre les éventuels problèmes dans les logs
 2. ✅ Alpha reorder
 3. ✅ Comments
-4. Proper renaming
-   1. Nomenclature clients pour services et autres conneries traefik
-   2. Nomenclature ports exterieurs services (pas de doublons) / Regarder pour gestion automatique
-5. 🚀 Minor linting/tweaks
+4. ✅ Proper renaming
+   1. ✅ Nomenclature ports exterieurs services (pas de doublons) / Regarder pour gestion automatique
+      1. Pas besoin de spécifier explicitement le port de sortie
+   2. ✅ Nomenclature clients pour services et autres conneries traefik
+      1. Tester conflits de noms si services muliples
+      2. traefik_1            | {"level":"error","msg":"Router defined multiple times with different configurations in [hello-helloworld-ziecuama7f13gx12pg8vh11jt helloDeux-helloworld-g79k1r85gyzcuxv3v33k7lwnq]","providerName":"docker","routerName":"helloworld","time":"2020-05-08T14:37:31Z"}
+      3. > Cf. nomenclature
+5. ✅ Minor linting/tweaks
    1. ✅ Force bridge driver for socket network
    2. ✅ socket volume > force read only
    3. ✅ Activer l'encryptage du réseau d'accès à la socket [bret fisher stack example](https://github.com/BretFisher/dogvscat/blob/master/stack-proxy-global.yml)
@@ -77,7 +82,7 @@ services:
       2. // Specific unprivileged user needs access to ports < 1024
          - sysctls:
            - net.ipv4.ip_unprivileged_port_start: 0
-   7. Traefik stats > Stats collection is disabled. Help us improve Traefik by turning this feature on :). More details [here](https://docs.traefik.io/contributing/data-collection/)
+   7. ✅ Traefik stats > Stats collection is disabled. Help us improve Traefik by turning this feature on :). More details [here](https://docs.traefik.io/contributing/data-collection/)
 6. Résoudre problèmes divers
    1. healthcheck traefik
    2. "traefik.http.routers.helloworld.entrypoints=web" ???
