@@ -77,9 +77,11 @@ services:
       # Send Traefik anonymous usage data / https://docs.traefik.io/contributing/data-collection/
       - "--global.sendAnonymousUsage"
       # Enable logs
-      # - "--log.filePath=/var/log/traefik.log"
+      - "--log.filePath=/home/traefik.log"
+      # - "--log.format=common"
       - "--log.format=json"
       - "--log.level=DEBUG"
+      # - "--log.level=ERROR"
       # Allow pings, for healthchecks
       - "--ping=true"
       # Traefik socket access from the proxy container, on the defined port
@@ -127,7 +129,14 @@ services:
     # Specific unprivileged user needs access to ports < 1024
     sysctls:
       net.ipv4.ip_unprivileged_port_start: 0
+    # Prevent modifications
     read_only: true
+    # Send logs to a named volume
+    volumes:
+      - type: volume
+        read_only: false
+        source: logs-traefik
+        target: /home/
 
 networks:
   dockersocket4traefiknetwork:
@@ -157,3 +166,9 @@ networks:
       fr.masamune.maintainer: 'masamune.code@gmail.com'
       fr.masamune.project: 'traefik outside internet access network'
       fr.masamune.type: 'core'
+
+volumes:
+  # Needs to be created before using docker compose
+  # cf. server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/06-prod-traefik-curated/README.md #### How to manage named volumes access rights
+  logs-traefik:
+    external: true

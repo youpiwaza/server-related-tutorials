@@ -104,7 +104,14 @@ services:
       1. TODO: Fix ?
 9. ✅ Test avec 2 services
 10. ✅ Test sur sous dossier
-11. Gestion des logs traefik (json + volumes > fichiers sur host), [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
+11. ✅ Gestion des logs traefik (json + volumes > fichiers sur host)
+    1. Docs
+        1. [Official docs](https://docs.traefik.io/observability/logs/)
+        2. [exemple](https://community.containo.us/t/502-bad-gateway-solved/2947)
+        3. [Access logs](https://docs.traefik.io/observability/access-logs/)
+    2. ~~/var/log/*~~
+    3. Traefik's container > /home/traefik.log
+    4. Stored inside a named volume 'logs-traefik' in /home/traefik.log
 12. Ajout https
 13. Cleaner repertoire home hecarim
 
@@ -141,3 +148,110 @@ Some researches on google, didn't help
 - [official doc](https://www.haproxy.com/fr/blog/introduction-to-haproxy-logging/)
 
 Solutions seems to install ~rsyslog and force logs into it, not much time to dig into it..
+
+### Logs management
+
+They first need to be generated inside the container, then passed to the host through a volume
+
+```yaml
+services:
+  traefik:
+    command:
+      # Enable logs
+      - "--log.filePath=/home/traefik.log"
+      - "--log.format=json"
+      - "--log.level=DEBUG"
+      # - "--log.level=ERROR"
+```
+
+Note: Compatible with read_only: true.
+
+#### How to manage named volumes access rights
+
+As bind mount is a security risk, we'll use a [named volume](https://docs.docker.com/engine/reference/commandline/volume_create/).
+
+As we are using user namespaces, the user inside the container is the docker_peon.
+
+Rights must be set accordingly before, through the builder_guy:
+
+```bash
+# docker_guy
+# Create a named volume
+docker volume create logs-traefik \
+   --label fr.masamune.client='masamune' \
+   --label fr.masamune.maintainer='masamune.code@gmail.com' \
+   --label fr.masamune.project='traefik reverse proxy' \
+   --label fr.masamune.type='core'
+
+# Traefik needs access to his /var/log/traefik.log
+#     We're gonna mount the volume from a temp container and edit the volume rights here
+#        target=/home >> We'll edit temp container's /home to edit the volume
+#     Later, Traefik container's /var/log/ will be mounted on volume's /home
+# Go inside the volume through an attached container, not using --user, so we're having root access inside the container
+docker run \
+   -it \
+   --rm \
+   --mount \
+      source=logs-traefik,target=/home \
+   alpine \
+   /bin/ash
+
+# Inside the temp container
+>> cd /home
+# Create the file that need to be edited
+>> touch traefik.log
+# Set rights accordingly to container's user (remapped)
+#     Use chown -R if you need full folder access from inside the container
+>> chown 1003:1003 traefik.log
+
+# Vérification
+>> ls -la
+# total 8
+# drwxr-xr-x    2 root     root          4096 May  9 13:29 .
+# drwxr-xr-x    1 root     root          4096 May  9 13:28 ..
+# -rw-r--r--    1 1003     1003             0 May  9 13:29 traefik.log
+>> exit
+```
+
+Note that the docker_peon still can't execute traefik.log nor create folders/files :)
+
+#### Assign the volume to the traefik container
+
+```yaml
+services:
+  traefik:
+    # Assign the_docker_peon unprivileged user
+    user: 1003:1003
+    volumes:
+      - type: volume
+        read_only: false
+        source: logs-traefik
+        target: /home/
+
+# Also needs to be defined in the top level volume key
+#     https://docs.docker.com/compose/compose-file/#volumes
+volumes:
+  logs-traefik:
+    # Use the existing volume, do not recreate one with a prefix
+    external: true
+```
+
+Check everything is fine
+
+```bash
+# Check from the container point of vue
+# Run the docker compose
+docker-compose -f traefik.yml up
+
+# From another terminal
+# Get the container's name
+docker container ls
+
+# Go in (alpine bash)
+docker exec -it tests_traefik_1 /bin/ash
+>> cd home/
+>> ls -la
+>> vi traefik.log
+>>>> :q
+>> exit
+```
