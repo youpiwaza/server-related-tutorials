@@ -57,7 +57,9 @@ docker system prune
        5. 💚 [Another tutorial](https://chriswiegman.com/2019/10/serving-your-docker-apps-with-https-and-traefik-2/)
     2. ✅ Enable in traefik container
     3. ✅ Enable on stack ~[hello https://test.masamune.fr/](https://test.masamune.fr/)
-    4. 🚀 Automatic redirect http to https
+    4. ✅ Automatic redirect http to https
+    5. ✅ Switch from Let's encrypt staging (for test purposes)
+       1. 🎉 Works
 
 ## Traefik HTTPS implementation
 

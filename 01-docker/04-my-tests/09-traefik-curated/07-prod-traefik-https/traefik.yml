@@ -149,6 +149,8 @@ services:
     volumes:
       # Store HTTPS certificates in a named volume
       # Traefik needs full access (incl. file creation) on acme.json
+      #   For concurrency reason, this file (acme.json) cannot be shared across multiple instances of Traefik.
+      #     https://docs.traefik.io/https/acme/#storage
       - type: volume
         read_only: false
         source: traefik-https
