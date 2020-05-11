@@ -1,0 +1,81 @@
+version: '3.7'
+
+services:
+  helloworld3:
+    deploy:
+      endpoint_mode: vip
+      labels:
+        # Tell Traefik to get the contents provided by this service using that shared network.
+        - "traefik.docker.network=traefik-public"
+        # Allow internet exposition (publish on port 80)
+        - "traefik.enable=true"
+        
+        # Strip prefix to allow correct assets path
+        #   https://docs.traefik.io/v2.0/middlewares/overview/
+        #   https://docs.traefik.io/v2.0/middlewares/stripprefix/
+        # Create a middleware named 'testMasamuneFr_sub_Helloworld3_middleware_pathstrip' that strips the prefix '/sub' on resources,
+        #   applied in traefik.http.routers.testMasamuneFr_sub_Helloworld3_Router.middlewares below v
+        - "traefik.http.middlewares.testMasamuneFr_sub_Helloworld3_middleware_pathstrip.stripprefix.prefixes=/sub"
+
+        # Specify entrypoint
+        - "traefik.http.routers.testMasamuneFr_sub_Helloworld3_Router.entrypoints=web"
+        
+        # Apply the middleware 'testMasamuneFr_sub_Helloworld3_middleware_pathstrip' to routers.helloworld33
+        - "traefik.http.routers.testMasamuneFr_sub_Helloworld3_Router.middlewares=testMasamuneFr_sub_Helloworld3_middleware_pathstrip@docker"
+        
+        # On which url ? Reverse proxy regexp
+        #   Test container on dedicated sub folders
+        #   http://test.masamune.fr/sub/
+        - "traefik.http.routers.testMasamuneFr_sub_Helloworld3_Router.rule=(Host(`test.masamune.fr`) && PathPrefix(`/sub`))"
+
+        # Use the service specifying the internal port
+        - "traefik.http.routers.testMasamuneFr_sub_Helloworld3_Router.service=testMasamuneFr_sub_Helloworld3_Service"
+        
+        # Create a service specifying the internal port
+        # - "traefik.http.services.testMasamuneFr_sub_Helloworld3_Service.loadbalancer.server.port=8080" # NO
+        - "traefik.http.services.testMasamuneFr_sub_Helloworld3_Service.loadbalancer.server.port=80"
+
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='curated service helloworld3'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 3
+        window: 120s
+      rollback_config:
+        delay: 0s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+      update_config:
+        delay: 10s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+    image: tutum/hello-world:latest
+    networks:
+      # Connect to traefik dedicated overlay network, allow reverse proxy
+      - traefik-public
+    # Optionnal / Specify a FREE external port
+    # ports:
+    #   - "15000:80"
+
+networks:
+  traefik-public:
+    # Connect to an existing network
+    external: true
