@@ -21,8 +21,8 @@ services:
         # Enable TLS
         - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls=true"
         # Automatic generation on all subdomains, using SANs
-        - traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.domains[0].main=masamune.fr
-        - traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.domains[0].sans=*.masamune.fr
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.domains[0].main=masamune.fr"
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.domains[0].sans=*.masamune.fr"
         # Automtic certifcate resolver, created in traefik.yml
         - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.certresolver=leresolver"
         
