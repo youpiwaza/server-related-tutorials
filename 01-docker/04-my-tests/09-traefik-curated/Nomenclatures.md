@@ -47,3 +47,12 @@ Règles:
 - "traefik.http.routers.testMasamuneFr_Helloworld_Router.service=testMasamuneFr_Helloworld_Service"
 - "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
 ```
+
+## Core Named volumes
+
+### logs-traefik
+
+Contains Traefik both debug & access logs
+
+- /home/traefik-access.log
+- /home/traefik-debug.log
