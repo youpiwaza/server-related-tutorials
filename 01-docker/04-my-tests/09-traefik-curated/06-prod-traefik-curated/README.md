@@ -11,10 +11,13 @@ sudo tail -f /var/log/syslog
 # docker_guy / Réseau attachable public, pour que les services soient connectés à traefik/internet
 docker network create --driver=overlay --attachable traefik-public
 
+# docker_guy / Create a named volume for logs (debug + access)
+# Do steps described below in #### How to manage named volumes access rights
+
 # Traefik + proxy
 # docker stack deploy -c traefik17.yml traefik # KO stack peut pas privileged
 # docker_guy / Lancement via docker compose, sans -d, afin de voir les logs (forcés en json-file)
-docker-compose -f traefik.yml up
+# docker-compose -f traefik.yml up
 # Scaling/replicas
 docker-compose -f traefik.yml up --scale dockersocketproxy=2
 # docker-compose -f traefik.yml up --scale traefik=2 # KO, as port 80 can be published to one instance only
@@ -22,6 +25,7 @@ docker-compose -f traefik.yml up --scale dockersocketproxy=2
 # docker_guy / Stack de test, sur http://test.masamune.fr/
 docker stack deploy -c hello.yml hello
 docker stack deploy -c helloDeux.yml helloDeux
+docker stack deploy -c helloSub.yml helloSub
 
 # [Online to curl/browser http://test.masamune.fr/](http://test.masamune.fr/)
 # [Online to curl/browser http://grafana.masamune.fr/](http://grafana.masamune.fr/)
@@ -33,6 +37,7 @@ docker service ls
 docker-compose -f traefik.yml down
 docker stack rm hello
 docker stack rm helloDeux
+docker stack rm helloSub
 docker system prune
 ```
 
@@ -112,8 +117,9 @@ services:
     2. ~~/var/log/*~~
     3. Traefik's container > /home/traefik.log
     4. Stored inside a named volume 'logs-traefik' in /home/traefik.log
-12. Ajout https
-13. Cleaner repertoire home hecarim
+12. 🚀🚀🚀🚀🚀 [Manage access logs](https://docs.traefik.io/observability/access-logs/)
+13. Ajout https
+14. Cleaner repertoire home hecarim
 
 ## Docs
 
@@ -193,27 +199,29 @@ docker run \
    --rm \
    --mount \
       source=logs-traefik,target=/home \
+   --workdir /home \
    alpine \
    /bin/ash
 
-# Inside the temp container
->> cd /home
-# Create the file that need to be edited
->> touch traefik.log
+# Inside the temp container, create the files that need to be edited
+>> touch traefik-access.log
+>> touch traefik-debug.log
 # Set rights accordingly to container's user (remapped)
 #     Use chown -R if you need full folder access from inside the container
->> chown 1003:1003 traefik.log
+>> chown 1003:1003 traefik-access.log
+>> chown 1003:1003 traefik-debug.log
 
 # Vérification
 >> ls -la
 # total 8
 # drwxr-xr-x    2 root     root          4096 May  9 13:29 .
 # drwxr-xr-x    1 root     root          4096 May  9 13:28 ..
-# -rw-r--r--    1 1003     1003             0 May  9 13:29 traefik.log
+# -rw-r--r--    1 1003     1003             0 May  9 13:29 traefik-debug.log
+# -rw-r--r--    1 1003     1003             0 May  9 13:29 traefik-access.log
 >> exit
 ```
 
-Note that the docker_peon still can't execute traefik.log nor create folders/files :)
+Note that the docker_peon still can't execute traefik-*.log files nor create folders/files :)
 
 #### Assign the volume to the traefik container
 
