@@ -18,7 +18,6 @@ services:
         - "traefik.http.routers.testMasamuneFr_Helloworld_Router.service=testMasamuneFr_Helloworld_Service"
         
         # Create a service specifying the internal port
-        # - "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=8080" # NO
         - "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
 
         - "fr.masamune.client='masamune'"

@@ -78,14 +78,21 @@ services:
       # Enable access logs
       - "--accesslog=true"
       - "--accesslog.bufferingsize=100"
-      - "--accesslog.filepath=/home/traefik-access.log"
-      # Specify internet access > Port 80
+      - "--accesslog.filepath=/home/logs/traefik-access.log"
+      # HTTPS certificates
+      #   Test API TODO: Switch to prod
+      - --certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
+      - --certificatesresolvers.leresolver.acme.email=masamune.code@gmail.com
+      - --certificatesresolvers.leresolver.acme.storage=/home/https/acme.json
+      - --certificatesresolvers.leresolver.acme.tlschallenge=true
+      # Specify internet access > HTTP 80 & HTTPS 443
+      # Note that "web" & "websecure" are abitrary names, but will be reused in services' contrainers
       - "--entrypoints.web.address=:80"
-      # - "--entryPoints.websecure.address=:443"
+      - "--entryPoints.websecure.address=:443"
       # Send Traefik anonymous usage data / https://docs.traefik.io/contributing/data-collection/
       - "--global.sendAnonymousUsage"
       # Enable logs
-      - "--log.filePath=/home/traefik-debug.log"
+      - "--log.filePath=/home/logs/traefik-debug.log"
       # - "--log.format=common"
       - "--log.format=json"
       - "--log.level=DEBUG"
@@ -127,7 +134,7 @@ services:
       - traefik-public
     ports:
       - "80:80"
-      # - "443:443"
+      - "443:443"
     security_opt:
       - apparmor=docker-default
       - no-new-privileges:true
@@ -139,12 +146,17 @@ services:
       net.ipv4.ip_unprivileged_port_start: 0
     # Prevent modifications
     read_only: true
-    # Send logs to a named volume
     volumes:
+      # Store HTTPS certificates in a named volume
       - type: volume
         read_only: false
-        source: logs-traefik
-        target: /home/
+        source: traefik-https
+        target: /home/https
+      # Send logs to a named volume
+      - type: volume
+        read_only: false
+        source: traefik-logs
+        target: /home/logs
 
 networks:
   dockersocket4traefiknetwork:
@@ -177,6 +189,8 @@ networks:
 
 volumes:
   # Needs to be created before using docker compose
+  traefik-https:
+    external: true
   # cf. server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/06-prod-traefik-curated/README.md #### How to manage named volumes access rights
-  logs-traefik:
+  traefik-logs:
     external: true
