@@ -31,6 +31,8 @@ Tests si conflits
 Règles:
 
 - (camelCase)
+- Préfixer http ou https
+  - http sera redirigé vers https systématiquement via traefik
 - Préfixer du sous domaine  + nom du site + extension + "_"
 - Préfixer du nom du service + "_"
 - Type traefik
@@ -43,9 +45,9 @@ Règles:
 
 # DEVIENT
 
-- "traefik.http.routers.testMasamuneFr_Helloworld_Router.rule=Host(`test.masamune.fr`)"
-- "traefik.http.routers.testMasamuneFr_Helloworld_Router.service=testMasamuneFr_Helloworld_Service"
-- "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
+- "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.rule=Host(`test.masamune.fr`)"
+- "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.service=https_testMasamuneFr_Helloworld_Service"
+- "traefik.http.services.https_testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
 ```
 
 ## Core Named volumes

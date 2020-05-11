@@ -50,9 +50,9 @@ docker system prune
        3. [Traefik > TLS > Routers](https://docs.traefik.io/routing/routers/#tls)
        4. 💚 [Traefik HTTPS tutorial](https://containo.us/blog/traefik-2-0-docker-101-fc2893944b9d/#i-need-https)
        5. 💚 [Another tutorial](https://chriswiegman.com/2019/10/serving-your-docker-apps-with-https-and-traefik-2/)
-    2. Enable in traefik container
-    3. Enable on stack ~[hello https://test.masamune.fr/](https://test.masamune.fr/)
-    4. Automatic redirect http to https
+    2. ✅ Enable in traefik container
+    3. ✅ Enable on stack ~[hello https://test.masamune.fr/](https://test.masamune.fr/)
+    4. 🚀 Automatic redirect http to https
 
 ## Traefik HTTPS implementation
 
@@ -174,11 +174,40 @@ services:
   helloworld:
     deploy:
       labels:
-        # Specify entrypoints
-        # - "traefik.http.routers.testMasamuneFr_Helloworld_Router.entrypoints=web"
-        - "traefik.http.routers.testMasamuneFr_Helloworld_Router.entrypoints=websecure"
+         ## HTTPS router specifications
+
+        # Entrypoint
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.entrypoints=websecure"
+        # On which url ? Reverse proxy regexp
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.rule=Host(`test.masamune.fr`)"
+        # Use the service created below specifying the internal port
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.service=testMasamuneFr_Helloworld_Service"
         # Enable TLS
-        - "traefik.http.routers.testMasamuneFr_Helloworld_Router.tls=true"
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls=true"
         # Automtic certifcate resolver, created in traefik.yml
-        - "traefik.http.routers.testMasamuneFr_Helloworld_Router.tls.certresolver=leresolver"
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.certresolver=leresolver"
+
+        # Create a service specifying the internal port
+        - "traefik.http.services.testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80".tls.certresolver=leresolver"
+```
+
+## Service HTTP redirection
+
+```yaml
+services:
+  helloworld:
+    deploy:
+      labels:
+        ## HTTP_ router specifications
+        #     Redirect every http requests to their https equivalent
+
+        # Create a middleware to redirect http to https
+        #     Middleware aren't shared ?
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        # All hosts..
+        - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.rule=hostregexp(`{host:.+}`)"
+        # .. coming from entrypoint web ..
+        - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.entrypoints=web"
+        # .. use the previously created middleware
+        - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.middlewares=redirect-to-https"
 ```

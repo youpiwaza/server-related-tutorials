@@ -118,10 +118,10 @@ services:
     # Traefik 2.2
     image: "traefik:chevrotin"
     labels:
-      fr.masamune.client: 'masamune'
-      fr.masamune.maintainer: 'masamune.code@gmail.com'
-      fr.masamune.project: 'reverse proxy / traefik'
-      fr.masamune.type: 'core'
+      - "fr.masamune.client: 'masamune'"
+      - "fr.masamune.maintainer: 'masamune.code@gmail.com'"
+      - "fr.masamune.project: 'reverse proxy / traefik'"
+      - "fr.masamune.type: 'core'"
     # Traefik doesn't support syslog
     logging:
       driver: "json-file"
