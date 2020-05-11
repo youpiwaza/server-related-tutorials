@@ -78,14 +78,14 @@ services:
       # Enable access logs
       - "--accesslog=true"
       - "--accesslog.bufferingsize=100"
-      - "--accesslog.filepath=/home/traefik-access.log"
+      - "--accesslog.filepath=/home/logs/traefik-access.log"
       # Specify internet access > Port 80
       - "--entrypoints.web.address=:80"
       # - "--entryPoints.websecure.address=:443"
       # Send Traefik anonymous usage data / https://docs.traefik.io/contributing/data-collection/
       - "--global.sendAnonymousUsage"
       # Enable logs
-      - "--log.filePath=/home/traefik-debug.log"
+      - "--log.filePath=/home/logs/traefik-debug.log"
       # - "--log.format=common"
       - "--log.format=json"
       - "--log.level=DEBUG"
@@ -143,8 +143,8 @@ services:
     volumes:
       - type: volume
         read_only: false
-        source: logs-traefik
-        target: /home/
+        source: traefik-logs
+        target: /home/logs
 
 networks:
   dockersocket4traefiknetwork:
@@ -178,5 +178,5 @@ networks:
 volumes:
   # Needs to be created before using docker compose
   # cf. server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/06-prod-traefik-curated/README.md #### How to manage named volumes access rights
-  logs-traefik:
+  traefik-logs:
     external: true

@@ -116,7 +116,7 @@ services:
         3. [Access logs](https://docs.traefik.io/observability/access-logs/)
     2. ~~/var/log/*~~
     3. Traefik's container > /home/traefik.log
-    4. Stored inside a named volume 'logs-traefik' in /home/traefik.log
+    4. Stored inside a named volume 'traefik-logs' in /home/traefik.log
 12. ✅ [Manage access logs](https://docs.traefik.io/observability/access-logs/)
 
 ## Docs
@@ -181,7 +181,7 @@ Rights must be set accordingly before, through the builder_guy:
 ```bash
 # docker_guy
 # Create a named volume
-docker volume create logs-traefik \
+docker volume create traefik-logs \
    --label fr.masamune.client='masamune' \
    --label fr.masamune.maintainer='masamune.code@gmail.com' \
    --label fr.masamune.project='traefik reverse proxy' \
@@ -189,15 +189,15 @@ docker volume create logs-traefik \
 
 # Traefik needs access to his /var/log/traefik.log
 #     We're gonna mount the volume from a temp container and edit the volume rights here
-#        target=/home >> We'll edit temp container's /home to edit the volume
-#     Later, Traefik container's /var/log/ will be mounted on volume's /home
+#        target=/home/logs >> We'll edit temp container's /home/logs to edit the volume
+#     Later, Traefik container's /var/log/ will be mounted on volume's /home/logs
 # Go inside the volume through an attached container, not using --user, so we're having root access inside the container
 docker run \
    -it \
    --rm \
    --mount \
-      source=logs-traefik,target=/home \
-   --workdir /home \
+      source=traefik-logs,target=/home/logs \
+   --workdir /home/logs \
    alpine \
    /bin/ash
 
@@ -208,6 +208,8 @@ docker run \
 #     Use chown -R if you need full folder access from inside the container
 >> chown 1003:1003 traefik-access.log
 >> chown 1003:1003 traefik-debug.log
+# One liner
+# >> touch traefik-access.log && touch traefik-debug.log && chown 1003:1003 traefik-access.log && chown 1003:1003 traefik-debug.log
 
 # Vérification
 >> ls -la
@@ -231,13 +233,13 @@ services:
     volumes:
       - type: volume
         read_only: false
-        source: logs-traefik
-        target: /home/
+        source: traefik-logs
+        target: /home/logs
 
 # Also needs to be defined in the top level volume key
 #     https://docs.docker.com/compose/compose-file/#volumes
 volumes:
-  logs-traefik:
+  traefik-logs:
     # Use the existing volume, do not recreate one with a prefix
     external: true
 ```

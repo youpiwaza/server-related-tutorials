@@ -54,5 +54,5 @@ Règles:
 
 Contains Traefik both debug & access logs
 
-- /home/traefik-access.log
-- /home/traefik-debug.log
+- /home/logs/traefik-access.log
+- /home/logs/traefik-debug.log
