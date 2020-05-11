@@ -117,9 +117,7 @@ services:
     2. ~~/var/log/*~~
     3. Traefik's container > /home/traefik.log
     4. Stored inside a named volume 'logs-traefik' in /home/traefik.log
-12. 🚀🚀🚀🚀🚀 [Manage access logs](https://docs.traefik.io/observability/access-logs/)
-13. Ajout https
-14. Cleaner repertoire home hecarim
+12. ✅ [Manage access logs](https://docs.traefik.io/observability/access-logs/)
 
 ## Docs
 
