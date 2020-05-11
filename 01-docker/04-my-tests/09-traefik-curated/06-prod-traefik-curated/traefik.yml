@@ -33,6 +33,8 @@ version: "3.7"
 
 services:
   dockersocketproxy:
+    cap_drop:
+      - ALL
     environment:
       # Authorize access
       NETWORKS: 1
@@ -56,9 +58,11 @@ services:
       # Publish on (usual) tcp port
       - 2375
     privileged: true
+    # KO / Prevent modifications
+    # read_only: true
     security_opt:
-      - no-new-privileges:true
       - apparmor=docker-default
+      - no-new-privileges:true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     userns_mode: "host"
     volumes:
@@ -125,8 +129,8 @@ services:
       - "80:80"
       # - "443:443"
     security_opt:
-      - no-new-privileges:true
       - apparmor=docker-default
+      - no-new-privileges:true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     # Assign the_docker_peon unprivileged user
     user: 1003:1003
