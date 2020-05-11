@@ -80,8 +80,8 @@ services:
       - "--accesslog.bufferingsize=100"
       - "--accesslog.filepath=/home/logs/traefik-access.log"
       # HTTPS certificates
-      #   Test API TODO: Switch to prod
-      - "--certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # - "--certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.leresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.leresolver.acme.email=masamune.code@gmail.com"
       - "--certificatesresolvers.leresolver.acme.storage=/home/https/acme.json"
       - "--certificatesresolvers.leresolver.acme.tlschallenge=true"

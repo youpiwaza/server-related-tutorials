@@ -1,6 +1,11 @@
 # Traefik > Enable HTTPS & automated certificate renewals
 
-Now that we have 'simple' a working base on prod environnement, time to enable HTTPS/
+Now that we have 'simple' a working base on prod environnement, time to enable HTTPS.
+
+Note: When all in place, might need to remove test certificates (using Let's encrypt staging uri) from the browser :
+
+- Empty browser cache
+- Restart browser
 
 ## Main commands
 
