@@ -79,8 +79,10 @@ docker run \
    alpine \
    /bin/ash
 
-# Create and set rights to /home/https/acme.json
->> touch acme.json && chown 1003:1003 acme.json
+# Create and set rights to /home/https/
+# Traefik needs full access (incl. file creation) on acme.json
+#     https://community.containo.us/t/non-existent-resolver-using-letsencrypt/3530
+>> chown -R 1003:1003 https/
 
 # Vérification
 >> ls -la
@@ -132,4 +134,51 @@ services:
     ports:
       - "80:80"
       - "443:443"
+```
+
+## Resolving traefik cancer doc cryptic bullsh*t
+
+### "router uses a non-existent resolver"
+
+Nothing to do with a link between stack & traefik : traefik needs to CREATE acme.json, so we can't even touch it.
+> Resolved by giving traefik full access on the "https" folder created inside the named volume "traefik-https", instead of creating acme.json & then chown it to 1003:1003.
+
+Thanks a lot [somebody](https://community.containo.us/t/non-existent-resolver-using-letsencrypt/3530/2).
+
+### Unable to obtain ACME certificate for domains
+
+Traefik's debug logs
+
+```json
+{   "level":"error",
+    "msg":"Unable to obtain ACME certificate for domains \"hello-helloworld\":
+            unable to generate a certificate for the domains [hello-helloworld]:
+            acme: error: 400 :: POST :: https://acme-staging-v02.api.letsencrypt.org/acme/new-order ::
+            urn:ietf:params:acme:error:rejectedIdentifier ::
+            Error creating new order :: Cannot issue for \"hello-helloworld\":
+            Domain name needs at least one dot, url: ",
+        "providerName":"leresolver.acme",
+        "routerName":"my-testMasamuneFr_Helloworld_Router@docker",
+        "rule":"Host(`hello-helloworld`)",
+        "time":"2020-05-11T13:15:22Z"
+}
+```
+
+yeah, Host rule is kinda fucking "test.masamune.fr" and not random "hello-helloworld".
+> Router name typo -_-" > Traefik default host rule "stack name" + "-" + "service name"
+
+## Service HTTPS implementation
+
+```yaml
+services:
+  helloworld:
+    deploy:
+      labels:
+        # Specify entrypoints
+        # - "traefik.http.routers.testMasamuneFr_Helloworld_Router.entrypoints=web"
+        - "traefik.http.routers.testMasamuneFr_Helloworld_Router.entrypoints=websecure"
+        # Enable TLS
+        - "traefik.http.routers.testMasamuneFr_Helloworld_Router.tls=true"
+        # Automtic certifcate resolver, created in traefik.yml
+        - "traefik.http.routers.testMasamuneFr_Helloworld_Router.tls.certresolver=leresolver"
 ```

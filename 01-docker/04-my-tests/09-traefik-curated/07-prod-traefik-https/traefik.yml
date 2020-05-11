@@ -81,10 +81,10 @@ services:
       - "--accesslog.filepath=/home/logs/traefik-access.log"
       # HTTPS certificates
       #   Test API TODO: Switch to prod
-      - --certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory
-      - --certificatesresolvers.leresolver.acme.email=masamune.code@gmail.com
-      - --certificatesresolvers.leresolver.acme.storage=/home/https/acme.json
-      - --certificatesresolvers.leresolver.acme.tlschallenge=true
+      - "--certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.leresolver.acme.email=masamune.code@gmail.com"
+      - "--certificatesresolvers.leresolver.acme.storage=/home/https/acme.json"
+      - "--certificatesresolvers.leresolver.acme.tlschallenge=true"
       # Specify internet access > HTTP 80 & HTTPS 443
       # Note that "web" & "websecure" are abitrary names, but will be reused in services' contrainers
       - "--entrypoints.web.address=:80"
@@ -148,6 +148,7 @@ services:
     read_only: true
     volumes:
       # Store HTTPS certificates in a named volume
+      # Traefik needs full access (incl. file creation) on acme.json
       - type: volume
         read_only: false
         source: traefik-https

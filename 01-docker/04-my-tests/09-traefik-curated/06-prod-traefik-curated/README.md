@@ -257,9 +257,10 @@ docker container ls
 
 # Go in (alpine bash)
 docker exec -it tests_traefik_1 /bin/ash
->> cd home/
+>> cd home/logs
 >> ls -la
->> vi traefik.log
+>> vi traefik-access.log
+>> vi traefik-debug.log
 >>>> :q
 >> exit
 ```
