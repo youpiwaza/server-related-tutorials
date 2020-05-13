@@ -261,6 +261,7 @@ docker exec -it tests_traefik_1 /bin/ash
 >> ls -la
 >> vi traefik-access.log
 >> vi traefik-debug.log
+>> tail -f traefik-debug.log
 >>>> :q
 >> exit
 ```
