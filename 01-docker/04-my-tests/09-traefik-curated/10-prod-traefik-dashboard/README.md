@@ -1,20 +1,6 @@
-# Traefik > Eable authed traefik dashboard
+# Traefik > Test traefik auth
 
-
-
-TODO:
-
-1. Attendre la propagation du nom de domaine traefik.masamune.fr
-2. Si jamais ça déconne, essayer auth sur test.masamune.fr (découpler de la mise en place de l'API)
-
-
-
-
-
-
-Enabling traefik's dashboard on an https uri, following this [tutorial](https://containo.us/blog/traefik-2-0-docker-101-fc2893944b9d/#compiling-everything-for-a-secured-dashboard-).
-
-Needs a proper DNS entry set up towards the desired dashbord URI (here I set up traefik.masamune.fr beforehand).
+Test auth sur test.masamune.fr (découpler de la mise en place de l'API)
 
 ## Certificate cache
 
@@ -42,6 +28,8 @@ docker network create --driver=overlay --attachable traefik-public
 # Scaling/replicas
 docker-compose -f traefik.yml up --scale dockersocketproxy=2
 # docker-compose -f traefik.yml up --scale traefik=2 # KO, as port 80 can be published to one instance only
+# Logs traefik
+docker exec -it tests_traefik_1 /bin/ash -c "tail -f home/logs/traefik-debug.log"
 
 # docker_guy / Stack de test, sur http://test.masamune.fr/
 docker stack deploy -c hello.yml hello
@@ -64,9 +52,4 @@ docker system prune
 
 ## TODO
 
-1. ✅ Create a subdomain
-2. 🚧 Attendre la propagation du sous domaine
-3. 📌 Enable API
-4. 📌 Forward API to subdomain
-5. 📌 Enable HTTPS on subdomain
-6. 📌 Enable Auth for subdomain
+1. Enable Auth for subdomain
