@@ -1,4 +1,4 @@
-# KO / Traefik > Test traefik auth
+# KO AF / Traefik > Test traefik auth
 
 - Fuck this shit
 - Fuck the documentation

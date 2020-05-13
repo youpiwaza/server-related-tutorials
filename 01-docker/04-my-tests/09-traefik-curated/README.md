@@ -25,3 +25,10 @@ Et cleaner un peu le bordel des anciens tests :')
 2. Entrypoints (ports depuis internet, ex: port 80)
 3. Envoie vers les routes
 4. Qui envoient vers les services associés
+
+## LATER
+
+TODO:
+
+1. Traefik dashboard / KO AF
+2. Log rotation in named volume
