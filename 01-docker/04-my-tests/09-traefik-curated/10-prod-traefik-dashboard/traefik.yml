@@ -80,7 +80,10 @@ services:
       - "--accesslog.bufferingsize=100"
       - "--accesslog.filepath=/home/logs/traefik-access.log"
       # Enable traefik's dashboard
+      # - "--api.insecure"
       - "--api"
+      # - "--api=true"
+      - "--api.dashboard=true"
       # HTTPS certificates
       # - "--certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
       - "--certificatesresolvers.leresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
@@ -126,32 +129,105 @@ services:
       - "fr.masamune.type: 'core'"
 
       # Dashboard
+      # # TEST 1 / docs
+      # #   https://containo.us/blog/traefik-2-0-docker-101-fc2893944b9d/#compiling-everything-for-a-secured-dashboard-
+      # # For the route http://traefik.masamune.fr ..
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.rule=Host(`traefik.masamune.fr`)"
+      # # .. send the traefik API stuff
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.service=api@internal"
+      # # .. and use basic auth middleware created below
+      # # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.middlewares=https_traefikMasamuneFr_Dashboard_Auth"
+      # # .. and all on https
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.tls=true"
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.tls.certresolver=leresolver"
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.entrypoints=websecure"
+      # # Create auth middleware
+      # # - "traefik.http.middlewares.https_traefikMasamuneFr_Dashboard_Auth.basicauth.users=user:$$apr1$$q8eZFHjF$$Fvmkk//V6Btlaf2i/ju5n/" # user/password
+
+      # # Create a service specifying the internal port
+      # - "traefik.http.services.https_testMasamuneFr_Dashboard_Service.loadbalancer.server.port=9942"
+      # # Use the service created below specifying the internal port
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.service=https_testMasamuneFr_Dashboard_Service"
+
+
+      # # Dashboard redirect to https
+      # - "traefik.http.routers.http_traefikMasamuneFr_Dashboard_Router.rule=hostregexp(`{host:.+}`)"
+      # - "traefik.http.routers.http_traefikMasamuneFr_Dashboard_Router.entrypoints=web"
+      # - "traefik.http.routers.http_traefikMasamuneFr_Dashboard_Router.middlewares=redirect-to-https"
+
+      # # middleware redirect
+      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      # ---
+      # TEST 2 / tutorial recos
+      # # - "traefik.http.routers.traefik.rule=Host(`api.example.com`)"
+      # - "traefik.http.routers.traefik.rule=Host(`traefik.masamune.fr`)"
+      # - "traefik.http.routers.traefik.service=api@internal"
+      # - "traefik.http.routers.traefik.middlewares=admin"
+      # # - "traefik.http.routers.traefik.tls.certresolver=le"
+      # - "traefik.http.routers.traefik.tls.certresolver=leresolver"
+      # - "traefik.http.routers.traefik.entrypoints=websecure"
+      # - "traefik.http.middlewares.admin.basicauth.users=user:$$apr1$$q8eZFHjF$$Fvmkk//V6Btlaf2i/ju5n/" # user/password
+
+      # ---
+      # TEST 3 / tutorial github
+      # # Dashboard
+      # # - "traefik.http.routers.traefik.rule=Host(`traefik.docker.localhost`)"
+      # - "traefik.http.routers.traefik.rule=Host(`traefik.masamune.fr`)"
+      # - "traefik.http.routers.traefik.service=api@internal"
+      # # FOR FUCKS SAKE
+      # - "traefik.http.routers.traefik.tls=true"
+      # - "traefik.http.routers.traefik.tls.certresolver=leresolver"
+      # - "traefik.http.routers.traefik.entrypoints=websecure"
+      # - "traefik.http.routers.traefik.middlewares=authtraefik"
+      # - "traefik.http.middlewares.authtraefik.basicauth.users=user:$$apr1$$q8eZFHjF$$Fvmkk//V6Btlaf2i/ju5n/" # user/password
+      
+      # # global redirect to https
+      # - "traefik.http.routers.http-catchall.rule=hostregexp(`{host:.+}`)"
+      # - "traefik.http.routers.http-catchall.entrypoints=web"
+      # - "traefik.http.routers.http-catchall.middlewares=redirect-to-https"
+
+      # # middleware redirect
+      # - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      # ---
+      # TEST 4 / Retarded random wild guess due to cancer documentation
       #   https://containo.us/blog/traefik-2-0-docker-101-fc2893944b9d/#compiling-everything-for-a-secured-dashboard-
+      # Tell Traefik to get the contents provided by this service using that shared network.
+      - "traefik.docker.network=traefik-public"
+      # Allow internet exposition (publish on port 80)
+      - "traefik.enable=true"
+
       # For the route http://traefik.masamune.fr ..
-      - "traefik.http.routers.https_traefikMasamuneFr_Helloworld_Router.rule=Host(`traefik.masamune.fr`)"
+      - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.rule=Host(`traefik.masamune.fr`)"
       # .. send the traefik API stuff
-      - "traefik.http.routers.https_traefikMasamuneFr_Helloworld_Router.service=api@internal"
+      - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.service=api@internal"
       # .. and use basic auth middleware created below
-      - "traefik.http.routers.https_traefikMasamuneFr_Helloworld_Router.middlewares=https_traefikMasamuneFr_Helloworld_Auth"
+      # - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.middlewares=https_traefikMasamuneFr_Dashboard_Auth"
       # .. and all on https
-      - "traefik.http.routers.https_traefikMasamuneFr_Helloworld_Router.tls.certresolver=leresolver"
-      - "traefik.http.routers.https_traefikMasamuneFr_Helloworld_Router.entrypoints=websecure"
+      - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.tls=true"
+      - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.tls.certresolver=leresolver"
+      - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.entrypoints=websecure"
       # Create auth middleware
-      - "traefik.http.middlewares.https_traefikMasamuneFr_Helloworld_Auth.basicauth.users=user:$$apr1$$q8eZFHjF$$Fvmkk//V6Btlaf2i/ju5n/" # user/password
+      # - "traefik.http.middlewares.https_traefikMasamuneFr_Dashboard_Auth.basicauth.users=user:$$apr1$$q8eZFHjF$$Fvmkk//V6Btlaf2i/ju5n/" # user/password
 
       # Create a service specifying the internal port
-      - "traefik.http.services.https_testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
+      - "traefik.http.services.https_testMasamuneFr_Dashboard_Service.loadbalancer.server.port=80"
       # Use the service created below specifying the internal port
-      - "traefik.http.routers.https_traefikMasamuneFr_Helloworld_Router.service=https_testMasamuneFr_Helloworld_Service"
+      - "traefik.http.routers.https_traefikMasamuneFr_Dashboard_Router.service=https_testMasamuneFr_Dashboard_Service"
 
 
       # Dashboard redirect to https
-      - "traefik.http.routers.http_traefikMasamuneFr_Helloworld_Router.rule=hostregexp(`{host:.+}`)"
-      - "traefik.http.routers.http_traefikMasamuneFr_Helloworld_Router.entrypoints=web"
-      - "traefik.http.routers.http_traefikMasamuneFr_Helloworld_Router.middlewares=redirect-to-https"
+      - "traefik.http.routers.http_traefikMasamuneFr_Dashboard_Router.rule=hostregexp(`{host:.+}`)"
+      - "traefik.http.routers.http_traefikMasamuneFr_Dashboard_Router.entrypoints=web"
+      - "traefik.http.routers.http_traefikMasamuneFr_Dashboard_Router.middlewares=redirect-to-https"
 
       # middleware redirect
       - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+
+      # Fuck this shit
+      # Fuck those guys
+      # Fuck this waste of time
 
     # Traefik doesn't support syslog
     logging:

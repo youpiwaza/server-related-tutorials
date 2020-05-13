@@ -1,6 +1,18 @@
-# Traefik > Test traefik auth
+# KO / Traefik > Test traefik auth
 
-Test auth sur test.masamune.fr (découpler de la mise en place de l'API)
+- Fuck this shit
+- Fuck the documentation
+- Fuck the missing instruction almost 1/3 of the time
+- Fuck the lack of working examples
+- Fuck those guys
+- Fuck this waste of time
+
+Mise en place du dashbard traefik (api secure) sur traefik.masamune.fr.
+
+Docs:
+
+- [Dashboard](https://docs.traefik.io/operations/dashboard/)
+- [API](https://docs.traefik.io/operations/api/)
 
 ## Certificate cache
 
@@ -52,4 +64,6 @@ docker system prune
 
 ## TODO
 
-1. Enable Auth for subdomain
+1. Enable traefik insecure api on traefik.masamune.fr
+2. Enable traefik secure api
+3. Add auth
