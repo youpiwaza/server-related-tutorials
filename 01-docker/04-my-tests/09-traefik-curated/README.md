@@ -32,3 +32,7 @@ TODO:
 
 1. Traefik dashboard / KO AF
 2. Log rotation in named volume
+3. Adjust time zone for logs
+   1. Not available in [v2+](https://docs.traefik.io/observability/logs/)
+   2. Was available in [1.7](https://docs.traefik.io/v1.7/configuration/logs/#time-zones)
+   3. This is retarded
