@@ -1,0 +1,63 @@
+version: '3.7'
+# docker-compose -f hello9.yml up --scale helloworld=2
+
+# Use w. docker-compose, no custom user, + replicas, + security recos
+
+# KO / Cant bind multiple stuff on the same port (80)
+
+# Even without a specified user, port definition is mandatory without traefik
+#   ports:
+#     - "80:80"
+
+# KO / cap_drop ALL > KO, even with cap_add: CAP_NET_BIND_SERVICE
+# OK / Healthcheck
+# KO / read_only: true > KO can't access to logs files
+#   > Try read-only + specific volumes
+# OK / security_opt > even if not pertinent w. docker stack
+
+services:
+  helloworld:
+    # cap_drop:
+    #   - ALL
+    # cpu_shares: 1024
+    healthcheck:
+      test: 'stat /www/index.php || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+    image: tutum/hello-world:latest
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'curated service helloworld'
+      fr.masamune.type: 'test'
+    # Debug with docker-compose up
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    # --memory-reservation="128m"
+    # --memory="256m"
+    # --memory-swap -1
+    networks:
+      # Connect to traefik dedicated overlay network, allow reverse proxy
+      - core-traefik-public
+    # --pids-limit 200
+    # Optionnal / Specify a FREE external port
+    ports:
+      - "80:80"
+      # - "15000:80"
+      # - "15000-15500:80"
+    # read_only: true
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # docker_peon unpriviledged namespaced user
+    # user: 1003:1003
+
+networks:
+  core-traefik-public:
+    # Connect to an existing network
+    external: true
