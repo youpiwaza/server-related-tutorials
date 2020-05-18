@@ -76,23 +76,38 @@ docker volume create traefik-https \
    --label fr.masamune.project='traefik reverse proxy' \
    --label fr.masamune.type='core'
 
-# Shell access through a tmp container
+# Shell access through a tmp container, NOT IN THE CONCERNED FOLDER : NOT target=/home/https
+#   Changes outside (eg. ../) the mounted folder won't be preserved ; tmp containers folder will be modified, but not the volume
 docker run \
    -it \
    --rm \
    --mount \
-      source=traefik-https,target=/home/https \
-   --workdir /home/https \
+      source=traefik-https,target=/home \
+   --workdir /home \
    alpine \
    /bin/ash
 
 # Create and set rights to /home/https/
 # Traefik needs full access (incl. file creation) on acme.json
 #     https://community.containo.us/t/non-existent-resolver-using-letsencrypt/3530
+>> mkdir https
 >> chown -R 1003:1003 https/
+>> exit
 
-# Vérification
+# Verification :
+# tmp container run as custom user, with /home mounted, which will have the VOLUME https/ folder mounted
+docker run \
+   -it \
+   --rm \
+   --mount \
+      source=traefik-https,target=/home \
+   --user=1003:1003 \
+   --workdir /home/https \
+   alpine \
+   /bin/ash
+>> touch hey.txt
 >> ls -la
+>> rm hey.txt
 >> exit
 ```
 
