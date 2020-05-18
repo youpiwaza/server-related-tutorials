@@ -188,6 +188,7 @@ docker volume create traefik-logs \
    --label fr.masamune.type='core'
 
 # Traefik needs access to his /var/log/traefik.log
+# Can be changed to /home/logs/ or whatever thanks to traefik configuration
 #     We're gonna mount the volume from a temp container and edit the volume rights here
 #        target=/home/logs >> We'll edit temp container's /home/logs to edit the volume
 #     Later, Traefik container's /var/log/ will be mounted on volume's /home/logs
@@ -228,6 +229,9 @@ Note that the docker_peon still can't execute traefik-*.log files nor create fol
 ```yaml
 services:
   traefik:
+    command:
+      - "--accesslog.filepath=/home/logs/traefik-access.log"
+      - "--log.filePath=/home/logs/traefik-debug.log"
     # Assign the_docker_peon unprivileged user
     user: 1003:1003
     volumes:
