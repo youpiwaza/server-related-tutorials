@@ -3,7 +3,7 @@ version: '3.7'
 
 # Use w. docker-compose, with custom user, no replicas, working security recos
 
-# Final state : ?
+# Final state : OK
 
 # 1. Added user: 1003:1003
 #   KO > network problem (~probably because :80 is < 1024, eg. restricted)
