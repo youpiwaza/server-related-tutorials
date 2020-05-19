@@ -100,7 +100,8 @@ version: '3.7'
 # KO / cap_drop ALL > KO, even with cap_add: CAP_NET_BIND_SERVICE
 # OK / Healthcheck
 # KO / read_only: true > KO can't access to logs files
-#   > Try read-only + specific volumes
+#   > Needs specific volumes for nginx / https://hub.docker.com/_/nginx > Running nginx in read-only mode
+#   > And probably php-fpm too
 # OK / security_opt > even if not pertinent w. docker stack
 
 services:
