@@ -1,0 +1,138 @@
+version: '3.7'
+# TEST: Déployer un deuxième service alakon sur grafana.masamune.fr, sans https
+
+# KO ?
+# Renommer nom service (helloworld aussi)
+
+services:
+  helloworldDeux:
+    # cap_drop:
+    #   - ALL
+    # cpu_shares: 1024
+    deploy:
+      endpoint_mode: vip
+      labels:
+        # Tell Traefik to get the contents provided by this service using that shared network.
+        - "traefik.docker.network=core-traefik-public"
+        # Allow internet exposition (publish on port 80)
+        - "traefik.enable=true"
+        
+        # Specify entrypoint
+        - "traefik.http.routers.grafanaMasamuneFr_HelloworldDeux_Router.entrypoints=web"
+        # On which url ? Reverse proxy regexp
+        - "traefik.http.routers.grafanaMasamuneFr_HelloworldDeux_Router.rule=Host(`grafana.masamune.fr`)"
+        # Use the service specifying the internal port
+        - "traefik.http.routers.grafanaMasamuneFr_HelloworldDeux_Router.service=grafanaMasamuneFr_HelloworldDeux_Service"
+        
+        # Create a service specifying the internal port
+        - "traefik.http.services.grafanaMasamuneFr_HelloworldDeux_Service.loadbalancer.server.port=8080"
+        
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='curated service helloworld deux'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      rollback_config:
+        delay: 0s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+      update_config:
+        delay: 10s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+    healthcheck:
+      test: 'stat /www/index.php || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+    image: tutum/hello-world:latest
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'curated service helloworld'
+      fr.masamune.type: 'test'
+    # Debug with docker-compose up
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    # --memory-reservation="128m"
+    # --memory="256m"
+    # --memory-swap -1
+    networks:
+      # Connect to traefik dedicated overlay network, allow reverse proxy
+      - core-traefik-public
+    # --pids-limit 200
+    # Optionnal / Specify a FREE external port
+    ports:
+      #   - "80:80"
+      # - "15000:80"
+      # - "15000-15500:80"
+      # Internal port > 1024 to prevent usage of root restricted ports
+      # - "15000:8080"
+      # - "80:8080" # ~OK
+      - "8080" # OK mais résoud pas le problème
+    # read_only: true
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # Can't use a specific user for nginx on port 80 as it requires unprivileged ports
+    #   /!\ sysctl param does not exist in ansible docker_swarm_service
+    # sysctls:
+    #   net.ipv4.ip_unprivileged_port_start: 0
+    # docker_peon unpriviledged namespaced user
+    # user: 1003:1003
+    ulimits:
+      nproc: 
+        hard: 65535
+        soft: 35000
+      nofile:
+        hard: 40000
+        soft: 20000
+    # Mount a prepared volume with existing log files (php-fpm.log, /nginx/access.log, /nginx/error.log) with proper rights (1003:1003)
+    volumes:
+      - type: volume
+        read_only: false
+        source: test-helloDeux-logs
+        target: /var/log/
+      # - type: volume
+      #   read_only: false
+      #   source: test-helloDeux-tmp-yolo-folders
+      #   target: /tmp/
+      # - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/listen-port-8080-nginx.conf:/etc/nginx/nginx.conf:ro'
+      # - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/custom-user-and-tutum-and-tmp-yolo--nginx.conf:/etc/nginx/nginx.conf:ro'
+
+networks:
+  core-traefik-public:
+    # Connect to an existing network
+    external: true
+
+volumes:
+  test-helloDeux-logs:
+    # Use the existing volume, do not recreate one with a prefix
+    external: true
+  # test-helloDeux-tmp-yolo-folders:
+  #   # Use the existing volume, do not recreate one with a prefix
+  #   external: true
