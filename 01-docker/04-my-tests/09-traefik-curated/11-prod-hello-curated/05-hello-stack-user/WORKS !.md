@@ -21,6 +21,8 @@ Faire attention:
 - volumes
   - Bidouiller dans /home ..
   - .. et ensuite monter la ou nécessaire
+- Uris
+  - helloDeux > works ONLY on [http uri](http://grafana.masamune.fr/), httpS KO AF
 
 ## TODO
 
