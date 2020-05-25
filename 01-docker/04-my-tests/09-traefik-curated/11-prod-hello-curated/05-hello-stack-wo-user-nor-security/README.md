@@ -2,6 +2,8 @@
 
 Test with stack and a working traefik
 
+Edit: OK without user nor security, backing-up after sh*t tons of adaptations.
+
 ## Named volume for hello > Logs
 
 ```bash
