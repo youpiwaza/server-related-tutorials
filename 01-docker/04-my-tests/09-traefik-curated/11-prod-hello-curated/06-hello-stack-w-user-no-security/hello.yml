@@ -1,0 +1,403 @@
+version: '3.7'
+# docker stack deploy -c helloX.yml hello
+
+# Use w. docker stack, custom user, no replicas, security recos
+# Uri & port management by traefik
+
+# Final state : ?
+
+# Manipulations
+# - Add deploy labels & stuff
+# - Remove sysctl (port 80 autorization)
+# - Remove specific port publication
+# - 1 replica
+
+# KO as such, container dosen't start
+# KO Specify ports > - "15000:80"
+# ~OK Test without traefik deploy stuff, ~docker stack deploy -c 04-hello-dc-user/hello.yml hello
+#   Container dispo sur l'ip host:80, bypass traefik !?
+# OK test avec hello-07 (sans user) > Ok sauf https (limit rate lolilol)
+
+# > Faire un comparatif des deux / partir de celle qui marche et ajouter les différences
+# en plus
+#   ✅ healtcheck 
+#   ✅ logs
+#   ✅ dc labels
+#   ✅ ports 15k:80
+#   ✅ security opts
+#   user
+#   ✅ volumes
+#   > ✅ logs
+#   > ✅ nginx.conf
+#   >   ✅ Verifier si tutum monté en stack a une conf différente > NON, c'est la même
+
+# Ajout de user > KO, les conteneurs ne bootent pas
+# Logs
+#   Hello
+#     php-fpm > rieng
+#     nginx access > rieng
+#     nginx error > yeph
+
+# 2020/05/19 13:43:41 [emerg] 1#0: bind() to 0.0.0.0:80 failed (13: Permission denied)
+
+# Le problème vient de l'autorisation de connexion au port 80 (<1024 depuis unprivileged user)
+# Il ne devrait pas y avoir de pb vu que le port de sortie est 15000
+# KO / Ne pas spécifier les ports, laisser traefik gérer.
+# Confirmation > /04-hello-dc-user.hello.yml >> Si on vire sysctl pour autoriser port 80, KO AF
+
+# recherche dans les anciennes docs sur le sujet :
+#   https://stackoverflow.com/questions/43467670/which-capabilities-can-i-drop-in-a-docker-nginx-container/45570342#45570342
+#     https://www.redhat.com/en/blog/secure-your-containers-one-weird-trick#setuid
+#     http://pjdietz.com/2016/08/28/nginx-in-docker-without-root.html
+#     https://stackoverflow.com/questions/42329261/running-nginx-as-non-root-user
+
+# Essai patch SO, ctrl + F "Obviously, net_bind_service"
+# ~nginx.conf
+#   server {
+#      # listen       80;
+#      listen       8080;
+
+# Docker compose
+# ~hello.yml > service > helloworld
+#   ports:
+#     - "80:8080"     # Publish on port 80 to be available on http_://HOST-IP:80  # OK
+
+# For docker stack, need also to warn traefik about the port
+# ~hello.yml > service > helloworld
+# deploy:
+#   labels:
+#     # Create a service specifying the internal port
+#     # - "traefik.http.services.https_testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
+#     - "traefik.http.services.https_testMasamuneFr_Helloworld_Service.loadbalancer.server.port=8080"
+#   ports:
+#     - "15000:8080"  # Publish on port wtv to work with docker stack
+# KO / Sur le papier tout bon mais > docjer container ls
+# > traefik unhealthy
+# > hello écoute encore sur le port 80/tcp ? doublon avec traefik
+#   Logs
+#     hello > php fpm & nginx > rien
+#     Traefik > conflits de ports
+#       {"entryPointName":"web","level":"error","msg":"close tcp [::]:80: use of closed network connection","time":"2020-05-19T14:37:02Z"}
+#       {"entryPointName":"websecure","level":"error","msg":"close tcp [::]:443: use of closed network connection","time":"2020-05-19T14:37:02Z"}
+
+# Should be ok BUT nginx publishes port 80/tcp by default
+#   https://stackoverflow.com/questions/40358923/docker-nginx-disable-default-exposed-port-80
+
+## MAIS !!! J'appelle ça du gros bullshit car server-related-tutorials\01-docker\04-my-tests\09-traefik-curated\07-prod-traefik-https\hello.yml
+## sans user cela fonctionne très bien, avec le port 80/tcp uniquement occupé sans aucun putain de problème merci
+#       > docker service ls
+#       hello_helloworld    replicated          2/2                 tutum/hello-world:latest   *:80->80/tcp
+
+#       Avec hello w. user & ports explicitly 80:8080 && traefik unhealthy
+#       > docker service ls
+#       hello_helloworld    replicated          1/2                 tutum/hello-world:latest   *:80->8080/tcp
+
+
+##    Adapaté dans hello copy 2.yml (++ -core)
+
+# KO sur stack: Essayer de mettre la capability net_bind_service
+
+# TODO: Essayer de rester en root mais changer le port de nginx ? Si ca roule, remettre user
+#           OK / avec nginx sur 8080 en interne
+#  > 2 possibilités
+#  >> Partir de 05-hello-stack-user/hello.yml et bidouiller ports
+#  >> Partir de 05-hello-stack-user/hello copy 2.yml (copie adaptée de 07-prod-traefik-https/hello.yml adaptée (++ -core)) QUI MARCHE et bidouiller les ports et que ça continue à marcher x")
+
+# Lancer avec user sans traefik, voir si repliques > conflits ports 80
+#     OK / Aucun conflit quand lancé sans traefik...
+
+# Essayer de monter le dossier /tmp/ de nginx sur un volume ? Pas d'acces en modificiation si docker_peon
+#     KO
+
+# Hello sans user OK > docker exec dedans voir le contenu des dossier tmp
+# docker exec -it hello_helloworld.1.pn6hvm168nfw7sq0y8os81rkm /bin/ash
+# >> cd tmp/
+# >> ls -la
+# total 36
+# drwxrwxrwt    1 root     root          4096 May 21 14:55 .
+# drwxr-xr-x    1 root     root          4096 May 21 14:55 ..
+# drwx------    2 nginx    root          4096 May 21 14:55 client_temp
+# drwx------    2 nginx    root          4096 May 21 14:55 fastcgi_temp
+# drwxr-xr-x    2 root     root          4096 Dec 14  2015 nginx
+# -rw-r--r--    1 root     root             2 May 21 14:55 nginx.pid
+# drwx------    2 nginx    root          4096 May 21 14:55 proxy_temp_path
+# drwx------    2 nginx    root          4096 May 21 14:55 scgi_temp
+# drwx------    2 nginx    root          4096 May 21 14:55 uwsgi_temp
+
+# L'UTILISATEUR N'EST PAS ROOT POUR LES DOSSIERS wtf
+#     Si réouverture du volume via un container alpine tmp & ls -la > nginx est remplacé par 100 !
+# DOSSIER nginx root:root supplémentaire
+# Tous les dossiers sont vides..
+# >> whoami
+# root
+
+# TEST: Laisser nginx gérer complètement le dossier /tmp/
+# > Pas possible de chown la racine d'un volume
+# >> volume créer un dossier yolo/ et le chown -R
+# >> Changer la conf nginx pour mettre tout ce qui est tmp/ dans /tmp/yolo/
+
+# avec user > docker stack deploy OK + affichage ok sur http://HOST-IP/ (1 seul conteneur, pas de load balancing)
+
+# Toujours conflit avec traefik
+#      syslog (docker daemon): 
+#      May 21 17:41:06 ns371715 dockerd[1160]: time="2020-05-21T17:41:06.159265838+02:00" level=warning msg="Failed to allocate and map port 80-80: listen tcp 0.0.0.0:80: bind: address already in use"
+#      May 21 17:41:06 ns371715 dockerd[1160]: time="2020-05-21T17:41:06.313325477+02:00" level=error msg="50d7bb8b2b54f1f09e41505b57bb837eb76f65f27275f7646c629b5df4d7ae3e cleanup: failed to delete container from containerd: no such container"
+#      May 21 17:41:06 ns371715 dockerd[1160]: time="2020-05-21T17:41:06.313381495+02:00" level=error msg="Handler for POST /v1.38/containers/50d7bb8b2b54f1f09e41505b57bb837eb76f65f27275f7646c629b5df4d7ae3e/start returned error: container 50d7bb8b2b54f1f09e41505b57bb837eb76f65f27275f7646c629b5df4d7ae3e: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_97ff068b5ade (c9ec64c96a398c25901bd180c07fe9fc5827d0debde737bc691b6554002c3711): listen tcp 0.0.0.0:80: bind: address already in use"
+#      ---
+#      docker-compose -f traefik1.yml up -d
+#      WARNING: The Docker Engine you're using is running in swarm mode.
+#      Compose does not use swarm mode to deploy services to multiple nodes in a swarm. All containers will be scheduled on the current node.
+#      To deploy your application across the swarm, use docker stack deploy.
+#      Creating network "tests_dockersocket4traefiknetwork" with driver "bridge"
+#      WARNING: Found orphan containers (tests_helloworld_1) for this project. If you removed or renamed this service in your compose file, you can run this command with the --remove-orphans flag to clean it up.
+#      Creating tests_dockersocketproxy_1 ... done                                                                                                                                                                       Creating tests_traefik_1           ...
+#      Creating tests_traefik_1           ... error
+#      ERROR: for tests_traefik_1  Cannot start service traefik: container 50d7bb8b2b54f1f09e41505b57bb837eb76f65f27275f7646c629b5df4d7ae3e: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_97ff068b5ade (c9ec64c96a398c25901bd180c07fe9fc5827d0debde737bc691b6554002c3711): listen tcp 0.0.0.0:80: bind: address already in use
+#      ERROR: for traefik  Cannot start service traefik: container 50d7bb8b2b54f1f09e41505b57bb837eb76f65f27275f7646c629b5df4d7ae3e: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_97ff068b5ade (c9ec64c96a398c25901bd180c07fe9fc5827d0debde737bc691b6554002c3711): listen tcp 0.0.0.0:80: bind: address already in use
+#      ERROR: Encountered errors while bringing up the project.
+
+
+
+# TODO: chercher les erreurs ci-dessus sur youtoub'
+# - Disable port binding / https://github.com/docker/compose/issues/4950#issuecomment-342882168
+#     hello > OK sans user (allocation de ports publiés automatique), mais ne résoud pas le problème
+#     Traefik > KO, plus de sites en ligne
+# - See who's on port 80 already / https://stackoverflow.com/a/36991832/12026487
+#     sudo netstat -tlnp | grep 80
+#     > (when traefik is up)              / tcp6       0      0 :::80                   :::*                    LISTEN      1160/dockerd
+#     > (traefik down)                    / NOTHING
+#     > (traefik down, hello w user up)   / NOTHING
+#     > (traefik down, hello wo user up)  / NOTHING
+#     > (traefik up, hello wo user up)    / tcp6       0      0 :::80                   :::*                    LISTEN      1160/dockerd
+#     > (traefik up, hello w user up)     / tcp6       0      0 :::80                   :::*                    LISTEN      1160/dockerd
+#   ~dockerd sur port 80 uniquement quand traefik est up
+
+#   traefik volume read-only false > ptet vrai si juste besoin de la clé (valeur osef)
+#     docker inspect tests_traefik_1 > 
+#     "Mounts": [
+#                 {
+#                     "Type": "volume",
+#                     "Name": "core-traefik-https",
+#                     "RW": true,
+# >> NOPE cay good
+
+#   docker inspect tests_traefik_1 > 
+#         "Ulimits": [
+#               {
+#                   "Name": "nofile",
+#                   "Hard": 256,
+#                   "Soft": 128
+#               },
+#               {
+#                   "Name": "nproc",
+#                   "Hard": 64,
+#                   "Soft": 32
+#               }
+#           ],
+#   >> Essayer de les monter....
+#       https://docs.docker.com/compose/compose-file/#ulimits
+#   >> Uniquement good pour DC, change rien
+
+
+
+
+
+
+
+### WIP v
+
+# NOTE DE MERDE : hello & helloDeux aucun putain de problème avec 1 réplique chacun
+#   Nombre de conteneurs en tout ? ou Répliques qui aggro le même volume et pb fifo ?
+#   Docs volumes
+#   - https://docs.docker.com/compose/compose-file/#not-supported-for-docker-stack-deploy
+#       See the section on how to configure volumes for services, swarms, and docker-stack.yml files.
+#       Volumes are supported but to work with swarms and services, they must be configured as named volumes or
+#       associated with services that are constrained to nodes with access to the requisite volumes.
+#   - https://docs.docker.com/storage/volumes/#share-data-among-machines
+#   - https://docs.docker.com/storage/tmpfs/
+#   - ! https://docs.docker.com/storage/volumes/#start-a-service-with-volumes
+#   - !! https://docs.docker.com/compose/compose-file/#volumes-for-services-swarms-and-stack-files
+#   - https://stackoverflow.com/questions/47756029/how-does-docker-swarm-implement-volume-sharing
+
+# A TESTAY: Virer mount de /tmp/, vu qu'on fout tout dans /tmp/ afin de ne pas galérer avec les droits de l'utilisateur
+# > 2 repliques avec fichiers tmp/ identiques montés > ptet le problème alakon ; check syslog pour fin fifo
+# Sinon monter dans tpfms anonyme (un par réplique auto) > ptet pas besoin de droits
+
+
+
+
+# Autres pistes
+
+#   EN COURS: test virer read only user cap drop all sur traefik copy.yml > ~moins de problemes ?
+
+#   virer tumtum & repartir sur du nginx vanilla, puis nginx + php fpm
+
+#   Docker daemon config > debug au lieu de info
+
+
+# TODOU, comme mwa:
+#   Docker daemon config > Augmenter ulimits par défaut ~2k
+#   /tmp/ files dans volume de type "tmpfs" ?
+#   proxy > cleaner syntaxe montage socket
+#     - https://docs.docker.com/storage/volumes/
+#     - https://docs.docker.com/compose/compose-file/#volumes
+#   
+
+
+
+services:
+  helloworld:
+    # cap_drop:
+    #   - ALL
+    # cpu_shares: 1024
+    deploy:
+      endpoint_mode: vip
+      labels:
+        # Tell Traefik to get the contents provided by this service using that shared network.
+        - "traefik.docker.network=core-traefik-public"
+        # Allow internet exposition (publish on port 80)
+        - "traefik.enable=true"
+        
+        ## HTTPS router specifications
+
+        # Entrypoint
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.entrypoints=websecure"
+        # On which url ? Reverse proxy regexp
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.rule=Host(`test.masamune.fr`)"
+        # Use the service created below specifying the internal port
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.service=https_testMasamuneFr_Helloworld_Service"
+        # Enable TLS
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls=true"
+        # Automatic generation on all subdomains, using SANs
+        # - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.domains[0].main=masamune.fr"
+        # - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.domains[0].sans=*.masamune.fr"
+        # Automtic certifcate resolver, created in traefik.yml
+        - "traefik.http.routers.https_testMasamuneFr_Helloworld_Router.tls.certresolver=leresolver"
+        
+        # Create a service specifying the internal port
+        # - "traefik.http.services.https_testMasamuneFr_Helloworld_Service.loadbalancer.server.port=80"
+        # Internal port > 1024 to prevent usage of root restricted ports
+        - "traefik.http.services.https_testMasamuneFr_Helloworld_Service.loadbalancer.server.port=8080"
+
+        ## HTTP_ router specifications
+        #     Redirect every http requests to their https equivalent
+
+        # Create a middleware to redirect http to https
+        #     Middleware aren't shared ?
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        # All hosts..
+        - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.rule=hostregexp(`{host:.+}`)"
+        # .. coming from entrypoint web ..
+        - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.entrypoints=web"
+        # .. use the previously created middleware
+        - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.middlewares=redirect-to-https"
+
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='curated service helloworld'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      rollback_config:
+        delay: 0s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+      update_config:
+        delay: 10s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+    healthcheck:
+      test: 'stat /www/index.php || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+    image: tutum/hello-world:latest
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'curated service helloworld'
+      fr.masamune.type: 'test'
+    # Debug with docker-compose up
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    # --memory-reservation="128m"
+    # --memory="256m"
+    # --memory-swap -1
+    networks:
+      # Connect to traefik dedicated overlay network, allow reverse proxy
+      - core-traefik-public
+    # --pids-limit 200
+    # Optionnal / Specify a FREE external port
+    ports:
+      #   - "80:80"
+      # - "15000:80"
+      # - "15000-15500:80"
+      # Internal port > 1024 to prevent usage of root restricted ports
+      # - "15000:8080"
+      # - "80:8080" # ~OK
+      - "8080" # OK mais résoud pas le problème
+    # read_only: true
+    security_opt:
+      - no-new-privileges:true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # Can't use a specific user for nginx on port 80 as it requires unprivileged ports
+    #   /!\ sysctl param does not exist in ansible docker_swarm_service
+    # sysctls:
+    #   net.ipv4.ip_unprivileged_port_start: 0
+    # docker_peon unpriviledged namespaced user
+    user: 1003:1003
+    ulimits:
+      nproc: 
+        hard: 65535
+        soft: 35000
+      nofile:
+        hard: 40000
+        soft: 20000
+    # Mount a prepared volume with existing log files (php-fpm.log, /nginx/access.log, /nginx/error.log) with proper rights (1003:1003)
+    volumes:
+      - type: volume
+        read_only: false
+        source: test-hello-logs
+        target: /var/log/
+      # - type: volume
+      #   read_only: false
+      #   source: test-hello-tmp-yolo-folders
+      #   target: /tmp/
+      # - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/listen-port-8080-nginx.conf:/etc/nginx/nginx.conf:ro'
+      # - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/custom-user-and-tutum-and-tmp-yolo--nginx.conf:/etc/nginx/nginx.conf:ro'
+
+networks:
+  core-traefik-public:
+    # Connect to an existing network
+    external: true
+
+volumes:
+  test-hello-logs:
+    # Use the existing volume, do not recreate one with a prefix
+    external: true
+  # test-hello-tmp-yolo-folders:
+  #   # Use the existing volume, do not recreate one with a prefix
+  #   external: true
