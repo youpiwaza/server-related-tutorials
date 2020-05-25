@@ -1,10 +1,14 @@
 # tutum/helloworld custom user fix
 
+/!\ Doesn't work on httpSSS://HOST-IP:80
+
+/!\ KO AF Si on vire sysctl pour autoriser port 80 (rappel: sysctl pas dispo pour stack)
+
 ## Volume creation
 
 ```bash
 # Create overlay network
-docker network create --driver=overlay --attachable traefik-public
+docker network create --driver=overlay --attachable core-traefik-public
 
 # Create named volume
 docker volume create test-hello-logs \
