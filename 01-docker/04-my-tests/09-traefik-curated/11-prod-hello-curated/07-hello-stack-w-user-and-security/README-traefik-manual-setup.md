@@ -44,6 +44,7 @@ docker run \
     --rm \
     --mount \
         source=core-traefik-logs,target=/home \
+    --user 1003:1003 \
     --workdir /home \
     alpine \
     /bin/ash
@@ -85,6 +86,7 @@ docker run \
     --rm \
     --mount \
         source=core-traefik-https,target=/home \
+    --user 1003:1003 \
     --workdir /home \
     alpine \
     /bin/ash

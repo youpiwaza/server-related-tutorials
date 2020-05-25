@@ -66,6 +66,13 @@ services:
       - apparmor=docker-default
       - no-new-privileges:true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    ulimits:
+      nproc: 
+        hard: 65535
+        soft: 35000
+      nofile:
+        hard: 40000
+        soft: 20000
     userns_mode: "host"
     volumes:
       # Access to socket, read-only for security
@@ -138,17 +145,24 @@ services:
     ports:
       - "80:80"
       - "443:443"
+    # Prevent modifications
+    read_only: true
     security_opt:
       - apparmor=docker-default
       - no-new-privileges:true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
-    # Assign the_docker_peon unprivileged user
-    user: 1003:1003
     # Specific unprivileged user needs access to ports < 1024
     sysctls:
       net.ipv4.ip_unprivileged_port_start: 0
-    # Prevent modifications
-    read_only: true
+    # Assign the_docker_peon unprivileged user
+    user: 1003:1003
+    ulimits:
+      nproc: 
+        hard: 65535
+        soft: 35000
+      nofile:
+        hard: 40000
+        soft: 20000
     volumes:
       # Store HTTPS certificates in a named volume
       # Traefik needs full access (incl. file creation) on acme.json

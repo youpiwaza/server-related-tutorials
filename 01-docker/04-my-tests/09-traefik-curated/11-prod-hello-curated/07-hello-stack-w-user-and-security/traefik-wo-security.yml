@@ -129,11 +129,11 @@ services:
     #   - apparmor=docker-default
     #   - no-new-privileges:true
     #   - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
-    # Assign the_docker_peon unprivileged user
-    # user: 1003:1003
     # Specific unprivileged user needs access to ports < 1024
     sysctls:
       net.ipv4.ip_unprivileged_port_start: 0
+    # Assign the_docker_peon unprivileged user
+    # user: 1003:1003
     ulimits:
       nproc: 
         hard: 65535

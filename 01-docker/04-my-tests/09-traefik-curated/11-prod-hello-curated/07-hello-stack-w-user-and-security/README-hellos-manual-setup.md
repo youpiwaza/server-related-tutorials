@@ -93,6 +93,7 @@ docker run \
     --rm \
     --mount \
         source=test-helloDeux-logs,target=/home \
+    --user 1003:1003 \
     --workdir /home \
     alpine \
     /bin/ash
