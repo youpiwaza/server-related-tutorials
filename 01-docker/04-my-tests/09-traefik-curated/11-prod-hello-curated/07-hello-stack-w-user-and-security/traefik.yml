@@ -1,0 +1,197 @@
+version: "3.7"
+
+# Original setup & tests project
+#   https://github.com/youpiwaza/server-related-tutorials/tree/master/01-docker/04-my-tests/09-traefik-curated
+
+# Issues & fixes
+#   Access to docker socket is a security risk
+#   > Grant access through a proxy container
+#   > Socket access with read-only volume
+
+#   Privileged is mandatory to access docker socket, and is also a security risk
+#   > Only the proxy container is privileged
+#     Priviledged incompatible with user namespace remap.
+#     > Force disable user namespace remap on proxy
+#       userns_mode: "host" not compatible with docker stack
+#       > Will be used through docker compose
+#       > Also enable the use of a bridge network
+
+#   Stack only allow overlay networks > security risk
+#   > Use docker compose for Traefik & proxy, and set a custom bridge network
+#     > non attachable
+#     > encrypted
+#   > Create a traefik dedicated overlay network
+
+# Cpu & memory restrictions not available in docker compose v3
+#   https://docs.docker.com/compose/compose-file/#resources
+
+# Scaling > Nothing in docker-compose file syntax
+# > scale on startup
+#     docker-compose -f traefik.yml up --scale dockersocketproxy=2
+# Only scale the proxy, as traefik has host port 80 published, and 2nd replicas can't have it too
+#   Starting tests_traefik_1                        ... done                                                                                                                                                                      Creating tests_traefik_2                        ...
+#   Creating tests_traefik_2                        ... error 
+#   Bind for 0.0.0.0:80 failed: port is already allocated
+
+services:
+  dockersocketproxy:
+    cap_drop:
+      - ALL
+    environment:
+      # Authorize access
+      NETWORKS: 1
+      SERVICES: 1
+      TASKS: 1
+    image: tecnativa/docker-socket-proxy
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'docker socket proxy'
+      fr.masamune.type: 'core'
+    # docker-compose interactive debug
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    # Traefik's docker socket access on dedicated bridge network
+    networks:
+      - core-traefik-proxy
+    ports:
+      # Publish on (usual) tcp port
+      - 2375
+    privileged: true
+    # KO / Prevent modifications
+    # read_only: true
+    security_opt:
+      - apparmor=docker-default
+      - no-new-privileges:true
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    userns_mode: "host"
+    volumes:
+      # Access to socket, read-only for security
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+  
+  traefik:
+    cap_add:
+      - CAP_NET_BIND_SERVICE
+    cap_drop:
+      - ALL
+    command:
+      # Enable access logs
+      - "--accesslog=true"
+      - "--accesslog.bufferingsize=100"
+      - "--accesslog.filepath=/home/logs/traefik-access.log"
+      # HTTPS certificates
+      - "--certificatesresolvers.leresolver.acme.caserver=https://acme-staging-v02.api.letsencrypt.org/directory"
+      # - "--certificatesresolvers.leresolver.acme.caserver=https://acme-v02.api.letsencrypt.org/directory"
+      - "--certificatesresolvers.leresolver.acme.email=masamune.code@gmail.com"
+      - "--certificatesresolvers.leresolver.acme.storage=/home/https/acme.json"
+      - "--certificatesresolvers.leresolver.acme.tlschallenge=true"
+      # Specify internet access > HTTP 80 & HTTPS 443
+      # Note that "web" & "websecure" are abitrary names, but will be reused in services' contrainers
+      - "--entrypoints.web.address=:80"
+      - "--entryPoints.websecure.address=:443"
+      # Send Traefik anonymous usage data / https://docs.traefik.io/contributing/data-collection/
+      - "--global.sendAnonymousUsage"
+      # Enable logs
+      - "--log.filePath=/home/logs/traefik-debug.log"
+      # - "--log.format=common"
+      - "--log.format=json"
+      # - "--log.level=DEBUG"
+      - "--log.level=ERROR"
+      # Allow pings, for traefik healthchecks
+      - "--ping=true"
+      # Traefik socket access from the proxy container, on the defined port
+      - "--providers.docker.endpoint=tcp://dockersocketproxy:2375"
+      # Only specified containers exposed on the internet
+      - "--providers.docker.exposedbydefault=false"
+      # Tell Traefik to get the contents provided by this service using a dedicated shared attachable overlay network.
+      - "--providers.docker.network=core-traefik-public"
+      # Enable docker swarm
+      - "--providers.docker.swarmMode=true"
+    depends_on:
+      - dockersocketproxy
+    healthcheck:
+      test: 'traefik healthcheck --ping'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+    # Traefik 2.2
+    image: "traefik:chevrotin"
+    labels:
+      - "fr.masamune.client: 'masamune'"
+      - "fr.masamune.maintainer: 'masamune.code@gmail.com'"
+      - "fr.masamune.project: 'reverse proxy / traefik'"
+      - "fr.masamune.type: 'core'"
+    # Traefik doesn't support syslog
+    # Note that enabling logs in command: will redirect logs, and they will be no longer displayed (if not used in detached mode)
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    networks:
+      # Traefik's docker socket access on dedicated network
+      - core-traefik-proxy
+      # Traefik access to web server containers, to allow reverse proxy serving
+      - core-traefik-public
+    ports:
+      - "80:80"
+      - "443:443"
+    security_opt:
+      - apparmor=docker-default
+      - no-new-privileges:true
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # Assign the_docker_peon unprivileged user
+    user: 1003:1003
+    # Specific unprivileged user needs access to ports < 1024
+    sysctls:
+      net.ipv4.ip_unprivileged_port_start: 0
+    # Prevent modifications
+    read_only: true
+    volumes:
+      # Store HTTPS certificates in a named volume
+      # Traefik needs full access (incl. file creation) on acme.json
+      #   For concurrency reason, this file (acme.json) cannot be shared across multiple instances of Traefik.
+      #     https://docs.traefik.io/https/acme/#storage
+      - type: volume
+        read_only: false
+        source: core-traefik-https
+        target: /home
+      # Send logs to a named volume
+      - type: volume
+        read_only: false
+        source: core-traefik-logs
+        target: /home/logs
+
+networks:
+  core-traefik-proxy:
+    # Prevent access to this network from other containers
+    attachable: false
+    # Force default driver as it will be used from docker compose, exclusively for proxy & traefik
+    driver: bridge
+    driver_opts:
+      # Since we're passing docker socket stuff over TCP, lets IPSec
+      encrypted: 'true'
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'docker socket proxy dedicated network'
+      fr.masamune.type: 'core'
+
+  # Needs to be created before using docker compose
+  #   In order to:
+  #   - be accessible to futur stacks
+  #   - have a set name without automatic prefix
+  # > docker network create --driver=overlay --attachable core-traefik-public
+  core-traefik-public:
+    # Connect to an existing network
+    external: true
+
+volumes:
+  # Needs to be created before using docker compose
+  core-traefik-https:
+    external: true
+  # cf. server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/06-prod-traefik-curated/README.md #### How to manage named volumes access rights
+  core-traefik-logs:
+    external: true
