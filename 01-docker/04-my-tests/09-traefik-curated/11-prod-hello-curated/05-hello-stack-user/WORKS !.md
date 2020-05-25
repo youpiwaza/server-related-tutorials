@@ -30,3 +30,4 @@ Faire attention:
 2. Rétablir sécurités traefik
 3. Lint that sh*t
 4. > ansible
+5. Remettre https
