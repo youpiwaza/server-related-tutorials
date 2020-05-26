@@ -1,5 +1,7 @@
 version: '3.7'
-# docker stack deploy -c helloX.yml hello
+# Usage
+# docker stack deploy -c hello.yml hello
+# docker stack rm hello
 
 services:
   helloworld:
@@ -103,6 +105,7 @@ services:
     # /!\ Specify the internal port, WITHOUT binding it !
     ports:
       - "8080"
+    # Needs write acces for /tmp/ files
     # read_only: true
     security_opt:
       - no-new-privileges:true
@@ -110,14 +113,14 @@ services:
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     # docker_peon unpriviledged namespaced user
     user: 1003:1003
-    # TODO: Remove/comment with lower numbers
-    ulimits:
-      nproc: 
-        hard: 65535
-        soft: 35000
-      nofile:
-        hard: 40000
-        soft: 20000
+    # ulimits > kinda random as I couldn't find any recommandations. Defaults.
+    # ulimits:
+    #   nofile: 
+    #     hard: 4096
+    #     soft: 2048
+    #   nproc:
+    #     hard: 512
+    #     soft: 256
     # Mount a prepared volume with existing log files (php-fpm.log, /nginx/access.log, /nginx/error.log) with proper rights (1003:1003), incl. the nginx/ folder
     volumes:
       - type: volume
