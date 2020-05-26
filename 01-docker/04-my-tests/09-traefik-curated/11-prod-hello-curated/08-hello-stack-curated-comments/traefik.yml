@@ -1,7 +1,17 @@
 version: "3.7"
 
+# Usage
+#     Classic
+# > docker-compose -f traefik.yml up -d
+#     Logs
+# > docker-compose -f traefik.yml up
+#     Stop
+# > docker-compose -f traefik.yml down
+
 # Original setup & tests project
 #   https://github.com/youpiwaza/server-related-tutorials/tree/master/01-docker/04-my-tests/09-traefik-curated
+# Final stuff, debugged & fine tuned with helloworld test projects
+#   https://github.com/youpiwaza/server-related-tutorials/01-docker/04-my-tests/09-traefik-curated/11-prod-hello-curated/08-hello-stack-curated-comments
 
 # Issues & fixes
 #   Access to docker socket is a security risk
@@ -35,10 +45,7 @@ version: "3.7"
 
 # Use named volumes (with pre-existing files/folders, properly chowned) for traefik logs & https
 
-# TODO:
-#   proxy > cleaner syntaxe montage socket
-#     - https://docs.docker.com/storage/volumes/
-#     - https://docs.docker.com/compose/compose-file/#volumes
+# ulimits > kinda random as I couldn't find any recommandations. Just doubled my defaults.
 
 services:
   dockersocketproxy:
@@ -73,19 +80,21 @@ services:
       - apparmor=docker-default
       - no-new-privileges:true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
-    # TODO: Lower the numbers
     ulimits:
       nproc: 
-        hard: 65535
-        soft: 35000
+        hard: 20000
+        soft: 10000
       nofile:
-        hard: 40000
-        soft: 20000
+        hard: 1000
+        soft: 500
     userns_mode: "host"
     volumes:
-      # TODO: Clean w. new syntax
       # Access to socket, read-only for security
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      # - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - type: bind
+        read_only: true
+        source: /var/run/docker.sock
+        target: /var/run/docker.sock
   
   traefik:
     cap_add:
@@ -175,14 +184,13 @@ services:
       net.ipv4.ip_unprivileged_port_start: 0
     # Assign the_docker_peon unprivileged user
     user: 1003:1003
-    # TODO: Lower the numbers
     ulimits:
       nproc: 
-        hard: 65535
-        soft: 35000
+        hard: 20000
+        soft: 10000
       nofile:
-        hard: 40000
-        soft: 20000
+        hard: 1000
+        soft: 500
     volumes:
       # Store HTTPS certificates in a named volume
       # Traefik needs full access (incl. file creation) on acme.json > chown -R on the volume's /https folder
