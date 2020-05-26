@@ -1,6 +1,8 @@
 # tutum/helloworld all fixes, working and properly commented
 
-Final product after 3 weeks of mental diarrhea
+Final product after 3 weeks of mental diarrhea.
+
+See precedent stuff in 01-docker/04-my-tests/09-traefik-curated/11-prod-hello-curated/* for more insights.
 
 ## Notes & recommandations
 
@@ -53,6 +55,32 @@ volumes:
     - the `sysctls: net.ipv4.ip_unprivileged_port_start: 0` exception
   - **BUT** both are not compatible with `docker stack`, so use config to publish on other ports > 1024 to avoid the issue
     - Traefik will do the re-routing through the load-balancer label
+  - **DON'T BIND THE PUBLISHED PORTS** as it will reserve this port, needs manual attribution, and can cause malfunctions/more config for replicas
+
+```yaml
+services:
+  helloworld:
+    ports:
+      # no no
+      # - "80:80"
+      # - "15000:80"
+      # - "15000-15500:80"
+      # Internal port > 1024 to prevent usage of root restricted ports
+      # - "15000:8080"
+      # - "80:8080"
+      # yes
+      - "8080"
+
+# no no
+# PORTS
+# 0.0.0.0:15000->80/tcp
+
+# yes
+# > docker service ls
+# ID                  NAME                       MODE                REPLICAS            IMAGE                      PORTS
+# zeo9jjz4emij        helloDeux_helloworldDeux   replicated          2/2                 tutum/hello-world:latest   *:30011->8080/tcp
+# kfmu3i75rhua        hello_helloworld           replicated          2/2                 tutum/hello-world:latest   *:30010->8080/tcp
+```
 
 ## Encountered errors
 
@@ -163,3 +191,57 @@ Pay attention when testing volumes with different users. I ran into a weird scen
 4. Started the samecontainer with a custom user, and the mounted volume > KO
 
 When the volumes' logs were accessed and edited by the rooted container, it **chowned them to root again**, throwing errors when re-used by the custom user.
+
+#### Containers bounces up and down, and/or traefik going unhealthy
+
+Don't bind services' containers ports. Only define the internal port, as it causes conflicts with traefik using the internal network 0.0.0.0 or some stuff.
+
+```yaml
+## docker stack deploy
+#      syslog (docker daemon):
+#      level=warning msg="Failed to allocate and map port 80-80: listen tcp 0.0.0.0:80: bind: address already in use"
+#      level=error msg="WTV cleanup: failed to delete container from containerd: no such container"
+#      level=error msg="Handler for POST /WTV/start returned error: container WTV: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_97ff068b5ade (WTV): listen tcp 0.0.0.0:80: bind: address already in use"
+
+## docker-compose up
+#      ERROR: for tests_traefik_1  Cannot start service traefik: container WTV: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_97ff068b5ade (WTV): listen tcp 0.0.0.0:80: bind: address already in use
+#      ERROR: for traefik  Cannot start service traefik: container WTV: endpoint join on GW Network failed: driver failed programming external connectivity on endpoint gateway_97ff068b5ade (WTV): listen tcp 0.0.0.0:80: bind: address already in use
+
+services:
+  helloworld:
+    ports:
+      # no no
+      # - "80:80"
+      # - "15000:80"
+      # - "15000-15500:80"
+      # Internal port > 1024 to prevent usage of root restricted ports
+      # - "15000:8080"
+      # Especially this
+      # - "80:8080"
+      # yes
+      - "8080"
+
+# no no
+# PORTS
+# 0.0.0.0:15000->80/tcp
+
+# yes
+# > docker service ls
+# ID                  NAME                       MODE                REPLICAS            IMAGE                      PORTS
+# zeo9jjz4emij        helloDeux_helloworldDeux   replicated          2/2                 tutum/hello-world:latest   *:30011->8080/tcp
+# kfmu3i75rhua        hello_helloworld           replicated          2/2                 tutum/hello-world:latest   *:30010->8080/tcp
+```
+
+## MISC
+
+Volumes docs:
+
+- [not-supported-for-docker-stack-deploy](https://docs.docker.com/compose/compose-file/#not-supported-for-docker-stack-deploy)
+    See the section on how to configure volumes for services, swarms, and docker-stack.yml files.
+    Volumes are supported but to work with swarms and services, they must be configured as named volumes or
+    associated with services that are constrained to nodes with access to the requisite volumes.
+- [share-data-among-machines](https://docs.docker.com/storage/volumes/#share-data-among-machines)
+- [storage/tmpfs/](https://docs.docker.com/storage/tmpfs/)
+- [!start-a-service-with-volumes](https://docs.docker.com/storage/volumes/#start-a-service-with-volumes)
+- [!!volumes-for-services-swarms-and-stack-files](https://docs.docker.com/compose/compose-file/#volumes-for-services-swarms-and-stack-files)
+- [SO / how-does-docker-swarm-implement-volume-sharing](https://stackoverflow.com/questions/47756029/how-does-docker-swarm-implement-volume-sharing)
