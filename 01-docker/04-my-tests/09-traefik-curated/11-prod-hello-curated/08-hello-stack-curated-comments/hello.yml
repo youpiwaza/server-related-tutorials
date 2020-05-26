@@ -117,7 +117,7 @@ services:
     # # Needs write acces for /tmp/ files
     # read_only: true
     security_opt:
-      - no-new-privileges:true
+      - no-new-privileges=true
       - apparmor=docker-default
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     # docker_peon unpriviledged namespaced user

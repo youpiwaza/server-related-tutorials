@@ -78,7 +78,7 @@ services:
     # read_only: true
     security_opt:
       - apparmor=docker-default
-      - no-new-privileges:true
+      - no-new-privileges=true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     ulimits:
       nproc: 
@@ -177,7 +177,7 @@ services:
     read_only: true
     security_opt:
       - apparmor=docker-default
-      - no-new-privileges:true
+      - no-new-privileges=true
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
     # Specific unprivileged user needs access to ports < 1024
     sysctls:
