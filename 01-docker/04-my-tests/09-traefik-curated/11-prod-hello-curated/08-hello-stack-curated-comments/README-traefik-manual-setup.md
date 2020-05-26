@@ -12,7 +12,14 @@ Volumes files created & managed from a temp alpine container (ran as root) in hi
 
 ```bash
 # Create overlay network
-docker network create --driver=overlay --attachable core-traefik-public
+docker network create \
+  --attachable \
+  --driver=overlay \
+  --label fr.masamune.client='masamune' \
+  --label fr.masamune.maintainer='masamune.code@gmail.com' \
+  --label fr.masamune.project='reverse proxy / traefik / public swarm overlay attachable network to grant internet access' \
+  --label fr.masamune.type='core' \
+  core-traefik-public
 ```
 
 ## Named volumes
