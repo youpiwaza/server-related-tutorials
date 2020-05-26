@@ -185,10 +185,10 @@ services:
     # Assign the_docker_peon unprivileged user
     user: 1003:1003
     ulimits:
-      nproc: 
+      nofile: 
         hard: 20000
         soft: 10000
-      nofile:
+      nproc:
         hard: 1000
         soft: 500
     volumes:
