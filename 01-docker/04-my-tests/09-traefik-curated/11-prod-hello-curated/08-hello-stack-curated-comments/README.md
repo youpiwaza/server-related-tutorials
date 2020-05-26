@@ -1,10 +1,3 @@
-WIP:
-
-- ✅ README-hellos
-- ✅ README-traefik
-- ✅ Récupérer et cleaner WORKS.md, cf ## Notes
-- Cleaner autres fichiers > virer comments tests & ajouter comments propres a chaque ligne touchy
-
 # tutum/helloworld all fixes, working and properly commented
 
 Final product after 3 weeks of mental diarrhea
