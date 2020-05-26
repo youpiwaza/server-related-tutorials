@@ -34,8 +34,7 @@ networks:
 ```
 
 - If there is some config overload to do, don't bind mount, but use config
-  - [Config docs](https://docs.docker.com/engine/swarm/configs/)
-  - [(Retarded) docker compose ref](https://docs.docker.com/compose/compose-file/#configs)
+  - See [dedicated README](./README-use-docker-config.md)
 - Custom user
   - Define the custom user
   - Get knowledge of the image behavior about custom user in dockerhub
