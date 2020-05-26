@@ -125,7 +125,7 @@ services:
         source: test-hello-logs
         target: /var/log/
       # TODO: Use config
-      - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/listen-port-8080-nginx.conf:/etc/nginx/nginx.conf:ro'
+      - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/curated-p8080-customUser-phpfpm--nginx.conf:/etc/nginx/nginx.conf:ro'
 
 networks:
   core-traefik-public:
