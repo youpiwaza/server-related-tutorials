@@ -87,4 +87,22 @@ Can also check on [http://HOST_IP:8080](http://HOST_IP:8080) (no https) due to t
 
 ## Execute as docker stack
 
-TODO
+Add the deploy stuff in wordpress-stack.yml.
+
+Don't forget to shut down DC first (same binded ports..).
+
+Forcé à une réplique pour éviter les galères dans un premier temps.
+
+```bash
+# on host, w. docker_guy
+# copy wordpress-stack.yml..
+
+# start
+docker stack deploy -c wordpress-stack.yml test-wordpress
+
+# from another terminal or use -d ^
+curl http://localhost:8080/
+
+# stop
+docker stack rm test-wordpress
+```
