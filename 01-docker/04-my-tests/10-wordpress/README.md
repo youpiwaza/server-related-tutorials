@@ -17,8 +17,14 @@ Comparatif des deux:
 - Wp officiel > Port mappés sur 80 & 443
   - **bitnami sur 8080 & 8443** (custom user > avoir priviledged ports)
 - Bitnami a 11 plugins pré-installés
-  - incl. un truc pour envoi des emails
+  - incl. un truc pour envoi des emails cf > DHub bitnami WP "SMTP Configuration"
+    - **Configuration simplifiée du SMTP**
 - Pas de soucis pour ajout d'images / plugins
+- Offi tourne sous mysql, bitnami sous maria_db
+- Inspection des volumes datas (!= bdd) :
+  - Wordpress stocke tout, **bitnami ne stocke que wp-config + wp-content/**
+  - Droits wp > xfs:xfs
+  - Droits bitnami > 1001:root
 
 DockerFile:
 
@@ -31,7 +37,6 @@ DockerFile:
 - Préférer l'utilisation des secrets docker (aux variables d'environnement) pour la mise en place
 - Voir pour l'envoi d'emails, qui nécessite de la configuration supplémentaire ? (Serveur/Traefik/WP php ?)
 
-## TODO
+## Choix
 
-- Vérifier si cela tourne avec un autre user
-- Se renseigner sur WP-CLI
+Bitnami semble être un meilleure choix ATM, et au pire je re-switcherai
