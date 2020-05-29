@@ -67,3 +67,24 @@ docker system prune
 docker volume rm test-wordpress-db && \
 docker volume rm test-wordpress-datas
 ```
+
+## Make a docker-compose file
+
+cf. wordpress.yml
+
+```bash
+# on host, w. docker_guy
+# copy wordpress.yml..
+
+# start
+docker-compose -f wordpress.yml up
+
+# from another terminal or use -d ^
+curl http://localhost:8080/
+```
+
+Can also check on [http://HOST_IP:8080](http://HOST_IP:8080) (no https) due to test port binding
+
+## Execute as docker stack
+
+TODO

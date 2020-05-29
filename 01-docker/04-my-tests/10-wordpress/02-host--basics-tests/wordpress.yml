@@ -1,0 +1,58 @@
+version: '3.7'
+## Create network and named volumes
+#     docker volume create --name test-wordpress-db     && \
+#     docker volume create --name test-wordpress-datas
+
+
+services:
+  mariadb:
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_DATABASE=bitnami_wordpress
+      - MARIADB_USER=bn_wordpress
+    image: 'bitnami/mariadb:10.3'
+    # docker-compose interactive debug
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    networks:
+      - test-wordpress
+    volumes:
+      - 'test-wordpress-db:/bitnami/mariadb'
+
+  wordpress:
+    depends_on:
+      - mariadb
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_HOST=mariadb
+      - MARIADB_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_NAME=bitnami_wordpress
+      - WORDPRESS_DATABASE_USER=bn_wordpress
+    image: 'bitnami/wordpress:5'
+    # docker-compose interactive debug
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    networks:
+      - test-wordpress
+    ports:
+      # To allow test "curl http://localhost:8080/"
+      # Also accessible from the internet on http://HOST_IP:8080 (no https)
+      - '8080:8080'
+      - '8443:8443'
+    volumes:
+      - 'test-wordpress-datas:/bitnami/wordpress'
+
+networks:
+  test-wordpress:
+
+volumes:
+  test-wordpress-db:
+    # Use an existing volume, do not recreate one with a prefix
+    external: true
+  test-wordpress-datas:
+    # Use an existing volume, do not recreate one with a prefix
+    external: true
