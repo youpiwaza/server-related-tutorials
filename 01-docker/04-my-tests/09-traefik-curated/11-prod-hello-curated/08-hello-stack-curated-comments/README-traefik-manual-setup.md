@@ -142,6 +142,7 @@ docker exec -it -rm tests_traefik_1 /bin/ash
 ```bash
 # Debug file live from inside the container
 docker exec -it tests_traefik_1 /bin/ash -c 'tail -f home/logs/traefik-debug.log'
+docker exec -it core-traefik_traefik_1 /bin/ash -c 'tail -f home/logs/traefik-debug.log'
 
 # Debug from logs volumes (don't "-f")
 docker run \
