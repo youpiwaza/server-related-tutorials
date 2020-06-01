@@ -1,0 +1,110 @@
+version: '3.7'
+## Create network and named volumes
+#     docker volume create --name test-wordpress-db     && \
+#     docker volume create --name test-wordpress-datas
+
+services:
+  mariadb:
+    deploy:
+      labels:
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='test service wordpress > mariadb'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 1
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_DATABASE=bitnami_wordpress
+      - MARIADB_USER=bn_wordpress
+    image: 'bitnami/mariadb:10.3'
+    # # Does not support syslog driver
+    # #   Use docker logs CONTAINER_NAME or docker service logs SERVICE_NAME (not stack, service) to access outputs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    networks:
+      - test-wordpress
+    volumes:
+      - 'test-wordpress-db:/bitnami/mariadb'
+
+  wordpress:
+    depends_on:
+      - mariadb
+    deploy:
+      labels:
+        # Tell Traefik to get the contents provided by this service using that shared network.
+        - "traefik.docker.network=core-traefik-public"
+        # Allow internet exposition (publish on port 80)
+        - "traefik.enable=true"
+
+        ## HTTPS router specifications
+        # Entrypoint
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.entrypoints=websecure"
+        # On which url ? Reverse proxy regexp
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.rule=Host(`test-wordpress.masamune.fr`)"
+        # Use the service created below specifying the internal port
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.service=https_testWordpress_MasamuneFr_Wordpress_Service"
+        # Enable TLS
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.tls=true"
+        # Automtic certifcate resolver, created in traefik.yml
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.tls.certresolver=leresolver"
+        
+        # Create a service specifying the internal port
+        # Internal port > 1024 to prevent usage of root restricted ports
+        - "traefik.http.services.https_testWordpress_MasamuneFr_Wordpress_Service.loadbalancer.server.port=8080"
+
+        ## HTTP_ router / Redirect every http requests to their https equivalent
+        # Create a middleware to redirect http to https
+        #     Middleware aren't shared ?
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        # All hosts..
+        - "traefik.http.routers.http_testWordpress_MasamuneFr_Wordpress_Router.rule=hostregexp(`{host:.+}`)"
+        # .. coming from entrypoint web ..
+        - "traefik.http.routers.http_testWordpress_MasamuneFr_Wordpress_Router.entrypoints=web"
+        # .. use the previously created middleware
+        - "traefik.http.routers.http_testWordpress_MasamuneFr_Wordpress_Router.middlewares=redirect-to-https"
+        
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='test service wordpress > wordpress'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 1
+    environment:
+      - ALLOW_EMPTY_PASSWORD=yes
+      - MARIADB_HOST=mariadb
+      - MARIADB_PORT_NUMBER=3306
+      - WORDPRESS_DATABASE_NAME=bitnami_wordpress
+      - WORDPRESS_DATABASE_USER=bn_wordpress
+    image: 'bitnami/wordpress:5'
+    # # Does not support syslog driver
+    # #   Use docker logs CONTAINER_NAME or docker service logs SERVICE_NAME (not stack, service) to access outputs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    networks:
+      # Connect to traefik dedicated overlay network, allow reverse proxy
+      - core-traefik-public
+      - test-wordpress
+    ports:
+      - '8080'
+      - '8443'
+    volumes:
+      - 'test-wordpress-datas:/bitnami/wordpress'
+
+networks:
+  core-traefik-public:
+    # Connect to an existing network, do not recreate one with a prefix
+    external: true
+  test-wordpress:
+
+volumes:
+  test-wordpress-db:
+    # Use an existing volume, do not recreate one with a prefix
+    external: true
+  test-wordpress-datas:
+    # Use an existing volume, do not recreate one with a prefix
+    external: true
