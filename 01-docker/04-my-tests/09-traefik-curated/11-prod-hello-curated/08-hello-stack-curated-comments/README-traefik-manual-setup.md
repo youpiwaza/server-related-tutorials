@@ -157,6 +157,7 @@ docker run \
 
 # Access file live from inside the container
 docker exec -it tests_traefik_1 /bin/ash -c 'tail -f home/logs/traefik-access.log'
+docker exec -it core-traefik_traefik_1 /bin/ash -c 'tail -f home/logs/traefik-access.log'
 
 # Access from logs volumes (don't "-f")
 docker run \
