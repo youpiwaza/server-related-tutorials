@@ -17,8 +17,7 @@ services:
         - "fr.masamune.project='test service wordpress > mariadb'"
         - "fr.masamune.type='test'"
       mode: replicated
-      # replicas: 2
-      replicas: 1
+      replicas: 2
       resources:
         limits:
           cpus: '0.50'
@@ -67,11 +66,15 @@ services:
     networks:
       - test-wordpress
     # --pids-limit 200
+    ports:
+      - '3306'
+    # # Needs write acces for /tmp/ files
     # read_only: true
     security_opt:
       - no-new-privileges=true
       - apparmor=docker-default
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # bitnami's needs default root to chown volumes, then switches to 1001. LATER: Custom Dockerfile
     # docker_peon unpriviledged namespaced user
     # user: 1003:1003
     volumes:
@@ -127,8 +130,7 @@ services:
         - "fr.masamune.project='test service wordpress > wordpress'"
         - "fr.masamune.type='test'"
       mode: replicated
-      # replicas: 2
-      replicas: 1
+      replicas: 2
       resources:
         limits:
           cpus: '0.50'
@@ -184,11 +186,13 @@ services:
     ports:
       - '8080'
       - '8443'
+    # # Needs write acces for /tmp/ files
     # read_only: true
     security_opt:
       - no-new-privileges=true
       - apparmor=docker-default
       - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # bitnami's needs default root to chown volumes, then switches to 1001. LATER: Custom Dockerfile
     # docker_peon unpriviledged namespaced user
     # user: 1003:1003
     volumes:
