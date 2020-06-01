@@ -50,15 +50,16 @@ Works pretty well for now, it's a shame the selected user is 1001 (builder_guy..
 
 LATER: Make our own Dockerfile with our custom user (~1003).
 
-## OK / Replicas
+## Replicas
 
 Services both get up, but website is KO. Nothing in logs, but it might be a port conflict for mariadb as website front errors are mostly 'error connecting DB'.
 
-Test: OK > 2 WP with only one instance of mariadb
+Test: OK > 2 WP with only one replica of mariadb
 
-Test: OK > declare mariadb port without bind
+Test: ~~OK~~ **KO 1/2** > declare mariadb port without bind + 2 replicas of mariadb
 
 ```yaml
+## NO, KO 1/2 v
 services:
   mariadb:
     deploy:
@@ -80,3 +81,5 @@ docker service ls
 # jkhvhfzm860n        test-wordpress_mariadb          replicated          2/2                 bitnami/mariadb:10.3       *:30049->3306/tcp
 # 4ysi81fihb5i        test-wordpress_wordpress        replicated          2/2                 bitnami/wordpress:5        *:30047->8080/tcp, *:30048->8443/tcp
 ```
+
+Edit: **NO. Website still KO 1/2. Reversing to 1 replica for mariadb**.
