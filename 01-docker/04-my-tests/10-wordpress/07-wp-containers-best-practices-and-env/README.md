@@ -34,13 +34,35 @@ Other:
 - ✅ Theme/Alpha reorder
 - ✅ Using the other [DC syntax](https://docs.docker.com/compose/compose-file/#environment) and enforcing quotes
 
+## Set up classic recommadations
+
+- MariaDB / *Random chars > No special chars nor symbols*
+  - custom root user 16 chars
+  - random root password 32 chars
+  - random database name 32 chars
+  - random table prefix 8 chars
+  - custom user 16 chars
+  - custom user password 16 chars
+- WordPress / *Random chars > **Use** special chars & symbols, **no $ ' "** !*
+  - [SO > wp username limitations](https://wordpress.stackexchange.com/a/99478)
+    - `sanitize_user() is used on the username at signup time so it should be alphanumeric characters plus _ space . – * and @.`
+  - random user name 50 chars
+    - Don't forget to display user through "Firstname Name" in wp-admin > Users > Your profile
+  - `Wordpress password recommandations, use : ! ? % ^ & ), EXCLUDE $ ' "`
+  - random user password 50 chars
+
+Note: Increasing wp containers healtcheck checkup time to compensate for database setup.
+
+Verifications after containers startup:
+
 ```bash
-# TODO:
+docker service logs test-wordpress_mariadb
+docker service logs test-wordpress_wordpress
+```
 
-# ## Set up classic recommadations
+## TODO
 
-# - custom db user, names, prefix
-
+```bash
 # ## Secrets/config
 
 # [DH wp > Docker Secrets](https://hub.docker.com/_/wordpress/):

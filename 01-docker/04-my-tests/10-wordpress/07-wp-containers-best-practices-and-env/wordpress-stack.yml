@@ -46,16 +46,21 @@ services:
         order: stop-first
         parallelism: 1
     environment:
-      ALLOW_EMPTY_PASSWORD: 'yes'
+      ALLOW_EMPTY_PASSWORD: 'no'
+
       MARIADB_CHARACTER_SET: 'utf8'
       MARIADB_COLLATE: 'utf8_general_ci'
-      MARIADB_DATABASE: 'bitnami_wordpress'
+      
+      MARIADB_DATABASE: 'bitnami_wordpress_drdS87QVpvADFw5W'
       # MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=155
-      MARIADB_USER: 'bn_wordpress'
-      # # MARIADB_ROOT_PASSWORD: 'NoDefaults'
+      MARIADB_PASSWORD: 'G6Sn3VaLqf2DDL9W'
+      MARIADB_USER: 'yAKqwcWYAr9kzLdn'
+
+      MARIADB_ROOT_PASSWORD: 'F9pXgdTAwcWSxH4WnZYex3pLJmR947VZ'
       # # Path to a file that contains the admin user password. This will override the value specified in MARIADB_ROOT_PASSWORD
       # MARIADB_ROOT_PASSWORD_FILE: 'secret.txt'
-      MARIADB_ROOT_USER: 'root'
+      MARIADB_ROOT_USER: 'root_F5g8H7F'
+
     healthcheck:
       test: 'stat /opt/bitnami/mariadb/conf/my.cnf || exit 1'
       interval: 10s
@@ -174,20 +179,20 @@ services:
         parallelism: 1
     environment:
       # # mariadb database creation
-      # MARIADB_ROOT_PASSWORD: 'NoDefaults'
-      # MYSQL_CLIENT_CREATE_DATABASE_NAME: 'NoDefaults'
-      # MYSQL_CLIENT_CREATE_DATABASE_PASSWORD: 'NoDefaults'
-      # MYSQL_CLIENT_CREATE_DATABASE_USER: 'NoDefaults'
-      WORDPRESS_TABLE_PREFIX: 'wp_'
+      MARIADB_ROOT_PASSWORD: 'F9pXgdTAwcWSxH4WnZYex3pLJmR947VZ'
+      MARIADB_ROOT_USER: 'root_F5g8H7F'
+      MYSQL_CLIENT_CREATE_DATABASE_NAME: 'bitnami_wordpress_drdS87QVpvADFw5W'
+      MYSQL_CLIENT_CREATE_DATABASE_PASSWORD: 'G6Sn3VaLqf2DDL9W'
+      MYSQL_CLIENT_CREATE_DATABASE_USER: 'yAKqwcWYAr9kzLdn'
+      WORDPRESS_TABLE_PREFIX: 'wp_PL9ZFfYp_'
       
       # # mariadb connection
-      ALLOW_EMPTY_PASSWORD: 'yes'
+      ALLOW_EMPTY_PASSWORD: 'no'
       MARIADB_HOST: 'mariadb'
       MARIADB_PORT_NUMBER: '3306'
-      WORDPRESS_DATABASE_NAME: 'bitnami_wordpress'
-      # WORDPRESS_DATABASE_PASSWORD: 'NoDefaults'
-      WORDPRESS_DATABASE_USER: 'bn_wordpress'
-      MARIADB_ROOT_USER: 'root'
+      WORDPRESS_DATABASE_NAME: 'bitnami_wordpress_drdS87QVpvADFw5W'
+      WORDPRESS_DATABASE_PASSWORD: 'G6Sn3VaLqf2DDL9W'
+      WORDPRESS_DATABASE_USER: 'yAKqwcWYAr9kzLdn'
       WORDPRESS_SKIP_INSTALL: 'no'
       
       # # PHP
@@ -201,11 +206,15 @@ services:
       # SMTP_PROTOCOL: 'tls'
 
       # # WordPress user info
-      WORDPRESS_BLOG_NAME: "User's blog"
-      WORDPRESS_EMAIL: 'user@example.com'
-      WORDPRESS_FIRST_NAME: 'FirstName'
-      WORDPRESS_LAST_NAME: 'LastName'
-      WORDPRESS_PASSWORD: 'bitnami'
+      WORDPRESS_BLOG_NAME: "Custom User's blog"
+      WORDPRESS_EMAIL: 'customuser@example.com'
+      WORDPRESS_FIRST_NAME: 'Bob'
+      WORDPRESS_LAST_NAME: 'Sponge'
+      # sanitize_user() is used on the username at signup time so it should be alphanumeric characters plus _ space . – * and @.`
+      WORDPRESS_USERNAME: 'ndj4E2rDbVeRkEHHcu9X7me3asqTNFmzwjKAhU9LbqpMb8Wbcf'
+      # Wordpress recommandations : ! ? % ^ & )
+      # No no $ ' "
+      WORDPRESS_PASSWORD: 'ndj4E2r!bVeRkE?Hcu8%7me3as^TNFmzwjKAh)U9Lbqp&b8Wbcf'
 
       # # WordPress config
       WORDPRESS_HTACCESS_OVERRIDE_NONE: 'yes'
@@ -213,13 +222,14 @@ services:
       WORDPRESS_RESET_DATA_PERMISSIONS: 'no'
       # Uri default scheme/config
       WORDPRESS_SCHEME: 'http'
-      WORDPRESS_USERNAME: 'user'
+      
     healthcheck:
       test: 'stat /bitnami/wordpress/wp-config.php || exit 1'
       interval: 10s
       timeout: 10s
       retries: 3
-      start_period: 0s
+      # Let some time for database setup
+      start_period: 60s
     image: 'bitnami/wordpress:5'
     labels:
       fr.masamune.client: 'masamune'
