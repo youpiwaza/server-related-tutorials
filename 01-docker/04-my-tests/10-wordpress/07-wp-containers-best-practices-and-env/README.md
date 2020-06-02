@@ -31,11 +31,15 @@ Other:
 ### Implement Env. variables
 
 - ✅ Adding all variables with defaults
-- Theme/Alpha reorder
+- ✅ Theme/Alpha reorder
 - Using the other [DC syntax](https://docs.docker.com/compose/compose-file/#environment) and enforcing quotes
 
 ```bash
 # TODO:
+
+# ## Set up classic recommadations
+
+# - custom db user, names, prefix
 
 # ## Secrets/config
 

@@ -47,16 +47,15 @@ services:
         parallelism: 1
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
-      - MARIADB_DATABASE=bitnami_wordpress
-      - MARIADB_USER=bn_wordpress
-      # - MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=155
       - MARIADB_CHARACTER_SET=utf8
       - MARIADB_COLLATE=utf8_general_ci
-      - MARIADB_ROOT_USER=root
-      # - MARIADB_ROOT_PASSWORD=NoDefaults
+      - MARIADB_DATABASE=bitnami_wordpress
+      # - MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=155
+      - MARIADB_USER=bn_wordpress
+      # # - MARIADB_ROOT_PASSWORD=NoDefaults
       # # Path to a file that contains the admin user password. This will override the value specified in MARIADB_ROOT_PASSWORD
       # - MARIADB_ROOT_PASSWORD_FILE=secret.txt
-
+      - MARIADB_ROOT_USER=root
     healthcheck:
       test: 'stat /opt/bitnami/mariadb/conf/my.cnf || exit 1'
       interval: 10s
@@ -174,36 +173,24 @@ services:
         order: stop-first
         parallelism: 1
     environment:
-      # db
+      # # mariadb database creation
+      # - MARIADB_ROOT_PASSWORD=NoDefaults
+      # - MYSQL_CLIENT_CREATE_DATABASE_NAME=NoDefaults
+      # - MYSQL_CLIENT_CREATE_DATABASE_PASSWORD=NoDefaults
+      # - MYSQL_CLIENT_CREATE_DATABASE_USER=NoDefaults
+      - WORDPRESS_TABLE_PREFIX=wp_
+      
+      # # mariadb connection
       - ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_HOST=mariadb
       - MARIADB_PORT_NUMBER=3306
       - WORDPRESS_DATABASE_NAME=bitnami_wordpress
-      - WORDPRESS_DATABASE_USER=bn_wordpress
       # - WORDPRESS_DATABASE_PASSWORD=NoDefaults
-      - WORDPRESS_SKIP_INSTALL=no
+      - WORDPRESS_DATABASE_USER=bn_wordpress
       - MARIADB_ROOT_USER=root
-
-      # mysql db creation
-      # - MARIADB_ROOT_PASSWORD=NoDefaults
-      # - MYSQL_CLIENT_CREATE_DATABASE_NAME=NoDefaults
-      - WORDPRESS_TABLE_PREFIX=wp_
-      # - MYSQL_CLIENT_CREATE_DATABASE_USER=NoDefaults
-      # - MYSQL_CLIENT_CREATE_DATABASE_PASSWORD=NoDefaults
-
-      # wp
-      - WORDPRESS_USERNAME=user
-      - WORDPRESS_PASSWORD=bitnami
-      - WORDPRESS_EMAIL=user@example.com
-      - WORDPRESS_FIRST_NAME=FirstName
-      - WORDPRESS_LAST_NAME=LastName
-      - WORDPRESS_BLOG_NAME=User's blog
-      - WORDPRESS_SCHEME=http
-      - WORDPRESS_HTACCESS_OVERRIDE_NONE=yes
-      - WORDPRESS_HTACCESS_PERSISTENCE_ENABLED=no
-      - WORDPRESS_RESET_DATA_PERMISSIONS=no
-
-      # php
+      - WORDPRESS_SKIP_INSTALL=no
+      
+      # # PHP
       - PHP_MEMORY_LIMIT=256M
 
       # # SMTP
@@ -212,6 +199,21 @@ services:
       # - SMTP_USER=your_email@gmail.com
       # - SMTP_PASSWORD=your_password
       # - SMTP_PROTOCOL=tls
+
+      # # WordPress user info
+      - WORDPRESS_BLOG_NAME=User's blog
+      - WORDPRESS_EMAIL=user@example.com
+      - WORDPRESS_FIRST_NAME=FirstName
+      - WORDPRESS_LAST_NAME=LastName
+      - WORDPRESS_PASSWORD=bitnami
+
+      # # WordPress config
+      - WORDPRESS_HTACCESS_OVERRIDE_NONE=yes
+      - WORDPRESS_HTACCESS_PERSISTENCE_ENABLED=no
+      - WORDPRESS_RESET_DATA_PERMISSIONS=no
+      # Uri default scheme/config
+      - WORDPRESS_SCHEME=http
+      - WORDPRESS_USERNAME=user
     healthcheck:
       test: 'stat /bitnami/wordpress/wp-config.php || exit 1'
       interval: 10s
