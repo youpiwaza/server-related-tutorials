@@ -32,7 +32,7 @@ Other:
 
 - ✅ Adding all variables with defaults
 - ✅ Theme/Alpha reorder
-- Using the other [DC syntax](https://docs.docker.com/compose/compose-file/#environment) and enforcing quotes
+- ✅ Using the other [DC syntax](https://docs.docker.com/compose/compose-file/#environment) and enforcing quotes
 
 ```bash
 # TODO:
