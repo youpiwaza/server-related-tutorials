@@ -96,6 +96,10 @@ docker service ls
 
 Edit: **NO. Website still KO 1/2. Reversing to 1 replica for mariadb**.
 
+Edit: Bitnami's MariaDb DH image actually ships with replication recommandations, cf [doc > Setting up a replication cluster](https://hub.docker.com/r/bitnami/mariadb/).
+
+LATER: ^ Doesn't seems so complicated, even has DC examples.
+
 ## Healthcheck
 
 Adding healthchecks on both containers. No internet recommandations so we'll cat on config files, following Docs/Docker Bench Security recommandations.
