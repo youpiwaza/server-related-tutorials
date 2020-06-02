@@ -25,9 +25,10 @@ Both WP & MariaDb
 docker run \
     -it \
     --mount \
-        source=test-wordpress-db,target=/bitnami/mariadb \
+        source=test-wordpress-datas,target=/bitnami \
+        # source=test-wordpress-db,target=/bitnami \
     --rm \
-    --workdir /bitnami/mariadb \
+    --workdir /bitnami \
     alpine \
     /bin/ash
 
@@ -83,3 +84,26 @@ docker service ls
 ```
 
 Edit: **NO. Website still KO 1/2. Reversing to 1 replica for mariadb**.
+
+## Healthcheck
+
+Adding healthchecks on both containers. No internet recommandations so we'll cat on config files, following Docs/Docker Bench Security recommandations.
+
+```yaml
+services:
+  mariadb:
+    healthcheck:
+      test: 'stat /opt/bitnami/mariadb/conf/my.cnf || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+
+  wordpress:
+    healthcheck:
+      test: 'stat /bitnami/wordpress/wp-config.php || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+```

@@ -48,6 +48,12 @@ services:
       - ALLOW_EMPTY_PASSWORD=yes
       - MARIADB_DATABASE=bitnami_wordpress
       - MARIADB_USER=bn_wordpress
+    healthcheck:
+      test: 'stat /opt/bitnami/mariadb/conf/my.cnf || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
     image: 'bitnami/mariadb:10.3'
     labels:
       fr.masamune.client: 'masamune'
@@ -164,6 +170,12 @@ services:
       - MARIADB_PORT_NUMBER=3306
       - WORDPRESS_DATABASE_NAME=bitnami_wordpress
       - WORDPRESS_DATABASE_USER=bn_wordpress
+    healthcheck:
+      test: 'stat /bitnami/wordpress/wp-config.php || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
     image: 'bitnami/wordpress:5'
     labels:
       fr.masamune.client: 'masamune'
