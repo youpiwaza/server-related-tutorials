@@ -84,6 +84,8 @@ Wrong path in doc !
 
 **Configuration** > MariaDb container > /opt/bitnami/mariadb/conf/my.cnf
 
+Note: Don't override file, use /opt/bitnami/mariadb/conf/my_custom.cnf, automatically loaded, cf. [doc > configuration file](https://hub.docker.com/r/bitnami/mariadb/).
+
 **Logs** > MariaDb container > /opt/bitnami/mariadb/logs/mysqld.log
 
 - Also linked to /dev/stdout
