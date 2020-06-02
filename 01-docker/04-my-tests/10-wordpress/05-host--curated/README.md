@@ -1,10 +1,21 @@
 # WP curation > Add security recommandations
 
 - ✅ usual stuff, cf. 01-docker/04-my-tests/09-traefik-curated/11-prod-hello-curated/08-hello-stack-curated-comments/hello.yml
-- custom user
-- replicas
+- ✅ custom user
+- ✅ replicas
+- ✅ healthchecks
+- Big checkup
+  1. ✅ Add article/page
+  2. ✅ Upload fichier
+  3. ✅ Installation/activation/test plugin
 
 ## Notes
+
+### Admin access
+
+- [admin link](https://test-wordpress.masamune.fr/wp-admin/)
+- WORDPRESS_USERNAME: WordPress application username. Default: user
+- WORDPRESS_PASSWORD: WordPress application password. Default: bitnami
 
 ### KO / read-only
 
