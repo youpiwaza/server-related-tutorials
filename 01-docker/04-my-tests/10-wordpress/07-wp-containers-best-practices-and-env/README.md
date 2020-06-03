@@ -60,12 +60,52 @@ docker service logs test-wordpress_mariadb
 docker service logs test-wordpress_wordpress
 ```
 
-## TODO
+## Secrets/config
+
+doc:
+
+- [docker secrets](https://docs.docker.com/engine/swarm/secrets/)
+  - [DC ref > secrets](https://docs.docker.com/compose/compose-file/#secrets)
+- ~[DH wp > Docker Secrets](https://hub.docker.com/_/wordpress/):
+  - `docker run --name some-wordpress -e WORDPRESS_DB_PASSWORD_FILE=/run/secrets/mysql-root`
+
+Note: To update or roll back secrets more easily, consider adding a version number or date to the secret name. This is made easier by the ability to control the mount point of the secret within a given container.
+
+### OK / Secret test
+
+Test secret creation, mount & access through a test service
 
 ```bash
-# ## Secrets/config
+# Create a file containing da secret
+nano mah-secret.txt
+> "shh dis is secret"
 
-# [DH wp > Docker Secrets](https://hub.docker.com/_/wordpress/):
+# Create a docker secret
+docker secret create test-da-secret mah-secret.txt
 
-# `docker run --name some-wordpress -e WORDPRESS_DB_PASSWORD_FILE=/run/secrets/mysql-root`
+# Verify
+docker secret ls
+# ID                          NAME                DRIVER              CREATED             UPDATED
+# okz4wlpnzt3b9t532kp1hhe02   test-da-secret                          5 seconds ago       5 seconds ago
+
+# Apply secret to a ~~container~~ service
+docker service create --name test-secret-container --secret test-da-secret alpine bin/ash -c 'while sleep 3600; do :; done'
+
+## Test
+# Get container name
+docker container ls
+# docker ps --filter name=test-secret-container -q
+
+# Go into da container
+docker exec -it CONTAINER_NAME /bin/ash
+# docker exec -it test-secret-container.1.ea4wqyzvyjzmb2qy5281ggn80 /bin/ash
+
+>> cat /run/secrets/test-da-secret
+## OK
+# shh dis is secret
+
+# Clean
+>> exit
+docker service rm test-secret-container
+docker secret rm test-da-secret
 ```
