@@ -426,6 +426,4 @@ Can be done from Admin:
 
 ## TODO : Volumes backup/template
 
-Make a volume backup dump after all initial configuration.
-
-Note: *Nomeclature*
+Make a volume backup dump after all initial configuration, including 09-defaults.
