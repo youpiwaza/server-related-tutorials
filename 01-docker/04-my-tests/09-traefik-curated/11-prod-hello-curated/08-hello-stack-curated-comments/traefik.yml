@@ -76,6 +76,8 @@ services:
     privileged: true
     # KO / Prevent modifications
     # read_only: true
+    # Restart in case of server reboot
+    restart: unless-stopped
     security_opt:
       - apparmor=docker-default
       - no-new-privileges=true
@@ -175,6 +177,8 @@ services:
       - "443:443"
     # Prevent modifications
     read_only: true
+    # Restart in case of server reboot
+    restart: unless-stopped
     security_opt:
       - apparmor=docker-default
       - no-new-privileges=true

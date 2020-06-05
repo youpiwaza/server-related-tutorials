@@ -81,6 +81,15 @@ services:
 # kfmu3i75rhua        hello_helloworld           replicated          2/2                 tutum/hello-world:latest   *:30010->8080/tcp
 ```
 
+### Restart policy
+
+Enforce DC restart in case of server reboot or something..
+
+```yaml
+  # Restart in case of server reboot
+  restart: unless-stopped
+```
+
 ## Encountered errors
 
 ### syslog / Closed fifo
