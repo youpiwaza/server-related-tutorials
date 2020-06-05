@@ -1,0 +1,301 @@
+version: '3.7'
+## Create network and named volumes
+#     docker volume create --name test-wordpress-db     && \
+#     docker volume create --name test-wordpress-datas
+
+services:
+  mariadb:
+    # cap_drop:
+    #   - ALL
+    # # /!\ Only works with docker stack deploy, use bind volume for docker-compose
+    # cpu_shares: 1024
+    deploy:
+      endpoint_mode: vip
+      labels:
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='test service wordpress > mariadb'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      # Possibility to implement replicas : https://hub.docker.com/r/bitnami/mariadb/ > Setting up a replication cluster
+      replicas: 1
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      rollback_config:
+        delay: 0s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+      update_config:
+        delay: 10s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+    environment:
+      ALLOW_EMPTY_PASSWORD: 'no'
+
+      MARIADB_CHARACTER_SET: 'utf8'
+      MARIADB_COLLATE: 'utf8_general_ci'
+      
+      MARIADB_DATABASE: 'bitnami_wordpress_drdS87QVpvADFw5W'
+      # MARIADB_EXTRA_FLAGS=--max-connect-errors=1000 --max_connections=155
+      MARIADB_PASSWORD: 'G6Sn3VaLqf2DDL9W'
+      MARIADB_USER: 'yAKqwcWYAr9kzLdn'
+
+      MARIADB_ROOT_PASSWORD: 'F9pXgdTAwcWSxH4WnZYex3pLJmR947VZ'
+      # # Path to a file that contains the admin user password. This will override the value specified in MARIADB_ROOT_PASSWORD
+      # MARIADB_ROOT_PASSWORD_FILE: 'secret.txt'
+      MARIADB_ROOT_USER: 'root_F5g8H7F'
+
+    healthcheck:
+      test: 'stat /opt/bitnami/mariadb/conf/my.cnf || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      start_period: 0s
+    image: 'bitnami/mariadb:10.3'
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'curated service wordpress / mariadb'
+      fr.masamune.type: 'test'
+    # # Does not support syslog driver
+    # #   Use docker logs CONTAINER_NAME or docker service logs SERVICE_NAME (not stack, service) to access outputs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    # --memory-reservation="128m"
+    # --memory="256m"
+    # --memory-swap -1
+    networks:
+      - test-wordpress
+    # --pids-limit 200
+    # Might be usefull for replicas
+    # ports:
+    #   - '3306'
+    # # Needs write acces for /tmp/ files
+    # read_only: true
+    security_opt:
+      - no-new-privileges=true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # bitnami's needs default root to chown volumes, then switches to 1001. LATER: Custom Dockerfile
+    # docker_peon unpriviledged namespaced user
+    # user: 1003:1003
+    volumes:
+      - type: volume
+        read_only: false
+        source: test-wordpress-db
+        target: /bitnami/mariadb
+
+  wordpress:
+    # cap_drop:
+    #   - ALL
+    # # /!\ Only works with docker stack deploy, use bind volume for docker-compose
+    # configs:
+    #   - source: wordpress_php_config
+    #     target: '/opt/bitnami/php/etc/php.ini'
+    #     # user specific
+    #     # uid: '1001'
+    #     # gid: '1001'
+    #     # read-only
+    #     # mode: 0440
+    #     mode: 0777
+    # cpu_shares: 1024
+    depends_on:
+      - mariadb
+    deploy:
+      endpoint_mode: vip
+      labels:
+        # Tell Traefik to get the contents provided by this service using that shared network.
+        - "traefik.docker.network=core-traefik-public"
+        # Allow internet exposition (publish on port 80)
+        - "traefik.enable=true"
+
+        ## HTTPS router specifications
+        # Entrypoint
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.entrypoints=websecure"
+        # On which url ? Reverse proxy regexp
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.rule=Host(`test-wordpress.masamune.fr`)"
+        # Use the service created below specifying the internal port
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.service=https_testWordpress_MasamuneFr_Wordpress_Service"
+        # Enable TLS
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.tls=true"
+        # Automtic certifcate resolver, created in traefik.yml
+        - "traefik.http.routers.https_testWordpress_MasamuneFr_Wordpress_Router.tls.certresolver=leresolver"
+        
+        # Create a service specifying the internal port
+        # Internal port > 1024 to prevent usage of root restricted ports
+        - "traefik.http.services.https_testWordpress_MasamuneFr_Wordpress_Service.loadbalancer.server.port=8080"
+
+        ## HTTP_ router / Redirect every http requests to their https equivalent
+        # Create a middleware to redirect http to https
+        #     Middleware aren't shared ?
+        - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
+        # All hosts..
+        - "traefik.http.routers.http_testWordpress_MasamuneFr_Wordpress_Router.rule=hostregexp(`{host:.+}`)"
+        # .. coming from entrypoint web ..
+        - "traefik.http.routers.http_testWordpress_MasamuneFr_Wordpress_Router.entrypoints=web"
+        # .. use the previously created middleware
+        - "traefik.http.routers.http_testWordpress_MasamuneFr_Wordpress_Router.middlewares=redirect-to-https"
+        
+        - "fr.masamune.client='masamune'"
+        - "fr.masamune.maintainer='masamune.code@gmail.com'"
+        - "fr.masamune.project='test service wordpress > wordpress'"
+        - "fr.masamune.type='test'"
+      mode: replicated
+      replicas: 2
+      resources:
+        limits:
+          cpus: '0.50'
+          memory: 256M
+        reservations:
+          cpus: '0.25'
+          memory: 128M
+      restart_policy:
+        condition: any
+        delay: 5s
+        max_attempts: 5
+        window: 120s
+      rollback_config:
+        delay: 0s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+      update_config:
+        delay: 10s
+        failure_action: pause
+        max_failure_ratio: 0
+        monitor: 0s
+        order: stop-first
+        parallelism: 1
+    environment:
+      # # mariadb database creation
+      MARIADB_ROOT_PASSWORD: 'F9pXgdTAwcWSxH4WnZYex3pLJmR947VZ'
+      MARIADB_ROOT_USER: 'root_F5g8H7F'
+      MYSQL_CLIENT_CREATE_DATABASE_NAME: 'bitnami_wordpress_drdS87QVpvADFw5W'
+      MYSQL_CLIENT_CREATE_DATABASE_PASSWORD: 'G6Sn3VaLqf2DDL9W'
+      MYSQL_CLIENT_CREATE_DATABASE_USER: 'yAKqwcWYAr9kzLdn'
+      WORDPRESS_TABLE_PREFIX: 'wp_PL9ZFfYp_'
+      
+      # # mariadb connection
+      ALLOW_EMPTY_PASSWORD: 'no'
+      MARIADB_HOST: 'mariadb'
+      MARIADB_PORT_NUMBER: '3306'
+      WORDPRESS_DATABASE_NAME: 'bitnami_wordpress_drdS87QVpvADFw5W'
+      WORDPRESS_DATABASE_PASSWORD: 'G6Sn3VaLqf2DDL9W'
+      WORDPRESS_DATABASE_USER: 'yAKqwcWYAr9kzLdn'
+      WORDPRESS_SKIP_INSTALL: 'no'
+      
+      # # PHP
+      PHP_MEMORY_LIMIT: '256M'
+
+      # # SMTP
+      # SMTP_HOST: 'smtp.gmail.com'
+      # SMTP_PORT: '587'
+      # SMTP_USER=your_email@gmail: 'com'
+      # SMTP_PASSWORD: 'your_password'
+      # SMTP_PROTOCOL: 'tls'
+
+      # # WordPress user info
+      WORDPRESS_BLOG_NAME: "Custom User's blog"
+      WORDPRESS_EMAIL: 'customuser@example.com'
+      WORDPRESS_FIRST_NAME: 'Bob'
+      WORDPRESS_LAST_NAME: 'Sponge'
+      # 50 chars length / NO SPECIAL CHARS, tends to not match when container is up
+      WORDPRESS_USERNAME: 'ndj4E2rDbVeRkEHHcu9X7me3asqTNFmzwjKAhU9LbqpMb8Wbcf'
+      # 50 chars length / Wordpress recommandations : ! ? % ^ & ) / No no $ ' "
+      WORDPRESS_PASSWORD: 'ndj4E2r!bVeRkE?Hcu8%7me3as^TNFmzwjKAh)U9Lbqp&b8Wbcf'
+
+      # # WordPress config
+      WORDPRESS_HTACCESS_OVERRIDE_NONE: 'yes'
+      WORDPRESS_HTACCESS_PERSISTENCE_ENABLED: 'no'
+      WORDPRESS_RESET_DATA_PERMISSIONS: 'no'
+      # Uri default scheme/config
+      WORDPRESS_SCHEME: 'https'
+      
+    healthcheck:
+      test: 'stat /bitnami/wordpress/wp-config.php || exit 1'
+      interval: 10s
+      timeout: 10s
+      retries: 3
+      # Let some time for database setup
+      start_period: 60s
+    image: 'bitnami/wordpress:5'
+    labels:
+      fr.masamune.client: 'masamune'
+      fr.masamune.maintainer: 'masamune.code@gmail.com'
+      fr.masamune.project: 'curated service wordpress / wordpress'
+      fr.masamune.type: 'test'
+    # # Does not support syslog driver
+    # #   Use docker logs CONTAINER_NAME or docker service logs SERVICE_NAME (not stack, service) to access outputs
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+    # --memory-reservation="128m"
+    # --memory="256m"
+    # --memory-swap -1
+    networks:
+      # Connect to traefik dedicated overlay network, allow reverse proxy
+      - core-traefik-public
+      - test-wordpress
+    # --pids-limit 200
+    ports:
+      - '8080'
+      - '8443'
+    # # Needs write acces for /tmp/ files
+    # read_only: true
+    security_opt:
+      - no-new-privileges=true
+      - apparmor=docker-default
+      - seccomp=/etc/docker/seccomp-profiles/default-docker-profile.json
+    # bitnami's needs default root to chown volumes, then switches to 1001. LATER: Custom Dockerfile
+    # docker_peon unpriviledged namespaced user
+    # user: 1003:1003
+    volumes:
+      - type: volume
+        read_only: false
+        source: test-wordpress-datas
+        target: /bitnami/wordpress
+      # # Note: Use config for docker stack deploy. Bind volumes can be a security issue, and should only be used for debug through docker-compose up
+      # # - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/curated-p8080-customUser-phpfpm--nginx.conf:/etc/nginx/nginx.conf:ro'
+      # - type: bind
+      #   read_only: false
+      #   source: /home/singed_the_docker_peon_9f3eqk4s9/tests/wordpress/config/bitnami-wp--activate-php-modules--php.ini
+      #   target: /opt/bitnami/php/etc/php.ini
+
+# configs:
+#   wordpress_php_config:
+#     file: '/home/singed_the_docker_peon_9f3eqk4s9/tests/wordpress/config/bitnami-wp--activate-php-modules--php.ini'
+
+networks:
+  core-traefik-public:
+    # Connect to an existing network, do not recreate one with a prefix
+    external: true
+  test-wordpress:
+
+volumes:
+  test-wordpress-db:
+    # Use an existing volume, do not recreate one with a prefix
+    external: true
+  test-wordpress-datas:
+    # Use an existing volume, do not recreate one with a prefix
+    external: true
