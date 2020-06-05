@@ -428,4 +428,4 @@ Can be done from Admin:
 
 Make a volume backup dump after all initial configuration.
 
-Note: *Nomeclature !*
+Note: *Nomeclature*
