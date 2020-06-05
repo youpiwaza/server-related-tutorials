@@ -210,10 +210,9 @@ services:
       WORDPRESS_EMAIL: 'customuser@example.com'
       WORDPRESS_FIRST_NAME: 'Bob'
       WORDPRESS_LAST_NAME: 'Sponge'
-      # sanitize_user() is used on the username at signup time so it should be alphanumeric characters plus _ space . – * and @.`
+      # 50 chars length / NO SPECIAL CHARS, tends to not match when container is up
       WORDPRESS_USERNAME: 'ndj4E2rDbVeRkEHHcu9X7me3asqTNFmzwjKAhU9LbqpMb8Wbcf'
-      # Wordpress recommandations : ! ? % ^ & )
-      # No no $ ' "
+      # 50 chars length / Wordpress recommandations : ! ? % ^ & ) / No no $ ' "
       WORDPRESS_PASSWORD: 'ndj4E2r!bVeRkE?Hcu8%7me3as^TNFmzwjKAh)U9Lbqp&b8Wbcf'
 
       # # WordPress config

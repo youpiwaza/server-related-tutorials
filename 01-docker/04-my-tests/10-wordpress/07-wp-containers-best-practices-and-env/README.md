@@ -43,15 +43,18 @@ Other:
   - random table prefix 8 chars
   - custom user 16 chars
   - custom user password 16 chars
-- WordPress / *Random chars > **Use** special chars & symbols, **no $ ' "** !*
-  - [SO > wp username limitations](https://wordpress.stackexchange.com/a/99478)
-    - `sanitize_user() is used on the username at signup time so it should be alphanumeric characters plus _ space . – * and @.`
-  - random user name 50 chars
+- WordPress
+  - *Maximum length is ~60-64 but seems random, prefer using 50 chars.*
+  - Username / 50 random chars
+    - NO SPECIAL CHARS, seems to be ko with bitnami's
+    - ~~[SO > wp username limitations](https://wordpress.stackexchange.com/a/99478)~~
+      - ~~`sanitize_user() is used on the username at signup time so it should be alphanumeric characters plus _ space . – * and @.`~~
+      - ~~*Random chars > **Use** special chars & symbols, **no $ ' "** !*~~
     - Don't forget to display user through "Firstname Name" in wp-admin > Users > Your profile
-  - `Wordpress password recommandations, use : ! ? % ^ & ), EXCLUDE $ ' "`
-  - random user password 50 chars
+  - Password / 50 random chars
+    - `Wordpress password recommandations, use : ! ? % ^ & ), EXCLUDE $ ' "`
 
-Note: Increasing wp containers healtcheck checkup time to compensate for database setup.
+Note: Increasing wp containers healtcheck checkup time (~30-40s, so increasing to 60s) to compensate for database setup.
 
 Verifications after containers startup:
 
@@ -109,3 +112,15 @@ docker exec -it CONTAINER_NAME /bin/ash
 docker service rm test-secret-container
 docker secret rm test-da-secret
 ```
+
+### KO / Secrets setup in DC files
+
+[doc](https://docs.docker.com/engine/swarm/secrets/#build-support-for-docker-secrets-into-your-images).
+
+Note: Docker secrets do not set environment variables directly. This was a conscious decision, because environment variables can unintentionally be leaked between containers (for instance, if you use --link).
+
+Bitnami's WP & Mariadb currently [don't support secrets](https://github.com/bitnami/bitnami-docker-wordpress/issues/194) (ENV > *_FILE, like official wordpress).
+
+Note: Loading sensitive vars from a secret & mounting them as ENV variables still represent a liability. We'll keep ENV vars for now.. Just keep 'em in a separate file/private github repo in the ansible scripts.
+
+LATER: When/if it supports, implement it.
