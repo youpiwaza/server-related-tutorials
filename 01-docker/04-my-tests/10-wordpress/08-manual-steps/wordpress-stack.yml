@@ -1,7 +1,15 @@
 version: '3.7'
 ## Create network and named volumes
-#     docker volume create --name test-wordpress-db     && \
-#     docker volume create --name test-wordpress-datas
+# docker volume create test-wordpress-db \
+#    --label fr.masamune.client='masamune' \
+#    --label fr.masamune.maintainer='masamune.code@gmail.com' \
+#    --label fr.masamune.project='test service wordpress > mariadb' \
+#    --label fr.masamune.type='test' \ &&
+# docker volume create test-wordpress-datas \
+#    --label fr.masamune.client='masamune' \
+#    --label fr.masamune.maintainer='masamune.code@gmail.com' \
+#    --label fr.masamune.project='test service wordpress > wordpress' \
+#    --label fr.masamune.type='test'
 
 services:
   mariadb:
