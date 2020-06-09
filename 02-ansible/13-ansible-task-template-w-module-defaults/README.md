@@ -3,7 +3,7 @@
 But: Permettre la réutilisation de templates, cf. ansible [module_defaults](https://docs.ansible.com/ansible/latest/user_guide/playbooks_module_defaults.html).
 
 ```bash
-> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/13-ansible-task-template-w-module-defau
+> cd ~/../c/Users/Patolash/Documents/_dev/server-related-tutorials/02-ansible/13-ansible-task-template-w-module-defaults
 
 # Lancer le playbook
 > ansible-playbook -i hosts playbook.yml | sed 's/\\n/\n/g'
