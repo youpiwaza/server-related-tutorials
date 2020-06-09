@@ -2,9 +2,59 @@
 
 List various steps / good practices to execute after installation > classic process review in order to prepare for automation.
 
+---
+
+## WP-CLI doc
+
+Small review of possibilities regarding [wp-cli](https://make.wordpress.org/cli/handbook/guides/quick-start/).
+
+- Install/activate plugins
+- Tout ce que propose l'admin :D
+
+### Bitnami's image
+
+- [doc > WP-CLI tool](https://hub.docker.com/r/bitnami/wordpress/).
+- [WP-CLI all commands](https://developer.wordpress.org/cli/commands/)
+
+- you need use the proper system user, daemon.
+  - Note: not sure about that
+    - Works as it is
+    - ~KO using `docker exec --user daemon`
+
+```bash
+# Get wp container name
+docker ps
+
+## OK
+docker exec CONTAINER-NAME wp help
+# docker exec test-wordpress_wordpress.1.dbl6yqi1bj4o456x6hmczojmk wp help
+
+## NAME
+##   wp
+##
+## DESCRIPTION
+##   Manage WordPress through the command-line.
+
+## Manually remove akismet from already installed wp
+
+# OK / WP-CLI install akismet plugin..
+docker exec test-wordpress_wordpress.1.dbl6yqi1bj4o456x6hmczojmk wp plugin install akismet
+# OK / .. and activate
+docker exec test-wordpress_wordpress.1.dbl6yqi1bj4o456x6hmczojmk wp plugin activate akismet
+
+# OK / Update all plugins
+docker exec test-wordpress_wordpress.1.dbl6yqi1bj4o456x6hmczojmk wp plugin update --all
+```
+
+---
+
 ## Defaults
 
 Bullet-proof nomenclature for all variables.
+
+### Random string generator
+
+Possibility to generate username, password, db user, etc. ?
 
 ### Sensitive information management
 
@@ -14,7 +64,15 @@ See if secrets can be implemented, as it doesn't seem to be the case for bitnami
 
 Automate github private repository creation + upload a generated README.md file ?
 
-## User display name
+## Users
+
+🤖 Available in WP-CLI 🤖
+
+### Generate a wp user for each client/publisher
+
+Without super admin access.
+
+### User display name
 
 wp-admin > Users > Your profile > "Firstname Name"
 
@@ -22,17 +80,23 @@ Prevents displaying admin log in username.
 
 ## Change language
 
+🤖 Available in WP-CLI 🤖
+
 Settings > General > Site language
 
 Adapt to customer's need.
 
 ## Remove unused themes
 
+🤖 Available in WP-CLI 🤖
+
 Can be done from Admin:
 
 - Appearance > Themes > (Theme) Details > Delete
 
 ## Plugins
+
+🤖 Available in WP-CLI 🤖
 
 1. Install needed plugins
 2. Update plugins if needed
@@ -46,7 +110,17 @@ Plugin list:
 
 ## Default pages
 
-Add secondary pages (credits, legal notices, sitemap)
+🤖 Available in WP-CLI 🤖
+
+- Add secondary pages (credits, legal notices, sitemap)
+- Add them to the secondary menu
+
+## Post defaults
+
+🤖 Available in WP-CLI 🤖
+
+- Categories
+- Permalinks structure
 
 ## Docker volumes backup
 
