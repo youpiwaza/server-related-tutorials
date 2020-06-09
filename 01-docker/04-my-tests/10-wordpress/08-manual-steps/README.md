@@ -2,8 +2,17 @@
 
 List various steps / good practices to execute after installation > classic process review in order to prepare for automation.
 
-- Add custom plugins
-- Add secondary pages (credits, legal notices, sitemap)
+## Defaults
+
+Bullet-proof nomenclature for all variables.
+
+### Sensitive information management
+
+See if secrets can be implemented, as it doesn't seem to be the case for bitnami's.
+
+### Defaults storage
+
+Automate github private repository creation + upload a generated README.md file ?
 
 ## User display name
 
