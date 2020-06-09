@@ -12,4 +12,5 @@
         msg: '{{ my_pass }}'
     
     - include: 2-specific-password.yml
+    - include: 3-prefix-password.yml
 ...

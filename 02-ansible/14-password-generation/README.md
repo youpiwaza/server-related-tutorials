@@ -38,3 +38,15 @@ See doc.
 ```yml
 "{{ lookup('password', './wp-password.txt length=50 chars=ascii_letters,digits,!,?,%,^,&,)') }}"
 ```
+
+## 3 Prefix
+
+Possibility to prefix when defining ~global var.
+
+Be careful as password in file won't be prefixed.
+
+```yml
+  set_fact:
+    # Be careful as password in file won't be prefixed
+    prefix_my_pass: 'da_prefix_{{ prefix_password_alias }}'
+```
