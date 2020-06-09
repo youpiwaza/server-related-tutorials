@@ -30,3 +30,11 @@ But: Generate passwords, and re-use them in playbooks.
 - debug:
     msg: '{{ my_pass }}'
 ```
+
+## 2 Specific characters
+
+See doc.
+
+```yml
+"{{ lookup('password', './wp-password.txt length=50 chars=ascii_letters,digits,!,?,%,^,&,)') }}"
+```
