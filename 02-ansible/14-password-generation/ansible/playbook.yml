@@ -10,4 +10,6 @@
     # Re-use var defined in 1-generate-and-reuse.yml
     - debug:
         msg: '{{ my_pass }}'
+    
+    - include: 2-specific-password.yml
 ...
