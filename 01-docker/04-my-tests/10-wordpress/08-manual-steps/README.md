@@ -54,7 +54,15 @@ Bullet-proof nomenclature for all variables.
 
 ### Random string generator
 
-Possibility to generate username, password, db user, etc. ?
+Possibility to generate username, password, db user, etc.
+
+🔍Docs:
+
+1. ✅🌱 [Ansible vault](https://docs.ansible.com/ansible/latest/user_guide/vault.html)
+2. ✅ [Ansible lookup password](https://docs.ansible.com/ansible/latest/plugins/lookup/password.html)
+3. ✅💚 [SO > Use case](https://stackoverflow.com/questions/46732703/how-to-generate-single-reusable-random-password-with-ansible)
+
+Will be tested in a dedicated project, cf. server-related-tutorials/02-ansible/14-password-generation .
 
 ### Sensitive information management
 
