@@ -1,8 +1,13 @@
 ---
 - name: Test / Generate random passwords
+  gather_facts: false
   hosts: 127.0.0.1
   remote_user: root
 
-  # TODO
-  # tasks:
+  tasks:
+    - include: 1-generate-and-reuse.yml
+
+    # Re-use var defined in 1-generate-and-reuse.yml
+    - debug:
+        msg: '{{ my_pass }}'
 ...

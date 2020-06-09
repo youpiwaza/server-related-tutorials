@@ -1,0 +1,19 @@
+---
+- name: Test / Generate random passwords
+  # Define ~global var from generated local vars v
+  set_fact:
+      my_pass: '{{ pwd_alias }}'
+  vars:
+    # Generate password in a file, and store it in a local var
+    #   https://docs.ansible.com/ansible/latest/plugins/lookup/password.html
+    #   https://stackoverflow.com/questions/46732703/how-to-generate-single-reusable-random-password-with-ansible
+    pwd_alias: "{{ lookup('password', './password1.txt length=15 chars=ascii_letters') }}"
+
+# Re-use var, password isn't re-created every time
+- debug:
+    msg: '{{ my_pass }}'
+- debug:
+    msg: '{{ my_pass }}'
+- debug:
+    msg: '{{ my_pass }}'
+...
