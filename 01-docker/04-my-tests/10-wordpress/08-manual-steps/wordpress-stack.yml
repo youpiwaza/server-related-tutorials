@@ -1,15 +1,18 @@
 version: '3.7'
 ## Create network and named volumes
-# docker volume create test-wordpress-db \
+# docker volume create \
 #    --label fr.masamune.client='masamune' \
 #    --label fr.masamune.maintainer='masamune.code@gmail.com' \
 #    --label fr.masamune.project='test service wordpress > mariadb' \
-#    --label fr.masamune.type='test' \ &&
-# docker volume create test-wordpress-datas \
+#    --label fr.masamune.type='test' \
+#    test--test-wordpress-masamune-fr--wordpress--db \
+# && \
+# docker volume create \
 #    --label fr.masamune.client='masamune' \
 #    --label fr.masamune.maintainer='masamune.code@gmail.com' \
 #    --label fr.masamune.project='test service wordpress > wordpress' \
-#    --label fr.masamune.type='test'
+#    --label fr.masamune.type='test' \
+#    test--test-wordpress-masamune-fr--wordpress--datas
 
 services:
   mariadb:
@@ -91,7 +94,7 @@ services:
     # --memory="256m"
     # --memory-swap -1
     networks:
-      - test-wordpress
+      - wordpress
     # --pids-limit 200
     # Might be usefull for replicas
     # ports:
@@ -264,7 +267,7 @@ services:
     networks:
       # Connect to traefik dedicated overlay network, allow reverse proxy
       - core-traefik-public
-      - test-wordpress
+      - wordpress
     # --pids-limit 200
     ports:
       - '8080'
@@ -298,7 +301,8 @@ networks:
   core-traefik-public:
     # Connect to an existing network, do not recreate one with a prefix
     external: true
-  test-wordpress:
+  # Will be prefixed on stack deploy
+  wordpress:
 
 volumes:
   test-wordpress-db:
