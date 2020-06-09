@@ -1,0 +1,8 @@
+---
+- name: Test / Generate random passwords
+  hosts: 127.0.0.1
+  remote_user: root
+
+  # TODO
+  # tasks:
+...
