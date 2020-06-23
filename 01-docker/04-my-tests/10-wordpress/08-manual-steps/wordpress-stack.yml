@@ -111,7 +111,7 @@ services:
     volumes:
       - type: volume
         read_only: false
-        source: test-wordpress-db
+        source: test--test-wordpress-masamune-fr--wordpress--db
         target: /bitnami/mariadb
 
   wordpress:
@@ -284,7 +284,7 @@ services:
     volumes:
       - type: volume
         read_only: false
-        source: test-wordpress-datas
+        source: test--test-wordpress-masamune-fr--wordpress--datas
         target: /bitnami/wordpress
       # # Note: Use config for docker stack deploy. Bind volumes can be a security issue, and should only be used for debug through docker-compose up
       # # - '/home/singed_the_docker_peon_9f3eqk4s9/tests/nginx/curated-p8080-customUser-phpfpm--nginx.conf:/etc/nginx/nginx.conf:ro'
@@ -305,9 +305,9 @@ networks:
   wordpress:
 
 volumes:
-  test-wordpress-db:
+  test--test-wordpress-masamune-fr--wordpress--db:
     # Use an existing volume, do not recreate one with a prefix
     external: true
-  test-wordpress-datas:
+  test--test-wordpress-masamune-fr--wordpress--datas:
     # Use an existing volume, do not recreate one with a prefix
     external: true
