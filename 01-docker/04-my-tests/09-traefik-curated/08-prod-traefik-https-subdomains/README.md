@@ -4,7 +4,7 @@ Using traefik's tls.domains to enable all subdomains at once
 
 ## Need proper DNS
 
-Need main domain DNS to point towards the server. Can't test only on subdomains (test.DOAMIN.com is redundant with *.DOMAIN.com)
+Need main domain DNS to point towards the server. Can't test only on subdomains (test.DOMAIN.com is redundant with *.DOMAIN.com)
 
 > Single sub domain definition for now
 
