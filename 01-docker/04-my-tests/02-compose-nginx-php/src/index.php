@@ -16,7 +16,7 @@
 	<pre>
 	<?php
 
-		echo 'A basic design if I need to do some PHPay';
+		echo 'A basic design if I need to do some PHPay !';
 		
 	?>
 	</pre>
