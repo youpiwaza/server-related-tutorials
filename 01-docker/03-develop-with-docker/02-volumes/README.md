@@ -245,7 +245,7 @@ One liner backup
 7. Puis le conteneur est détruit, vu qu'il ne fait plus rien
 
 ```bash
-# docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar cvf /backup/backup.tar /dbdata
+# docker run --rm --volumes-from dbstore -v $(pwd):/backup ubuntu tar -cvf /backup/backup.tar /dbdata
 
 # Attention, on passe le conteneur concerné avec --volume-from, et NON le volume, NI le nom du build !
 # En gros le tout dernier paramètre c'est le répertoire (contenu dans le volume) à sauvegarder
@@ -254,7 +254,7 @@ One liner backup
   --volumes-from test-volumes-nginx \
   -v $(pwd):/backup \
   alpine:latest \
-  tar cvf /backup/backup.tar /usr/share/nginx/html
+  tar -cvf /backup/backup.tar /usr/share/nginx/html
 ```
 
 ---
@@ -266,7 +266,7 @@ Essai en montant correctement les volumes (pour *bind* on rajoute `type=bind,`)
   --mount source=nginx-vol,destination=/home/volumeContent \
   --mount type=bind,source=$(pwd),target=/backup \
   alpine:latest \
-  tar cvf /backup/backup2.tar "/home/volumeContent"
+  tar -cvf /backup/backup2.tar "/home/volumeContent"
 ```
 
 OK :D
@@ -278,19 +278,36 @@ En gros
 3. On zip  "/home/volumeContent" dans le fichier "backup2.tar", qui se trouvera dans "/backup"
 4. Cela copie dans le répertoire courant grâce au *bind*.
 
+Edit 2021 : Résolution des problèmes de droits lors de la création de l'archive (permission denied).
+
+Lié à la configuration du démon docker > user remap.
+
+Solution : Lancement du conteneur sans le user remap.
+
+```bash
+docker run --rm -i -t  \
+>   --userns=host \
+>   -v $(pwd):/home/backup \
+>   -w /home/backup \
+>   alpine:latest \
+>   /bin/ash
+```
+
+cf. [notes](server-related-tutorials/01-docker/03-develop-with-docker/02-volumes/notes-problemes-backup-docker-volumes.md) pour les détails.
+
 #### Restaurer
 
 One liner
 
 ```bash
-> docker run --rm --volumes-from dbstore2 -v $(pwd):/backup ubuntu bash -c "cd /dbdata && tar xvf /backup/backup.tar --strip 1"
+> docker run --rm --volumes-from dbstore2 -v $(pwd):/backup ubuntu bash -c "cd /dbdata && tar -xvf /backup/backup.tar --strip 1"
 ```
 
 1. Nouveau conteneur, monté avec le même volume que le conteneur  dbstore2
 2. *bind* le repertoire courant de l'hôte avec le répertoire "/backup" du nouveau conteneur
 3. On demande au shell d'exécuter
    1. Go dans "/dbdata" // Le répertoire arbitraire ou sont stockées les données du build, correspond à "/usr/share/nginx/html" dans les exemples précédents
-   2. Y extraire "/backup/backup.tar" (Le fichier est présent dans le novueau conteneur car il est également présent dans le répertoire courant de l'hôte (*bind*))
+   2. Y extraire "/backup/backup.tar" (Le fichier est présent dans le nouveau conteneur car il est également présent dans le répertoire courant de l'hôte (*bind*))
 
 non testé, + meilleure écriture (cf. backup)
 
