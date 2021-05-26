@@ -37,6 +37,8 @@ services:
         - "traefik.http.middlewares.redirect-to-https.redirectscheme.scheme=https"
         # All hosts..
         - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.rule=hostregexp(`{host:.+}`)"
+        ## https://doc.traefik.io/traefik/routing/routers/#rule > HostRegexp !?? Forcer redrection www. vers https
+        # - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.rule=hostregexp(`{host:.+}`, `{subdomain:[a-z]+}.example.com`)"
         # .. coming from entrypoint web ..
         - "traefik.http.routers.http_testMasamuneFr_Helloworld_Router.entrypoints=web"
         # .. use the previously created middleware
