@@ -53,21 +53,21 @@ docker run --rm -i -t \
 ### 1 / KO / permission denied / Test w. interactive & shell
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/backup \
+  --mount type=bind,source=$(pwd),destination=/backup \
   alpine:latest \
   /bin/ash
 
 ### 2 / KO / Without pwd var
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=/home/THE_DOCKER_GUY/tests/backup-volumes,target=/backup \
+  --mount type=bind,source=/home/THE_DOCKER_GUY/tests/backup-volumes,destination=/backup \
   alpine:latest \
   /bin/ash
 
 ### 3 / KO / W. only current directory mounted (no volume)
 docker run --rm -i -t  \
-  # --mount type=bind,source=$(pwd),target=/backup \
-  --mount type=bind,source=/home/THE_DOCKER_GUY/tests/backup-volumes,target=/backup \
+  # --mount type=bind,source=$(pwd),destination=/backup \
+  --mount type=bind,source=/home/THE_DOCKER_GUY/tests/backup-volumes,destination=/backup \
   alpine:latest \
   /bin/ash
 
@@ -96,7 +96,7 @@ docker run --rm -i -t  \
 # 1 / KO / docker guy > permission denied
 docker run --rm \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=/home/DOCKER_PEON/tests/backups-volumes,target=/backup \
+  --mount type=bind,source=/home/DOCKER_PEON/tests/backups-volumes,destination=/backup \
   alpine:latest \
   tar -cvf /backup/backup.tar "/home/volumeContent"
 
@@ -234,7 +234,7 @@ Si géré dans le dossier de docker_peon, l'extraction doit être faite par buil
 # DOCKER GUY, dans /home/DOCKER_PEON/tests/backups-volumes
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/backup \
+  --mount type=bind,source=$(pwd),destination=/backup \
   --userns=host \
   -w /home/backup \
   alpine:latest \
@@ -279,7 +279,7 @@ Commande à réutiliser :
 # Créer une archive d'un volume
 docker run --rm -i -t  \
   --mount source=NOM_VOLUME_A_SAUVEGARDER,destination=/DOSSIER_DANS_VOLUME_A_RECUPERER \
-  --mount type=bind,source=/DOSSIER_HOTE_OU_RANGER_L_ARCHIVE,target=/backup \
+  --mount type=bind,source=/DOSSIER_HOTE_OU_RANGER_L_ARCHIVE,destination=/backup \
   --userns=host \
   -w /home/backup \
   alpine:latest \
@@ -305,7 +305,7 @@ A partir du bordel ci-dessus
 ## Test / KO
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/backup \
+  --mount type=bind,source=$(pwd),destination=/backup \
   --userns=host \
   -w /home/backup \
   alpine:latest \
@@ -314,7 +314,7 @@ docker run --rm -i -t  \
 ## KO
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/backup \
+  --mount type=bind,source=$(pwd),destination=/backup \
   --userns=host \
   -w /home/backup \
   alpine:latest \
@@ -328,11 +328,11 @@ docker run --rm -i -t  \
 # Run x2
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/backup \
+  --mount type=bind,source=$(pwd),destination=/backup \
   --userns=host \
   -w /home/backup \
   alpine:latest \
-  tar -cvf /backup/nom-sauvegarde---backup---$(date +%Y-%m-%d--%H.%M.%S).tar "/home/volumeContent"
+  tar -cvf /backup/test-example---backup---$(date +%Y-%m-%d--%H.%M.%S).tar "/home/volumeContent"
 
 ls -la
 # total 308
@@ -352,7 +352,7 @@ ls -la
 # backup
 sudo docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/backup \
+  --mount type=bind,source=$(pwd),destination=/backup \
   --userns=host \
   -w /home/backup \
   alpine:latest \
@@ -387,7 +387,7 @@ docker run --rm \
 ## Test archive injection location
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/home \
+  --mount type=bind,source=$(pwd),destination=/home \
   --userns=host \
   -w /home \
   alpine:latest \
@@ -423,7 +423,7 @@ docker run --rm -i -t  \
 ## OK / Final test
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/home \
+  --mount type=bind,source=$(pwd),destination=/home \
   --userns=host \
   -w /home \
   alpine:latest \
@@ -432,7 +432,7 @@ docker run --rm -i -t  \
 ## Check
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
-  --mount type=bind,source=$(pwd),target=/home \
+  --mount type=bind,source=$(pwd),destination=/home \
   --userns=host \
   -w /home \
   alpine:latest \
