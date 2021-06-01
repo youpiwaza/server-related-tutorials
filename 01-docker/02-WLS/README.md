@@ -1,5 +1,11 @@
 # Installation
 
+DOUBLON de [install-dev-env/02-docker/](https://github.com/youpiwaza/install-dev-env/blob/master/02-docker/README.md).
+
+👴DEPRECATED: Préférer l'utilisation de l'autre repo, qui sera maintenue, contrairement à celle-ci.
+
+---
+
 Installation sur WLS pour que cela soit plus proche de l'environnement serveur
 
 [docker doc ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
