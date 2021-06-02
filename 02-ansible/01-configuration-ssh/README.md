@@ -78,7 +78,9 @@ Ajout de notre clé à l'agent SSH
 > ssh-add -l
 ```
 
-Création d'un raccourci en local
+Création d'un raccourci en local.
+
+Edit 2021: ~KO, redemande systématiquement la passphrase >.>
 
 ```bash
 # Créer/Modifier le fichier de config ssh local WSL
@@ -101,6 +103,16 @@ Host awesome
 Test > Ok, connexion avec la passphrase la première, puis directe.
 
 ### WSL / Duplica de la clé SSH pour windows
+
+#### Edit 2021
+
+C'est un peu la merde avec WSL2, cf. [1](https://stackoverflow.com/questions/63600692/ubuntu-on-windows-10-wsl2-chown-chmod-doesnt-work-on-copied-files) [2](https://devblogs.microsoft.com/commandline/sharing-ssh-keys-between-windows-and-wsl-2/) [3](https://florianbrinkmann.com/en/ssh-key-and-the-windows-subsystem-for-linux-3436/).
+
+J'ai réussi a le faire tourner via le link en suivant la solution 1 (stack overflow)
+
+---
+---
+---
 
 Pour le fichier situé sur la bécanne, il devra être accessible pour Windows (généralement dans Users/MON_UTILISATEUR/.ssh/), ainsi que pour WSL (généralement dans ~/.ssh/).
 

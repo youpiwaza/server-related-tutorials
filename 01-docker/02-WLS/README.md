@@ -1,6 +1,14 @@
-# Installation
+# Installation de docker desktop, puis lien vers WSL
 
-Installation sur WLS pour que cela soit plus proche de l'environnement serveur
+Outdated, voir le [repo dédié à l'installation de l'environnement de dev](https://github.com/youpiwaza/install-dev-env).
+
+---
+---
+---
+
+## Old 👴💩
+
+Installation sur WSL pour que cela soit plus proche de l'environnement serveur
 
 [docker doc ubuntu](https://docs.docker.com/install/linux/docker-ce/ubuntu/)
 
