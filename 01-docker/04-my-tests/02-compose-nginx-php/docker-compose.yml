@@ -4,7 +4,8 @@ version: '3.7'
 services:
   web:
     # latest when writing
-    image: nginx:1.17.6-alpine
+    # image: nginx:1.17.6-alpine
+    image: nginx:alpine
     networks:
       - network-php
     ports:
@@ -28,7 +29,8 @@ services:
   
   phpfpm:
     # latest when writing
-    image: 'php:7.4.1-fpm'
+    # image: 'php:7.4.1-fpm'
+    image: 'php:fpm'
     networks:
       - network-php
     volumes:
