@@ -45,5 +45,7 @@
       failed_when: "'Yay tout fonctionne !' not in da_webpage.content"
 
     - debug:
-        msg: 'Affichage du contenu de la page :\n\n{{ da_webpage.content }}'
+        msg:
+          - 'Affichage du contenu de la page :'
+          - '{{ da_webpage.content }}'
 ...

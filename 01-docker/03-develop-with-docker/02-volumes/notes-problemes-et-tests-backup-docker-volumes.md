@@ -93,7 +93,7 @@ docker run --rm -i -t  \
 # ---
 
 ## Test OQ in proper folder
-# 1 / KO / docker guy > permission denied
+# 1 / KO / docker_guy > permission denied
 docker run --rm \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
   --mount type=bind,source=/home/DOCKER_PEON/tests/backups-volumes,destination=/backup \
@@ -231,7 +231,7 @@ Si géré dans le dossier de docker_peon, l'extraction doit être faite par buil
 ```bash
 ## OK / Conteneur temporaire > connexion au volume à sauvegarder & connexion volume bindé sur hôte
 ## "zip" du contenu à sauvegarder & copie sur l'hôte (via le bind)
-# DOCKER GUY, dans /home/DOCKER_PEON/tests/backups-volumes
+# docker_guy, dans /home/DOCKER_PEON/tests/backups-volumes
 docker run --rm -i -t  \
   --mount source=test-helloDeux-logs,destination=/home/volumeContent \
   --mount type=bind,source=$(pwd),destination=/backup \
