@@ -111,10 +111,13 @@ sudo nano /etc/ssh/sshd_config
 #>>    X11Forwarding no
 #>>    AllowTcpForwarding no
 
+# Verify sshd_config file before restarting
+sudo sshd -t
+
 # Save and exit the file. Restart sshd service to take effect the saved changes.
-systemctl restart sshd
+# systemctl restart sshd
 # OR
-# service sshd restart
+sudo service sshd restart
 
 # That’s it, you can check by logging into the your remote SSH and SFTP server by using the step provided above at Verify SSH and SFTP login.
 ```
