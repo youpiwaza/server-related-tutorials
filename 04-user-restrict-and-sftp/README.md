@@ -51,13 +51,14 @@ Here's some must know/notes/tips about this:
 - `/etc/ssh/sshd_config` bullsh*t
   - If new config isn't good, it won't update. Pay attention to error messages when restarting the service. Prefer test the config before with `sudo sshd -t`
   - Under certain circumstances, it won't include `/etc/ssh/sshd_config.d/*.conf` by default. Need to be manually included through `Include /etc/ssh/sshd_config.d/*.conf` in the sshd_config file.
-    - Also note that some/most instructions just **WON'T WORK FOR NO REASON** when included, like `ChrootDirectory` && `ForceCommand`
+    - Also note that some/most instructions just **WON'T WORK FOR NO REASON** when included, like `ChrootDirectory` && `ForceCommand`, [hey SO](https://unix.stackexchange.com/questions/464637/put-forcecommand-in-a-user-specific-configuration-file)
   - They are several commands to restart the ssh service, depending on OS & stuff. Try & note the one working before loosing time.
   - `sshd_config` **doesn't overload configuration** : first instruction is law !
     - If you want to make includes, make them at the beginning of the file, **else they will be ignored** if instruction is already declared by default.
     - Same if no includes. Comment default or declare beforehand.
     - It also has a real problem with same case declarations: don't user `Match User SAME_GUY` several times or some might be ignored. Same for `Match Group`
       - Can also error if `Subsystem sftp  internal-sftp` the Subsystem instruction is declared twice..
+      - cf. [SO](https://unix.stackexchange.com/questions/61655/multiple-similar-entries-in-ssh-config)
   - When using `ChrootDirectory`, pay attention to trailing `/`, as it can error on user login.
   - `ChrootDirectory` allow the use of some aliases
     - `%u` for user name
@@ -105,6 +106,7 @@ sudo groups DA_USER
 
 ## SSH stuff
 # Display current sshd configuration (especially usefull when using Includes or such)
+#       https://unix.stackexchange.com/a/218191
 sudo sshd -T
 sudo sshd -T | sort
 
