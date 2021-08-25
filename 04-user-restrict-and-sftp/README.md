@@ -1,149 +1,74 @@
-# Setting up a restricted user, which can only sftp
+# Setting up a restricted user, which can only sftp in a specific folder, aka chroot prison
 
-The goal here is to provide one user per client website, to allow host file manipulation (secore ftp)
+The goal here is to provide one sftp user per client website, to allow host file manipulation
 
-Note: Those tutorials are slightly outdated, prefer refer to current doc:
+Note: Those tutorials are slightly outdated, prefer refer to current **doc**:
 
 - [Ubuntu 20 adduser/addgroup](https://manpages.ubuntu.com/manpages/focal/fr/man8/adduser.8.html)
 - [Ubuntu 20 sshd_config](https://manpages.ubuntu.com/manpages/focal/man5/sshd_config.5.html)
+- [Ubuntu 20 usermod](https://manpages.ubuntu.com/manpages/focal/fr/man8/usermod.8.html)
 
 Tutorials
 
 - [User sftp restrict](https://www.tecmint.com/restrict-sftp-user-home-directories-using-chroot/) > #Restrict Users to a Specific Directory
 - [Only sftp](https://geraldonit.com/2018/05/02/enabling-sftp-only-access-on-linux/)
 
-Note: Both tutorials seems legit, but won't work with my setup as you need ssh key files (.ppk).
+Note: Both tutorials seems legit, but won't work with my setup as you need ssh key files (.ppk). Edit: Create user through ansible role (incl. keys), then proceed to tutorials.
 
-## Setup one user
+SO
 
-```bash
-### Restrict Users to a Specific Directory
-# In our previous example, we restrict the existing users to the home directory. Now, we will see how to restrict a new user to a custom directory.
+- [home dir management](https://askubuntu.com/a/250877)
+  - Note that users must be logged out else... Yeah just don't log in at the same time (and don't forget to log off after tests)
+  - Don't use `chroot` command, use the User/Group Matches in `sshd_config` & `ChrootDirectory`
+    - Also user `usermod --home FOLDER USER`
 
-## Create Group and New Users
-# Create a new group 'sftpgroup'.
-sudo groupadd sftpgroup
+## (Purge) Notes
 
-# Next, create a directory for SFTP group and assign permissions for the root user.
-sudo mkdir -p /sftpusers/chroot
-sudo chown root:root /sftpusers/chroot/
+This has been a real purge & a long process, some bullsh*t & lots of things not in the official documentation.
 
-# Next, create new directories for each user, to which they will have full access.
-# For example, we will create 'tecmint' user and it’s new home directory with correct group permission using following series of commands.
+Here's some must know/notes/tips about this:
 
-## adduser doc for ubuntu 20
-#       https://manpages.ubuntu.com/manpages/focal/fr/man8/adduser.8.html
-# Also define the shell to /sbin/nologin, which refuse logins but print a nice message
-#       https://ubuntuplace.info/questions/454405/what-is-the-difference-between-sbin-nologin-and-bin-false
-
-
-# > sudo adduser tecmint -g sftpgroup -s /sbin/nologin
-# Option g is ambiguous (gecos, gid, group)
-# Option s is ambiguous (shell, system)
-
-# > sudo adduser tecmint --group sftpgroup --shell /sbin/nologin
-# adduser: Specify only one name in this mode. // Group already exists, so you must use --ingroup
-
-# > sudo adduser tecmint --ingroup sftpgroup --shell /sbin/nologin
-# Adding user `tecmint' ...
-# Adding new user `tecmint' (1004) with group `sftpgroup' ...
-# Creating home directory `/home/tecmint' ...
-# Copying files from `/etc/skel' ...
-# New password:
-# > 12345
-# Retype new password:
-# > 12345
-# passwd: password updated successfully
-# Changing the user information for tecmint
-# Enter the new value, or press ENTER for the default
-#         Full Name []:
-#         Room Number []:
-#         Work Phone []:
-#         Home Phone []:
-#         Other []:
-# Is the information correct? [Y/n] Y
-
-## Debug: remove user & /home/tecmint
-# > sudo userdel tecmint
-# > sudo rm -R /home/tecmint
-
-## Ideally we don't want either home directory nor skeleton folder tree
-sudo adduser tecmint --ingroup sftpgroup --shell /sbin/nologin --no-create-home
-# Adding user `tecmint' ...
-# Adding new user `tecmint' (1004) with group `sftpgroup' ...
-# Not creating home directory `/home/tecmint'.
-# New password:
-# Retype new password:
-# passwd: password updated successfully
-# Changing the user information for tecmint
-# Enter the new value, or press ENTER for the default
-#         Full Name []:
-#         Room Number []:
-#         Work Phone []:
-#         Home Phone []:
-#         Other []:
-# Is the information correct? [Y/n] Y
-
-# Useless with adduser
-# passwd tecmint
-
-# Create custom home directory
-sudo mkdir /sftpusers/chroot/tecmint
-# Create a test file in user folder (to see something when connecting)
-touch /sftpusers/chroot/tecmint/hey.txt
-
-# Use correct group permission
-sudo chown tecmint:sftpgroup /sftpusers/chroot/tecmint/
-sudo chmod 700 /sftpusers/chroot/tecmint/
-
-
-## Configure SSH for SFTP Access
-# Modify or add the following lines at the end of the configuration file: '/etc/ssh/sshd_config'
-sudo nano /etc/ssh/sshd_config
-
-## At the very end
-#>> #Subsystem  	sftp	/usr/libexec/openssh/sftp-server
-#>> Subsystem sftp  internal-sftp
-#>>  
-#>> Match Group sftpgroup
-#>>    ChrootDirectory /sftpusers/chroot/
-#>>    ForceCommand internal-sftp
-#>>    X11Forwarding no
-#>>    AllowTcpForwarding no
-
-# Verify sshd_config file before restarting
-sudo sshd -t
-
-# Save and exit the file. Restart sshd service to take effect the saved changes.
-# systemctl restart sshd
-# OR
-sudo service sshd restart
-
-# That’s it, you can check by logging into the your remote SSH and SFTP server by using the step provided above at Verify SSH and SFTP login.
-```
-
-## Tests
-
-```bash
-## test ssh connexion
-# ssh tecmint@SERVER-IP
-ssh tecmint@169.169.169.169
-# ssh: connect to host 169.169.169.169 port 22: Connection refused
-
-## (Opt) With a specific port
-# ssh tecmint@SERVER-IP -p PORT
-ssh tecmint@169.169.169.169 -p 69
-# tecmint@169.169.169.169: Permission denied (publickey). ## Used noPasswordLogin or something in sshd_config
-
-## Test sftp connexion
-# KO
-# > sftp tecmint@169.169.169.169
-
-# 🚨 big case -P for port, must be before
-# > sftp -P 69 tecmint@169.169.169.169
-# tecmint@169.169.169.169: Permission denied (publickey).
-# Connection closed.
-# Connection closed
-
-Besoin de générer une clé privée publique + ajout au serveur, cf. rôles déjà en place (adapter)
-```
+- Security
+  - When using sftp protocol only, most stuff are restricted: user can mostly `ls cd chmod mkdir touch` & upload/download files (depending on rights & own) but he can't execute scripts or such (from what i've seen).
+  - Note that he (vanilla) still has no access restriction to folders and can `cd ..` or `cd /`, implying the need of the chroot prison (~= can't "escape" from folder) nor edit stuff outside.
+- sftp is compatible with user having shell set to `/sbin/nologin` under certain circumstances (chroot prison &&||? sftp only)
+- sftp can be tested through either
+  - terminal > eval ssh agent, add key & passphrase
+  - software (~filezilla) > Authentication "key file" > set private .ppk
+- Problems encountered
+  - Some commands/params don't work: Make sure to refer to ubuntu doc, PROPER VERSION, and prefer using full params & not aliases, eg. `adduser -g MY_GROUP -s MY_SHELL` >> `adduser --group MY_GROUP --shell MY_SHELL`
+  - Can't sftp connect
+    - Must have ssh keys set (ssh-agent or key file)
+    - Those keys **MUST BE** in user's home folder, in `.ssh/` hidden folder
+      - Use `ls -lah` to check for hidden stuff
+      - This is especially important if user's home directory is moved/renamed
+      - Usually a `.cache/` folder comes along, with specific chmod/chown: `700 root:root`
+    - Don't forget to specify the SSH port, especially if it's custom
+      - Pay attention to syntax & params placement : big case `-P` to specify port, **must be before** adress: `sftp -P 1234 USER@123.123.123.123`
+    - user home directory **must** have correct rights & ownership, ~7XX & USER:GROUP
+    - I'd not recommand shell set as `rbash`
+    - sshd_config shenanigans
+- `/etc/ssh/sshd_config` bullsh*t
+  - If new config isn't good, it won't update. Pay attention to error messages when restarting the service. Prefer test the config before with `sudo sshd -t`
+  - Under certain circumstances, it won't include `/etc/ssh/sshd_config.d/*.conf` by default. Need to be manually included through `Include /etc/ssh/sshd_config.d/*.conf` in the sshd_config file.
+    - Also note that some/most instructions just **WON'T WORK FOR NO REASON** when included, like `ChrootDirectory` && `ForceCommand`
+  - They are several commands to restart the ssh service, depending on OS & stuff. Try & note the one working before loosing time.
+  - `sshd_config` **doesn't overload configuration** : first instruction is law !
+    - If you want to make includes, make them at the beginning of the file, **else they will be ignored** if instruction is already declared by default.
+    - Same if no includes. Comment default or declare beforehand.
+    - It also has a real problem with same case declarations: don't user `Match User SAME_GUY` several times or some might be ignored. Same for `Match Group`
+      - Can also error if `Subsystem sftp  internal-sftp` the Subsystem instruction is declared twice..
+  - When using `ChrootDirectory`, pay attention to trailing `/`, as it can error on user login.
+  - `ChrootDirectory` allow the use of some aliases
+    - `%u` for user name
+    - `%h` for user home directory path
+  - You can specify default folder location when user connects through `ForceCommand internal-sftp -d /FOLDER`
+    - It must be accessible & properly chmod/chown, else connexion KO
+- Chroot prison
+  - Pay attention to target specific user/group, else you'll be lock
+  - Main folder must be own be `root:root` AND can't be editable other than root
+  - Must contains a folder with proper user rights USER:USER|GROUP 7XX
+  - Documents for user to read (README.md) must allow to read, use special rights > 311 & root:root for no modification
+  - Can be set ~anywhere: in `/home`, in `/`, and in another user `/home/DAT_GUY/chroot_prison/` folder as long are rights & config are set properly
+  - User will always have access to main chroot prison folder, but can't get back higher.
+  - You ~can (not tested) set several chroot prison in one system
