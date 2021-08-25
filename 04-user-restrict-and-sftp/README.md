@@ -96,6 +96,7 @@ sudo userdel -r DA_USER
 ## Group stuff
 # Create group
 sudo groupadd DA_GROUP
+sudo groupdel DA_GROUP
 
 # Add user to group
 sudo usermod -a -G DA_GROUP DA_USER
@@ -439,15 +440,15 @@ sudo chown -R bob:esseEffeTayPayAkses /home/docker_peon/clients/_websites_files_
 
 ##### 🎉 SAUVEGARDE DU BAIL 🎉
 #### Arbo
-# /home/docker_peon/clients/_websites_files_sftp_access_chroot_prison/
-#     README.md >> Not really the datas, only access to named volumes (l'intérêt c'de pouvoir kill les conteneurs temp/ afin de renforcer la sécu)
-#     /%u---DASHED-URI              // chroot prison template : CET utilisateur (& son site : 1 utilisateur par site)
-#     /michel---michel--com         // chroot prison de CET utilisateur
-#     /bob---bob--com               // chroot prison de CET utilisateur
-#       /.cache/                    // root:root 700
-#       /.ssh/                      // root:root 700
+# /home/docker_peon/clients/_websites_files_sftp_access_chroot_prison/                                      / root:root 755
+#     README.md >> Not really the datas, only access to named volumes (l'intérêt c'de pouvoir kill les conteneurs temp/ afin de renforcer la sécu)  / root:root 311
+#     /%u---DASHED-URI              // chroot prison template : CET utilisateur (& son site : 1 utilisateur par site) / root:root 755
+#     /michel---michel--com         // chroot prison de CET utilisateur / root:root 755
+#     /bob---bob--com               // chroot prison de CET utilisateur / root:root 755
+#       /.cache/                    // bob:bob 700
+#       /.ssh/                      // bob:bob 700
 #       /README.md                  // root:root 311 -rw-r--r-- > Ne rien modifier ici, de toutes manières tu peux pas laul
-#       /yay_fun                    // bob:esseEffeTayPayAkses 700 + point d'arrivée de l'utilisateur (il peut remonter dans /bob---bob--com mais pas plus haut)
+#       /yay_fun                    // bob:bob 700 + point d'arrivée de l'utilisateur (il peut remonter dans /bob---bob--com mais pas plus haut)
 #         /README.md                // root:root 311 -rw-r--r-- > # Hellow /n Ton petit dossier d'utilisateur ubuntu a toi ;) /n Tu as accès aux fichiers des sites (configs & volumes des conteneurs) dans les différents dossiers présents ici. /n Si c'pas la go me demander d'activer le conteneur dédié. /n Bonne journée
 #         /configs                    
 #         /volume1                    
