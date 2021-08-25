@@ -135,7 +135,6 @@ sudo rm -R PATH_TO_REMOVE
 
 ```ini
 ### Simple example
-## Disable default config, else error
 # Subsystem     sftp    /usr/lib/openssh/sftp-server
 Subsystem   sftp    internal-sftp
 
@@ -150,6 +149,8 @@ Match Group DA_GROUP
 
 ### Explanations
 ## Restrict sftp
+## Disable default config, else error
+# Subsystem     sftp    /usr/lib/openssh/sftp-server
 Subsystem   sftp    internal-sftp
 
 ## Target only a user or all users from a group
