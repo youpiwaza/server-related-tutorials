@@ -1,7 +1,7 @@
 # Monter un compose Nginx & PHP, avec sources bindées
 
 ```bash
-> cd /mnt/c/Users/Patolash/Documents/_dev/server-related-tutorials/01-docker/04-my-tests/02-compose-nginx-php
+> cd /mnt/c/Users/Patolash/Documents/_dev/__dev_current/server-related-tutorials/01-docker/04-my-tests/02-compose-nginx-php
 > docker-compose up
 ```
 
