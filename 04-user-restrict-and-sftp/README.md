@@ -466,3 +466,134 @@ sudo chown -R bob:esseEffeTayPayAkses /home/docker_peon/clients/_websites_files_
 ```
 
 Yay let's automate this horsesh*t and never speak of it again.
+
+## Automation / CHANGE VARS AVANT COMMIT / Bind a named volume
+
+Notes & pistes
+
+- Only with named volumes existing data is copied from the container target folder into the volume.
+- 💩 KO / Bind autre dossier + Création d'un lien symbolique
+  - liens symboliques [doc fr](https://doc.ubuntu-fr.org/lien_physique_et_symbolique)
+  - Virer un lien (symbolique) `unlink LIEN`
+- Serveur sftp en tant que conteneur, utilisant le même volume nommé
+  - [docker forum](https://forums.docker.com/t/shared-web-hosting-with-docker-best-practices/7893/3)
+  - dockerhub > [maintained sftp](https://hub.docker.com/r/atmoz/sftp)
+- Site de dev > docker cp prod vers host > dev avec bind edit > docker cp dev vers prod
+  - `docker cp` Copy files/folders between a container and the local filesystem
+    - [doc](https://docs.docker.com/engine/reference/commandline/cp/)
+
+```bash
+# Monter un conteneur ubuntu alakon afin de bind un volume dans un rep
+#     https://docs.docker.com/engine/reference/run/
+#     https://docs.docker.com/storage/volumes/
+# Récup du named volume via --volumes-from
+# Mise a dispo via un BIND
+docker run --rm -i -t  \
+  ## Mount all volumes related to the container
+  # --volumes-from CONTAINER
+  ## Create a new volume binded to a SOURCE path on the host
+
+  --mount destination=/home/volumeContent,source=/home/singed_the_docker_peon_9f3eqk4s9/tests/masamune/bind-volumes,type=bind \
+  -w /home/volumeContent \
+  alpine:latest \
+  /bin/ash
+
+### nc
+## Tests w. hello-masa-fr, using ~nginx
+# cf. ansible-install-web-server\ansible\generated\tests\masamune\hello--masamune--fr\stack\hello--masamune--fr---nginx--generated.yml
+
+# OK > Les fichiers présents dans le dossier host sont visibles dans le conteneur
+docker run --rm -i -t  \
+  --mount destination=/home/volumeContent,source=/home/singed_the_docker_peon_9f3eqk4s9/tests/masamune/bind-volumes,type=bind \
+  -w /home/volumeContent/ \
+  alpine:latest \
+  /bin/ash
+
+# OK > ls dans conteneur > on a les fichiers
+docker run --rm -i -t  \
+  --volumes-from test---hello--masamune--fr_nginx.1.nt838dx0c46q00t4mhgewfbn6 \
+  -w /var/log/ \
+  alpine:latest \
+  /bin/ash
+
+# KO > le mount écrase le contenu du volume-from
+docker run --rm -i -t  \
+  --mount destination=/var/log/,source=/home/singed_the_docker_peon_9f3eqk4s9/tests/masamune/bind-volumes,type=bind \
+  --volumes-from test---hello--masamune--fr_nginx.1.nt838dx0c46q00t4mhgewfbn6 \
+  -w /var/log/ \
+  alpine:latest \
+  /bin/ash
+
+# OK // Essai en montant le volume nommé plutôt que les volumes d'un conteneur
+docker run --rm -i -t  \
+  --mount destination=/var/log/,source=test---hello--masamune--fr---nginx--logs,type=volume \
+  -w /var/log/ \
+  alpine:latest \
+  /bin/ash
+
+# double trouble # Prevent duplicate mount point
+#   /var/log/ contient bien les logs
+#   /home/ contient bien 'hey' présent sur l'hôte
+docker run --rm -i -t  \
+  --mount destination=/var/log/,source=test---hello--masamune--fr---nginx--logs,type=volume \
+  --mount destination=/home/,source=/home/singed_the_docker_peon_9f3eqk4s9/tests/masamune/bind-volumes,type=bind \
+  -w /var/log/ \
+  alpine:latest \
+  /bin/ash
+
+# KO, /home/ chown is nobody
+>> ln –s /var/log/ /home/
+
+# fuck chown
+# Création du lien oké
+# KO, /home/ contient le lien symbolique vers /var/log, et c'est bien répercuté sur l'hôte
+#     DANS LE PUTAIN DE SENS ou sur l'hôte on est redirigés vers /var/log de l'hôte wtf
+docker run --rm -i -t  \
+  --mount destination=/var/log/,source=test---hello--masamune--fr---nginx--logs,type=volume \
+  --mount destination=/home/,source=/home/singed_the_docker_peon_9f3eqk4s9/tests/masamune/bind-volumes,type=bind \
+  --userns=host \
+  -w /var/log/ \
+  alpine:latest \
+  /bin/ash
+
+>> ln –s /var/log/ /home/
+
+# ln -s > symbolique ; need lien physique
+# KO // Cross-device link
+>> ln /var/log/ /home/
+
+# Essai sans les / finaux -_-
+# KO
+>> ln -s /var/log /home
+# KO
+>> ln /var/log /home
+
+# ---
+
+### Test sftp container
+# https://hub.docker.com/r/atmoz/sftp
+# docker run \
+#     -v <host-dir>/upload:/home/foo/upload \
+#     -p 2222:22 -d atmoz/sftp \
+#     foo:pass:1001
+
+# OK
+docker run --rm -i -t \
+    -v /home/singed_the_docker_peon_9f3eqk4s9/tests/masamune/bind-volumes:/home/foo/upload \
+    -p 2222:22 \
+    atmoz/sftp \
+    foo:pass:1101
+
+# OK
+sftp -P 2222 foo@188.165.253.170
+
+# w. bind. volumes
+docker run --rm -i -t \
+    --mount destination=/var/log/,source=test---hello--masamune--fr---nginx--logs,type=volume \
+    --name 
+    -p 2222:22 \
+    -w /var/log/ \
+    atmoz/sftp \
+    foo:pass:1101
+
+```
